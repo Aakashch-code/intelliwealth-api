@@ -1,0 +1,170 @@
+# ========== Build & packaging ==========
+/target/
+/build/
+/out/
+/*.jar
+/*.war
+/*.ear
+/*.zip
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Allow target/build under test/main, but ignore generic targets
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Gradle
+.gradle/
+gradle-app.setting
+gradle-wrapper.jar
+
+# ========== IDEs & editors ==========
+# STS / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+# Keep workspace files out
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Other editors
+*.swp
+*~.nib
+*~.kate-swp
+*.sublime-workspace
+*.sublime-project
+
+# ========== OS files ==========
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========== Logs & reports ==========
+*.log
+logs/
+logging/
+test-results/
+coverage/
+reports/
+surefire-reports/
+target/surefire-reports/
+
+# ========== Local config & envs (DO NOT PUBLISH) ==========
+# environment files (common)
+.env
+.env.*
+.envrc
+secrets.env
+
+# Spring Boot local overrides / secrets
+/application-*.yml
+/application-*.yaml
+src/main/resources/application.properties
+# if you keep application.yml in repo, DO NOT ignore it; this pattern is for local/dev files:
+application-local.yml
+application-dev.yml
+application-test.yml
+application-secrets.yml
+credentials.yml
+secrets.yml
+
+# JVM keystores & certs
+*.jks
+*.keystore
+keystore.jks
+*.pem
+*.p12
+*.crt
+certs/
+private/
+
+# SSH keys, GPG keys
+id_rsa
+id_rsa.pub
+*.asc
+*.gpg
+*.pem
+
+# ========== Docker ==========
+docker-compose.override.yml
+docker-compose.*.yml
+docker/.env
+**/docker/.env
+
+# ========== Dependency caches ==========
+/.gradle/
+/.idea/libraries/
+.m2/repository/
+# If you accidentally committed local maven settings:
+settings.xml
+
+# ========== Node / frontend (if present) ==========
+node_modules/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+.pnp/
+.pnp.js
+
+# ========== Test / debug ==========
+*.class
+*.tmp
+*.cache
+*.pid
+*.seed
+
+# ========== CI / local generated ==========
+ci-output/
+dist/
+bin/
+tmp/
+
+# ========== Coverage / analysis ==========
+.coverage
+coverage/
+*.lcov
+
+# ========== Misc ==========
+*.sqlite
+*.db
+*.bak
+*.swp
+*.swo
+
+# ========== Editor/project specific ==========
+.history/
+*.log
+
+# ========== Local tooling ==========
+.prettiercache
+.eslintcache
+
+# ========== Security: block common secret file names ==========
+*.secret
+*.credentials
+*.key
+*.env.local
+*.env.production
