@@ -1,65 +1,106 @@
 package com.example.intelliwealth.service;
 
+import com.example.intelliwealth.dto.transactions.TransactionDTO;
+import com.example.intelliwealth.mapper.transactions.TransactionMapper;
 import com.example.intelliwealth.model.Transaction;
 import com.example.intelliwealth.repository.TransactionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TransactionService {
 
     @Autowired
     private TransactionsRepository repo;
 
-    // GET
+    @Autowired
+    private TransactionMapper mapper;
 
-    public List<Transaction> getAllTransactions() {
-        return repo.findAll();
+    // ===================== GET =====================
+
+    public List<TransactionDTO> getAllTransactions() {
+        return repo.findAll()
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Transaction getTransactionById(int transactionNum) {
-        return repo.findById(transactionNum)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found with id: " + transactionNum));
+    public TransactionDTO getTransactionById(int transactionNum) {
+        Transaction entity = repo.findById(transactionNum)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Transaction not found with id: " + transactionNum));
+
+        return mapper.toDTO(entity);
     }
 
-    public List<Transaction> getTransactionsByType(String type) {
-        return repo.findByType(type);
+    public List<TransactionDTO> getTransactionsByType(String type) {
+        return repo.findByType(type)
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public double getIncomeAmount() {
-        return repo.findByType("INCOME").stream()
-                .mapToDouble(t -> t.getAmount().doubleValue())
-                .sum();
+    // ===================== CALCULATIONS =====================
+
+    public BigDecimal getIncomeAmount() {
+        return repo.findByType("INCOME")
+                .stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public double getExpenseAmount() {
-        return repo.findByType("EXPENSE").stream()
-                .mapToDouble(t -> t.getAmount().doubleValue())
-                .sum();
+    public BigDecimal getExpenseAmount() {
+        return repo.findByType("EXPENSE")
+                .stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // POST
-
-    public Transaction createTransaction(Transaction transaction) {
-        return repo.save(transaction);
+    public BigDecimal calculateNetAmount() {
+        return getIncomeAmount().subtract(getExpenseAmount());
     }
 
-    // PUT
+    // ===================== SEARCH =====================
 
-    public Transaction updateTransaction(int id, Transaction transaction) {
+    public List<TransactionDTO> searchTransactions(String keyword) {
+        return repo.findByDescriptionContainingIgnoreCase(keyword)
+                .stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ===================== POST =====================
+
+    public TransactionDTO createTransaction(TransactionDTO dto) {
+        Transaction entity = mapper.toEntity(dto);
+        Transaction saved = repo.save(entity);
+        return mapper.toDTO(saved);
+    }
+
+    // ===================== PUT =====================
+
+    public TransactionDTO updateTransaction(int id, TransactionDTO dto) {
         Transaction existing = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found with id: " + id));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Transaction not found with id: " + id));
 
-        existing.setType(transaction.getType());
-        existing.setAmount(transaction.getAmount());
-        existing.setDescription(transaction.getDescription());
+        existing.setType(dto.getType());
+        existing.setDescription(dto.getDescription());
+        existing.setAmount(dto.getAmount());
+        existing.setCategory(dto.getCategory());
+        existing.setSource(dto.getSource());
+        existing.setTransactionId(dto.getTransactionId());
+        existing.setCreatedAt(dto.getCreatedAt());
 
-
-        return repo.save(existing);
+        Transaction updated = repo.save(existing);
+        return mapper.toDTO(updated);
     }
 
-    // DELETE
+    // ===================== DELETE =====================
 
     public void deleteTransaction(int id) {
         repo.deleteById(id);
@@ -67,15 +108,5 @@ public class TransactionService {
 
     public void deleteAllTransactions() {
         repo.deleteAll();
-    }
-
-    // CALCULATIONS
-
-    public double calculateNetAmount() {
-        return getIncomeAmount() - getExpenseAmount();
-    }
-
-    public List<Transaction> searchTransactions(String keyword) {
-        return repo.findByDescriptionContainingIgnoreCase(keyword);
     }
 }
