@@ -1,5 +1,8 @@
 package com.example.intelliwealth.model;
 
+import com.example.intelliwealth.config.CurrencySerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -28,8 +32,7 @@ public class Transaction {
     private String transactionId;
     private String category;
     private String source;
-    private Date createdAt;
-    private String note;
+    private LocalDate createdAt;
 
 
 
