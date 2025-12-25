@@ -1,53 +1,61 @@
 package com.example.intelliwealth.controller;
 
-import com.example.intelliwealth.model.Goal;
-import com.example.intelliwealth.model.Subscription;
+import com.example.intelliwealth.dto.subscription.SubscriptionRequestDTO;
+import com.example.intelliwealth.dto.subscription.SubscriptionResponseDTO;
 import com.example.intelliwealth.service.SubscriptionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api")
-
+@RequestMapping("/api/subscriptions")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
+@Tag(name = "Subscription Management", description = "Manage user subscriptions")
 public class SubscriptionController {
 
-    @Autowired
-    private SubscriptionService service;
+    private final SubscriptionService service;
 
-    //Get
-    @GetMapping("/subscription")
-    public List<Subscription> getAllSubscription() {
-        return service.getAllSubscription();
+    // --- Endpoints ---
+
+    @Operation(summary = "Get all subscriptions", description = "Fetch all, or filter using ?active=true/false")
+    @GetMapping
+    public List<SubscriptionResponseDTO> getAll(
+            @Parameter(description = "Filter by status") @RequestParam(required = false) Boolean active) {
+        if (active != null) {
+            return active ? service.getActiveSubscriptions() : service.getInactiveSubscriptions();
+        }
+        return service.getAllSubscriptions();
     }
 
-    @GetMapping("/subscription/{subscriptionId}")
-    public Subscription getSubscriptionById(@PathVariable int subscriptionId) {
-        return service.getSubscriptionById(subscriptionId);
+    @Operation(summary = "Create subscription")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubscriptionResponseDTO create(@RequestBody SubscriptionRequestDTO dto) {
+        return service.createSubscription(dto);
     }
 
-    //Put
-    @PutMapping("/subscription/{subscriptionId}")
-    public Subscription updateSubscriptionById (@RequestBody Subscription subscriptionId) {
-        return service.updateSubscription(subscriptionId);
-    }
-    //Post
-    @PostMapping("/subscription")
-    public Subscription createSubscription (@RequestBody Subscription subscription) {
-        return service.createSubscription(subscription);
+    @Operation(summary = "Get by ID")
+    @GetMapping("/{id}")
+    public SubscriptionResponseDTO getById(@PathVariable Long id) {
+        return service.getSubscriptionById(id);
     }
 
-    //Delete
-    @DeleteMapping("/subscription/{subscriptionId}")
-    public void deleteSubscription (@PathVariable long subscriptionId) {
-        service.deleteSubscriptionById(subscriptionId);
-    }
-    @DeleteMapping("/subscription")
-    public void deleteAllSubscription () {
-        service.deleteAllSubscription();
+    @Operation(summary = "Toggle Status", description = "Pauses or Resumes a subscription")
+    @PutMapping("/{id}/toggle")
+    public SubscriptionResponseDTO toggle(@PathVariable Long id) {
+        return service.toggleSubscriptionStatus(id);
     }
 
-
+    @Operation(summary = "Delete permanently")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.hardDeleteSubscription(id);
+    }
 }

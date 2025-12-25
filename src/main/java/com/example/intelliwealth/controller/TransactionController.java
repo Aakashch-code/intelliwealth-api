@@ -1,6 +1,7 @@
 package com.example.intelliwealth.controller;
 
-import com.example.intelliwealth.dto.transactions.TransactionDTO;
+import com.example.intelliwealth.dto.transactions.TransactionRequestDTO;
+import com.example.intelliwealth.dto.transactions.TransactionResponseDTO;
 import com.example.intelliwealth.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,85 +9,70 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/transactions")
-@Tag(
-        name = "Transaction Management",
-        description = "Operations related to income and expense tracking"
-)
+@CrossOrigin(origins = "http://localhost:5173")
 public class TransactionController {
 
+    private final TransactionService service;
+
     @Autowired
-    private TransactionService service;
+    public TransactionController(TransactionService service) {
+        this.service = service;
+    }
 
-    // ===================== GET RESOURCES =====================
+    // ===================== GET =====================
 
-    @Operation(
-            summary = "Retrieve transactions",
-            description = "Get all transactions, or filter them by a keyword search."
-    )
     @GetMapping
-    public List<TransactionDTO> getTransactions(
-            @Parameter(description = "Optional keyword to filter results", example = "Grocery")
+    public List<TransactionResponseDTO> getTransactions(
             @RequestParam(required = false) String keyword) {
 
-        // If keyword exists, search; otherwise, get all.
-        // You might need to adjust your service to handle this logic,
-        // or call the specific service method here based on the param.
-        if (keyword != null && !keyword.isEmpty()) {
+        if (keyword != null && !keyword.isBlank()) {
             return service.searchTransactions(keyword);
         }
         return service.getAllTransactions();
     }
 
-    @Operation(
-            summary = "Get transaction by ID",
-            description = "Retrieve a specific transaction using its unique ID."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Transaction found"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
-    })
     @GetMapping("/{id}")
-    public TransactionDTO getTransactionById(@PathVariable int id) {
+    public TransactionResponseDTO getTransactionById(@PathVariable int id) {
         return service.getTransactionById(id);
     }
 
-    // ===================== ANALYTICS / AGGREGATES =====================
+    // ===================== SUMMARY =====================
 
-    @Operation(
-            summary = "Get financial summary",
-            description = "Calculates the net amount (Income - Expenses)."
-    )
-    @GetMapping("/summary") // Naming it "summary" allows you to add Total Income/Expense later easily
-    public BigDecimal getFinancialSummary() {
+    @GetMapping("/summary")
+    public BigDecimal getNetAmount() {
         return service.calculateNetAmount();
     }
 
-    // ===================== POST RESOURCES =====================
+    // ===================== POST =====================
 
-    @Operation(
-            summary = "Create transaction",
-            description = "Creates a new income or expense transaction."
-    )
     @PostMapping
-    public TransactionDTO createTransaction(@RequestBody TransactionDTO transaction) {
-        return service.createTransaction(transaction);
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionResponseDTO createTransaction(
+            @RequestBody TransactionRequestDTO request) {
+        return service.createTransaction(request);
     }
 
-    // ===================== DELETE RESOURCES =====================
+    // ===================== PUT =====================
 
-    @Operation(
-            summary = "Clear transaction history",
-            description = "Removes all transactions from the database."
-    )
+    @PutMapping("/{id}")
+    public TransactionResponseDTO updateTransaction(
+            @PathVariable int id,
+            @RequestBody TransactionRequestDTO request) {
+        return service.updateTransaction(id, request);
+    }
+
+    // ===================== DELETE =====================
+
     @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearAllTransactions() {
         service.deleteAllTransactions();
     }
