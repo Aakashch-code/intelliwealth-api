@@ -1,16 +1,16 @@
 package com.example.intelliwealth.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.intelliwealth.config.CurrencySerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -21,10 +21,21 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
     private BigDecimal amount;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String billingCycle;
-    private Date nextRecurrence;
+
+    @Column(nullable = false)
     private String category;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate nextRecurrence;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
 }

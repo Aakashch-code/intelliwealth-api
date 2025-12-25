@@ -1,33 +1,33 @@
-package com.example.intelliwealth.model;
+package com.example.intelliwealth.dto.budget;
 
 import com.example.intelliwealth.config.CurrencySerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-public class Budget {
+@Schema(description = "Response object containing budget details")
+public class BudgetResponseDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier of the budget", example = "1")
     private int id;
+
+    @Schema(description = "The category of the budget", example = "Groceries")
     private String category;
+
+    @Schema(description = "The billing date formatted as dd-MM-yyyy", example = "01-12-2023")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date billingPeriod;
+
+    @Schema(description = "Total amount allocated", example = "500.00")
     @JsonSerialize(using = CurrencySerializer.class)
     private BigDecimal amountAllocated;
+
+    @Schema(description = "Total amount spent", example = "150.75")
     @JsonSerialize(using = CurrencySerializer.class)
     private BigDecimal amountSpent;
 }

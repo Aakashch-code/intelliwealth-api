@@ -1,6 +1,8 @@
 package com.example.intelliwealth.controller;
 
 import com.example.intelliwealth.service.FinancialChatService;
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +13,11 @@ public class FinancialChatController {
     @Autowired
     private FinancialChatService financialChatService;
 
+    @Getter
     static class ChatRequest {
-        private String query;
         // getter and setter
-        public String getQuery() { return query; }
+        private String query;
+
         public void setQuery(String query) { this.query = query; }
     }
 

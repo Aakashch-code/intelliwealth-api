@@ -1,12 +1,15 @@
 package com.example.intelliwealth.service;
 
+import com.example.intelliwealth.dto.budget.BudgetResponseDTO;
+import com.example.intelliwealth.dto.goal.GoalResponse;
+import com.example.intelliwealth.dto.subscription.SubscriptionResponseDTO;
+import com.example.intelliwealth.dto.transactions.TransactionResponseDTO;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.intelliwealth.model.Budget;
 import com.example.intelliwealth.model.Subscription;
-import com.example.intelliwealth.model.Transaction;
 import com.example.intelliwealth.model.Goal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,10 +42,10 @@ public class FinancialChatService {
     public String getPersonalizedAdvice(String userQuery) {
 
         // 1) Fetch all four datasets
-        List<Budget> budgets = budgetService.getAllBudget();
-        List<Subscription> subscriptions = subscriptionService.getAllSubscription();
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        List<Goal> goals = goalService.getAllGoal();
+        List<BudgetResponseDTO> budgets = budgetService.getAllBudgets();
+        List<SubscriptionResponseDTO> subscriptions = subscriptionService.getAllSubscriptions();
+        List<TransactionResponseDTO> transactions = transactionService.getAllTransactions();
+        List<GoalResponse> goals = goalService.getAllGoal();
 
         // 2) Serialize them (pretty printed so the model can read easily)
         String budgetsJson = "[]";
