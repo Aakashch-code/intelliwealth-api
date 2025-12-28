@@ -2,10 +2,13 @@ package com.example.intelliwealth.wealth.asset;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AssetService {
@@ -13,71 +16,71 @@ public class AssetService {
     private final AssetRepository repo;
     private final AssetsMapper mapper;
 
-    // ---------------- CREATE ----------------
-    public Asset createAsset(AssetsRequestDTO dto) {
-
+    @Transactional
+    public AssetsResponseDTO createAsset(AssetsRequestDTO dto) {
+        // 1. Initialize attributes if null to avoid NullPointer
         if (dto.getAttributes() == null) {
             dto.setAttributes(new HashMap<>());
         }
 
-        // STRICT validation for create
-        AssetValidator.validateAttributes(
-                dto.getCategory(),
-                dto.getAttributes()
-        );
+        // 2. Validate dynamic attributes
+        AssetValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
 
-        return repo.save(mapper.toEntity(dto));
+        // 3. Save
+        Asset entity = mapper.toEntity(dto);
+        Asset savedEntity = repo.save(entity);
+
+        // 4. Return DTO
+        return mapper.toDto(savedEntity);
     }
 
-    // ---------------- UPDATE ----------------
-    public Asset modifyAsset(AssetsRequestDTO dto, String id) {
+    public AssetsResponseDTO modifyAsset(AssetsRequestDTO dto, String id) {
+        Asset existingAsset = repo.findById(id)
+                .orElseThrow(() -> new AssetNotFoundException("Asset with ID " + id + " not found"));
 
-        Asset asset = getAssetById(id);
+        // Update fields
+        existingAsset.setName(dto.getName());
+        existingAsset.setMainCategory(dto.getMainCategory());
+        existingAsset.setCategory(dto.getCategory());
+        existingAsset.setCurrentValue(dto.getCurrentValue());
+        existingAsset.setDateAcquired(dto.getDateAcquired());
 
-        asset.setName(dto.getName());
-        asset.setMainCategory(dto.getMainCategory());
-        asset.setCategory(dto.getCategory());
-        asset.setCurrentValue(dto.getCurrentValue());
-        asset.setDateAcquired(dto.getDateAcquired());
-
+        // Merge attributes carefully
         if (dto.getAttributes() != null) {
-            if (asset.getAttributes() == null) {
-                asset.setAttributes(new HashMap<>());
+            if (existingAsset.getAttributes() == null) {
+                existingAsset.setAttributes(new HashMap<>());
             }
-            asset.getAttributes().putAll(dto.getAttributes());
+            existingAsset.getAttributes().putAll(dto.getAttributes());
         }
 
-        // Validate AFTER merge
-        AssetValidator.validateAttributes(
-                asset.getCategory(),
-                asset.getAttributes()
-        );
+        // Validate state after merge
+        AssetValidator.validateAttributes(existingAsset.getCategory(), existingAsset.getAttributes());
 
-        return repo.save(asset);
+        Asset savedEntity = repo.save(existingAsset);
+        return mapper.toDto(savedEntity);
     }
 
-    // ---------------- OTHERS ----------------
     public List<AssetsResponseDTO> getAllAssets() {
         return repo.findAll().stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    public Asset getAssetById(String id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Asset not found"));
+    public AssetsResponseDTO getAssetById(String id) {
+        Asset asset = repo.findById(id)
+                .orElseThrow(() -> new AssetNotFoundException("Asset with ID " + id + " not found"));
+        return mapper.toDto(asset);
     }
 
     public BigDecimal allAssetsAmount() {
-        return repo.findAll()
-                .stream()
+        return repo.findAll().stream()
                 .map(Asset::getCurrentValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void deleteAsset(String id) {
         if (!repo.existsById(id)) {
-            throw new RuntimeException("Asset not found");
+            throw new AssetNotFoundException("Cannot delete. Asset with ID " + id + " not found");
         }
         repo.deleteById(id);
     }

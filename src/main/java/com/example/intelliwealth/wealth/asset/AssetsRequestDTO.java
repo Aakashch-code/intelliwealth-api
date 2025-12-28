@@ -10,22 +10,22 @@ import java.util.Map;
 
 @Data
 public class AssetsRequestDTO {
-
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotNull
+    @NotNull(message = "Main Category is required")
     private AssetMainCategory mainCategory;
 
-    @NotNull
+    @NotNull(message = "Category is required")
     private AssetCategory category;
 
-    @NotNull
+    @NotNull(message = "Current Value is required")
     private BigDecimal currentValue;
 
-    @NotNull
+    @NotNull(message = "Date Acquired is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateAcquired;
 
+    // This allows the user to send dynamic fields
     private Map<String, Object> attributes;
 }
