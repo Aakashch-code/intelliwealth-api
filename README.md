@@ -1,48 +1,55 @@
 # 💰 Intelli Wealth - Backend API
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green?style=flat-square&logo=springboot)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square&logo=postgresql)
+![AI](https://img.shields.io/badge/AI_Engine-Fynix-purple?style=flat-square&logo=openai)
+![Swagger](https://img.shields.io/badge/Docs-Swagger_UI-85ea2d?style=flat-square&logo=swagger)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
-**Intelli Wealth** is the backend server for a comprehensive personal finance management platform. It exposes a robust RESTful API designed to track wealth, manage diverse assets, and calculate real-time financial health metrics.
+**Intelli Wealth** is a modular personal finance engine built with Spring Boot. It provides a comprehensive set of RESTful APIs to track wealth, manage liabilities, calculate financial health metrics, and generate AI-driven insights via the custom **Fynix** engine.
 
-This repository contains the **server-side logic**, database architecture, and security implementation (JWT) that powers the user dashboard.
+This repository hosts the **backend core**, focusing on domain-driven design and a clean "Package-by-Feature" architecture.
+
+> **Current Status:** 🚧 Active Development. (Security layers and Frontend integration are planned for future updates).
 
 ---
 
-## 📸 API Output & Frontend Integration
-*Note: This repository hosts the backend code. The images below demonstrate how the API data is consumed and rendered by the client application.*
+## 🔌 API Documentation & Architecture
 
-### 1. Dashboard - Populated Data
-> **Backend Role:** The API aggregates Net Worth (Assets - Liabilities), fetches the last 10 transactional records, calculates monthly spending vs. budget, and retrieves active goals via the `/api/v1/dashboard/overview` endpoint.
+The application exposes a fully documented REST API via **Swagger UI**.
 
-![Dashboard Populated](https://github.com/user-attachments/assets/2eafa37b-63b0-4054-9ca7-a8037821243a)
+### API Modules
+The backend is divided into distinct functional domains as seen in the API interface:
 
-### 2. Dashboard - Empty State
-> **Backend Role:** The API handles new user states gracefully, returning standardized zero-values and empty DTO lists to ensure the frontend renders a clean "Welcome" state without crashing.
+* **Fynix AI:** Intelligent financial chat and summary generation.
+* **Wealth Management:** Net worth aggregation, Asset tracking, and Debt management.
+* **Protection:** Insurance policy tracking and Contingency (Emergency Fund) planning.
+* **Core Finance:** Budgeting, Goals, Transactions, and Subscriptions.
 
-![Dashboard Empty](https://github.com/user-attachments/assets/ed82ffef-e673-40fd-af53-716ee7a143e7)
-
+![img.png](img.png)
 ---
 
 ## 🌟 Key Features
 
-### 🔐 Security & Auth
-* **JWT Authentication:** Stateless session management using JSON Web Tokens.
-* **Role-Based Access:** Secure endpoints for user data protection.
+### 🧠 Fynix AI Module
+* **Financial Chatbot:** `FinancialChatController` handles context-aware queries about user data.
+* **Smart Summaries:** Automated extraction of key financial metrics and recommendations.
+* **Prompt Engineering:** Custom `FynixPromptBuilder` and `AiJsonExtractor` for structured AI responses.
 
-### 💸 Core Finance Engine
-* **Transaction Management:** CRUD operations for incomes and expenses with categorization.
-* **Budgeting System:** Logic to compare defined budgets against actual transaction data.
-* **Subscription Tracker:** Monitors recurring expenses (e.g., Netflix, Gym) to calculate monthly fixed costs.
+### 🛡️ Protection & Contingency
+* **Insurance Engine:** Manages Life, Health, and General insurance with specific attributes (frequency, premium, coverage).
+* **Contingency Planning:** Specialized logic to calculate financial survival capability in months based on liquid assets.
 
-### 📈 Wealth & Analytics
-* **Net Worth Calculator:** Real-time aggregation formula: `(Total Assets + Liquid Cash) - (Liabilities)`.
-* **Asset Portfolio:** Supports multiple asset classes:
-    * *Real Estate* (Commercial/Residential)
-    * *Market Instruments* (Bonds, Gold, Mutual Funds)
-* **Goal Tracking:** Progress calculation logic for specific savings targets.
+### 📈 Wealth Management
+* **Asset & Debt Tracking:** Dedicated controllers for managing Assets (`Real Estate`, `Gold`, `Mutual Funds`) and Liabilities.
+* **Net Worth Engine:** Real-time calculation service that aggregates data from Asset and Debt repositories.
+* **Attribute Rules:** Dynamic validation rules for different asset/debt categories.
+
+### 💸 Core Services
+* **Smart Budgeting:** Compare actual spending against defined budgets.
+* **Goal Tracking:** Monitor progress toward specific financial targets (e.g., "Buy a House").
+* **Subscription Manager:** Tracks recurring payments to identify fixed monthly costs.
 
 ---
 
@@ -53,22 +60,34 @@ This repository contains the **server-side logic**, database architecture, and s
 | **Language** | Java 21 |
 | **Framework** | Spring Boot 3.x |
 | **Database** | PostgreSQL |
-| **Security** | Spring Security & JWT |
+| **AI Integration** | Custom AI Service / Ollama (Local) |
+| **Documentation** | Swagger / OpenAPI 3.0 |
 | **Build Tool** | Maven |
-| **Architecture** | Layered (Controller, Service, Repository) |
+| **Architecture** | Modular Monolith (Package-by-Feature) |
 
 ---
 
 ## 📂 Project Structure
 
-A look at the layered architecture used to separate concerns:
+The project utilizes a **Package-by-Feature** directory structure to ensure high cohesion and modularity.
 
 ```text
-src/main/java/com/intelliwealth
-├── config       # Security configuration & CORS setup
-├── controller   # REST API Endpoints (Request/Response handling)
-├── service      # Business Logic (Calculations, Validations)
-├── repository   # JPA Interfaces for Database Access
-├── entity       # Database Models (Hibernate Entities)
-├── dto          # Data Transfer Objects (API Payloads)
-└── utils        # JWT Utilities & Helper classes
+src/main/java/com/example/intelliwealth
+├── config              # Global Configuration (AI, Swagger, Web, Currency)
+├── core
+│   ├── budget          # Budgeting logic
+│   └── goal            # Financial Goals management
+├── wealth
+│   ├── asset           # Asset tracking & attribute rules
+│   ├── debt            # Liability management
+│   └── networth        # Aggregation logic
+├── protection
+│   ├── insurance       # Insurance policies & validation
+│   └── contingency     # Emergency fund calculations
+├── fynix               # AI Module
+│   ├── controller      # Chat API endpoints
+│   ├── service         # AI Context processing
+│   └── util            # JSON extractors & Prompt builders
+├── subscription        # Recurring expense management
+├── transaction         # Core ledger (Income/Expense)
+└── exception           # Global Exception Handling
