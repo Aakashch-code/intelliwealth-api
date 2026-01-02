@@ -4,31 +4,35 @@ import com.example.intelliwealth.wealth.asset.Asset;
 import com.example.intelliwealth.wealth.debt.Debt;
 import com.example.intelliwealth.wealth.asset.AssetRepository;
 import com.example.intelliwealth.wealth.debt.DebtRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-
 @Service
+@RequiredArgsConstructor
 public class NetWorthService {
 
-    @Autowired
-    private AssetRepository asset;
-    @Autowired
-    private DebtRepository debt;
+    private final AssetRepository assetRepository;
+    private final DebtRepository debtRepository;
 
-    public BigDecimal calculateNetWorth() {
-        BigDecimal totalAssets = asset.findAll().stream()
-                .map(Asset::getCurrentValue)
+    public NetWorthResponseDTO calculateNetWorth() {
+
+        BigDecimal totalAssets = assetRepository.findAll()
+                .stream()
+                .map(a -> a.getCurrentValue() == null ? BigDecimal.ZERO : a.getCurrentValue())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalDebts = debt.findAll().stream()
-                .map(Debt::getOutstandingAmount)
+        BigDecimal totalDebts = debtRepository.findAll()
+                .stream()
+                .map(d -> d.getOutstandingAmount() == null ? BigDecimal.ZERO : d.getOutstandingAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return totalAssets.subtract(totalDebts);
+        return new NetWorthResponseDTO(
+                totalAssets,
+                totalDebts,
+                totalAssets.subtract(totalDebts)
+        );
     }
-
-
-
 }
+

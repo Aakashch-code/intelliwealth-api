@@ -1,50 +1,33 @@
 package com.example.intelliwealth.wealth.networth;
 
-
-import com.example.intelliwealth.wealth.asset.Asset;
-import com.example.intelliwealth.wealth.asset.AssetsRequestDTO;
-import com.example.intelliwealth.wealth.asset.AssetsResponseDTO;
-import com.example.intelliwealth.wealth.debt.Debt;
-import com.example.intelliwealth.wealth.asset.AssetService;
-import com.example.intelliwealth.wealth.debt.DebtResponseDTO;
-import com.example.intelliwealth.wealth.debt.DebtService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.math.BigDecimal;
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/networth")
+@RequiredArgsConstructor
+@Tag(name = "Net Worth", description = "APIs for calculating user net worth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class NetWorthController {
 
-    @Autowired
-    private NetWorthService service;
+    private final NetWorthService netWorthService;
 
-    @Autowired
-    private AssetService assetService;
-
-    @Autowired
-    private DebtService debtService;
-
+    @Operation(
+            summary = "Get Net Worth",
+            description = "Calculates total assets, total debts and net worth"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Net worth calculated successfully",
+            content = @Content(schema = @Schema(implementation = NetWorthResponseDTO.class))
+    )
     @GetMapping
-    public BigDecimal getNetWorth() {
-        return service.calculateNetWorth();
+    public NetWorthResponseDTO getNetWorth() {
+        return netWorthService.calculateNetWorth();
     }
-
-    @GetMapping("/debt")
-    public List<DebtResponseDTO> fetchAllDebt() {
-        return debtService.getAll();
-    }
-
-    @GetMapping("/asset")
-    private List<AssetsResponseDTO> fetchAllAssets() {
-        return assetService.getAllAssets();
-    }
-
-
 }
