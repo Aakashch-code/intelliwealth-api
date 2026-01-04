@@ -69,25 +69,111 @@ The backend is divided into distinct functional domains as seen in the API inter
 
 ## 📂 Project Structure
 
-The project utilizes a **Package-by-Feature** directory structure to ensure high cohesion and modularity.
-
+The project adopts a Package-by-Feature (vertical slicing) architecture,
+where each feature encapsulates its controllers, services, repositories, DTOs, and 
+domain logic. This design ensures high cohesion, clear boundaries, and scalable growth as 
+the application evolves.
 ```text
-src/main/java/com/example/intelliwealth
-├── config              # Global Configuration (AI, Swagger, Web, Currency)
-├── core
-│   ├── budget          # Budgeting logic
-│   └── goal            # Financial Goals management
-├── wealth
-│   ├── asset           # Asset tracking & attribute rules
-│   ├── debt            # Liability management
-│   └── networth        # Aggregation logic
-├── protection
-│   ├── insurance       # Insurance policies & validation
-│   └── contingency     # Emergency fund calculations
-├── fynix               # AI Module
-│   ├── controller      # Chat API endpoints
-│   ├── service         # AI Context processing
-│   └── util            # JSON extractors & Prompt builders
-├── subscription        # Recurring expense management
-├── transaction         # Core ledger (Income/Expense)
-└── exception           # Global Exception Handling
+src
+└── main
+    └── java
+        └── com.example.intelliwealth
+            │
+            ├── config
+            │   ├── AIConfig.java
+            │   ├── CurrencySerializer.java
+            │   ├── SwaggerConfig.java
+            │   └── WebConfig.java
+            │
+            ├── exception
+            │   ├── ApiError.java
+            │   ├── GlobalExceptionHandler.java
+            │   └── GoalNotFoundException.java
+            │
+            ├── core
+            │   ├── budget
+            │   │   ├── Budget.java
+            │   │   ├── BudgetController.java
+            │   │   ├── BudgetService.java
+            │   │   ├── BudgetRepository.java
+            │   │   ├── BudgetMapper.java
+            │   │   ├── BudgetRequestDTO.java
+            │   │   ├── BudgetResponseDTO.java
+            │   │   └── BudgetSummaryDTO.java
+            │   │
+            │   ├── goal
+            │   │   ├── Goal.java
+            │   │   ├── GoalController.java
+            │   │   ├── GoalService.java
+            │   │   ├── GoalRepository.java
+            │   │   ├── GoalRequestDTO.java
+            │   │   ├── AddFundsRequestDTO.java
+            │   │   ├── GoalResponseDTO.java
+            │   │   └── GoalStatsResponseDTO.java
+            │   │
+            │   ├── subscription
+            │   │   ├── Subscription.java
+            │   │   ├── SubscriptionController.java
+            │   │   ├── SubscriptionService.java
+            │   │   ├── SubscriptionRepository.java
+            │   │   ├── SubscriptionMapper.java
+            │   │   ├── SubscriptionRequestDTO.java
+            │   │   └── SubscriptionResponseDTO.java
+            │   │
+            │   └── transaction
+            │       ├── Transaction.java
+            │       ├── TransactionController.java
+            │       ├── TransactionService.java
+            │       ├── TransactionsRepository.java
+            │       ├── TransactionMapper.java
+            │       ├── TransactionRequestDTO.java
+            │       └── TransactionResponseDTO.java
+            │
+            ├── fynix
+            │   ├── controller
+            │   ├── dto
+            │   ├── model
+            │   ├── repository
+            │   ├── service
+            │   └── util
+            │
+            ├── protection
+            │   ├── contingency
+            │   │   ├── ContingencyController.java
+            │   │   ├── ContingencyService.java
+            │   │   └── ContingencyReportDTO.java
+            │   │
+            │   └── insurance
+            │       ├── controller
+            │       ├── service
+            │       ├── repository
+            │       ├── dto
+            │       ├── mapper
+            │       ├── domain
+            │       └── validation
+            │
+            └── wealth
+                ├── asset
+                │   ├── controller
+                │   ├── service
+                │   ├── repository
+                │   ├── dto
+                │   ├── mapper
+                │   ├── domain
+                │   ├── validation
+                │   └── exception
+                │
+                ├── debt
+                │   ├── controller
+                │   ├── service
+                │   ├── repository
+                │   ├── dto
+                │   ├── mapper
+                │   ├── domain
+                │   ├── validation
+                │   └── exception
+                │
+                └── networth
+                    ├── NetWorthController.java
+                    ├── NetWorthService.java
+                    └── NetWorthResponseDTO.java
