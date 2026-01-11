@@ -1,6 +1,9 @@
 package com.example.intelliwealth.core.subscription;
 
+import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.core.subscription.SubscriptionNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,76 +13,98 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class SubscriptionService {
+@Transactional
+@PreAuthorize("isAuthenticated()")
+public class SubscriptionService extends SecuredService {
 
     private final SubscriptionRepository repo;
     private final SubscriptionMapper mapper;
 
-    // --- Read Operations ---
+    // ---------------- READ ----------------
 
     public List<SubscriptionResponseDTO> getAllSubscriptions() {
-        return repo.findAll().stream().map(mapper::toResponse).toList();
+        return repo.findAllByUserId(currentUserId())
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     public List<SubscriptionResponseDTO> getActiveSubscriptions() {
-        return repo.findByIsActiveTrue().stream().map(mapper::toResponse).toList();
+        return repo.findByUserIdAndIsActiveTrue(currentUserId())
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     public List<SubscriptionResponseDTO> getInactiveSubscriptions() {
-        return repo.findByIsActiveFalse().stream().map(mapper::toResponse).toList();
+        return repo.findByUserIdAndIsActiveFalse(currentUserId())
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     public SubscriptionResponseDTO getSubscriptionById(Long id) {
-        return repo.findById(id)
+        return repo.findByIdAndUserId(id, currentUserId())
                 .map(mapper::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException("Subscription not found: " + id));
+                .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
     }
 
-    // --- Write Operations ---
+    // ---------------- CREATE ----------------
 
     public SubscriptionResponseDTO createSubscription(SubscriptionRequestDTO dto) {
-        Subscription saved = repo.save(mapper.toEntity(dto));
-        return mapper.toResponse(saved);
+        Subscription entity = mapper.toEntity(dto);
+        entity.setUserId(currentUserId()); // 🔐 owner
+
+        return mapper.toResponse(repo.save(entity));
     }
 
-    @Transactional
+    // ---------------- UPDATE ----------------
+
     public SubscriptionResponseDTO toggleSubscriptionStatus(Long id) {
-        Subscription sub = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Subscription not found: " + id));
+        Subscription sub = repo.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
 
         sub.setActive(!sub.isActive());
-        return mapper.toResponse(sub);
+        return mapper.toResponse(repo.save(sub));
     }
+
+    // ---------------- DELETE ----------------
 
     public void hardDeleteSubscription(Long id) {
-        if (!repo.existsById(id)) {
-            throw new IllegalArgumentException("Subscription not found: " + id);
-        }
-        repo.deleteById(id);
+        Subscription sub = repo.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
+
+        repo.delete(sub);
     }
 
+    // ---------------- AGGREGATE ----------------
+
     public BigDecimal getTotalMonthlySubscriptions() {
-        List<Subscription> activeSubs = repo.findByIsActiveTrue();
+        List<Subscription> activeSubs =
+                repo.findByUserIdAndIsActiveTrue(currentUserId());
+
         BigDecimal totalMonthly = BigDecimal.ZERO;
 
         for (Subscription sub : activeSubs) {
             BigDecimal amount = sub.getAmount();
-            String cycle = sub.getBillingCycle().toUpperCase(); // Normalize text
-
             if (amount == null) continue;
 
-            // Normalize to Monthly cost
+            String cycle = sub.getBillingCycle().toUpperCase();
+
             if (cycle.contains("YEAR") || cycle.contains("ANNUAL")) {
-                // Divide by 12 (Use RoundingMode to avoid infinite decimals)
-                totalMonthly = totalMonthly.add(amount.divide(new BigDecimal("12"), 2, RoundingMode.HALF_UP));
+                totalMonthly = totalMonthly.add(
+                        amount.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP)
+                );
             } else if (cycle.contains("QUARTER")) {
-                // Divide by 3
-                totalMonthly = totalMonthly.add(amount.divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP));
+                totalMonthly = totalMonthly.add(
+                        amount.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP)
+                );
             } else if (cycle.contains("WEEK")) {
-                // Multiply by 4.33 (average weeks in a month)
-                totalMonthly = totalMonthly.add(amount.multiply(new BigDecimal("4.33")));
+                totalMonthly = totalMonthly.add(
+                        amount.multiply(BigDecimal.valueOf(4.33))
+                );
             } else {
-                // Assume MONTHLY
+                // MONTHLY
                 totalMonthly = totalMonthly.add(amount);
             }
         }

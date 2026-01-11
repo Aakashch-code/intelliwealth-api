@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
+
 @Document(collection = "debts")
 @Data
 @NoArgsConstructor
@@ -19,6 +21,7 @@ public class Debt {
     @Id
     private String id;
 
+    private UUID userId;
     private String name;
     private String creditor;
 

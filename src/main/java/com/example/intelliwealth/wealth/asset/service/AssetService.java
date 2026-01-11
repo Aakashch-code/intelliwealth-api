@@ -1,5 +1,7 @@
 package com.example.intelliwealth.wealth.asset.service;
 
+import com.example.intelliwealth.authentication.model.Users;
+import com.example.intelliwealth.authentication.security.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.Asset;
 import com.example.intelliwealth.wealth.asset.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.dto.AssetsResponseDTO;
@@ -8,87 +10,96 @@ import com.example.intelliwealth.wealth.asset.mapper.AssetsMapper;
 import com.example.intelliwealth.wealth.asset.repository.AssetRepository;
 import com.example.intelliwealth.wealth.asset.validation.AssetValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AssetService {
+@Transactional
+@PreAuthorize("isAuthenticated()")
+public class AssetService extends SecuredService {
 
     private final AssetRepository repo;
     private final AssetsMapper mapper;
 
-    @Transactional
+    // ---------------- CREATE ----------------
+
     public AssetsResponseDTO createAsset(AssetsRequestDTO dto) {
-        // 1. Initialize attributes if null to avoid NullPointer
+
         if (dto.getAttributes() == null) {
             dto.setAttributes(new HashMap<>());
         }
 
-        // 2. Validate dynamic attributes
         AssetValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
 
-        // 3. Save
         Asset entity = mapper.toEntity(dto);
-        Asset savedEntity = repo.save(entity);
+        entity.setUserId(currentUserId());
 
-        // 4. Return DTO
-        return mapper.toDto(savedEntity);
+        return mapper.toDto(repo.save(entity));
     }
+
+    // ---------------- UPDATE ----------------
 
     public AssetsResponseDTO modifyAsset(AssetsRequestDTO dto, String id) {
-        Asset existingAsset = repo.findById(id)
-                .orElseThrow(() -> new AssetNotFoundException("Asset with ID " + id + " not found"));
 
-        // Update fields
-        existingAsset.setName(dto.getName());
-        existingAsset.setMainCategory(dto.getMainCategory());
-        existingAsset.setCategory(dto.getCategory());
-        existingAsset.setCurrentValue(dto.getCurrentValue());
-        existingAsset.setDateAcquired(dto.getDateAcquired());
+        Asset existing = repo.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new AssetNotFoundException("Asset not found"));
 
-        // Merge attributes carefully
+        existing.setName(dto.getName());
+        existing.setMainCategory(dto.getMainCategory());
+        existing.setCategory(dto.getCategory());
+        existing.setCurrentValue(dto.getCurrentValue());
+        existing.setDateAcquired(dto.getDateAcquired());
+
         if (dto.getAttributes() != null) {
-            if (existingAsset.getAttributes() == null) {
-                existingAsset.setAttributes(new HashMap<>());
-            }
-            existingAsset.getAttributes().putAll(dto.getAttributes());
+            existing.getAttributes().putAll(dto.getAttributes());
         }
 
-        // Validate state after merge
-        AssetValidator.validateAttributes(existingAsset.getCategory(), existingAsset.getAttributes());
+        AssetValidator.validateAttributes(existing.getCategory(), existing.getAttributes());
 
-        Asset savedEntity = repo.save(existingAsset);
-        return mapper.toDto(savedEntity);
+        return mapper.toDto(repo.save(existing));
     }
 
+    // ---------------- READ ----------------
+
     public List<AssetsResponseDTO> getAllAssets() {
-        return repo.findAll().stream()
+        return repo.findAllByUserId(currentUserId())
+                .stream()
                 .map(mapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public AssetsResponseDTO getAssetById(String id) {
-        Asset asset = repo.findById(id)
-                .orElseThrow(() -> new AssetNotFoundException("Asset with ID " + id + " not found"));
-        return mapper.toDto(asset);
+        return repo.findByIdAndUserId(id, currentUserId())
+                .map(mapper::toDto)
+                .orElseThrow(() -> new AssetNotFoundException("Asset not found"));
     }
 
+    // ---------------- AGGREGATE ----------------
+
     public BigDecimal allAssetsAmount() {
-        return repo.findAll().stream()
+        return repo.findAllByUserId(currentUserId())
+                .stream()
                 .map(Asset::getCurrentValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    // ---------------- DELETE ----------------
+
     public void deleteAsset(String id) {
-        if (!repo.existsById(id)) {
-            throw new AssetNotFoundException("Cannot delete. Asset with ID " + id + " not found");
-        }
-        repo.deleteById(id);
+        Asset asset = repo.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new AssetNotFoundException("Asset not found"));
+
+        repo.delete(asset);
     }
 }

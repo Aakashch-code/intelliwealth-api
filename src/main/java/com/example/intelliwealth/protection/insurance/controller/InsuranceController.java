@@ -1,4 +1,4 @@
-package com.example.intelliwealth.protection.insurance.conroller;
+package com.example.intelliwealth.protection.insurance.controller;
 
 import com.example.intelliwealth.protection.insurance.domain.InsuranceCategory;
 import com.example.intelliwealth.protection.insurance.dto.InsuranceRequestDTO;

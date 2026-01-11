@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 
 @Document(collection = "insurance")
 @Data
@@ -17,6 +18,8 @@ public class Insurance {
 
     @Id
     private String id;
+
+    private UUID userId;
 
     private String name;
     private String provider;

@@ -7,14 +7,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
-
-// PostgreSQL (Core)
-@EntityScan(basePackages = "com.example.intelliwealth.core")
+@EntityScan(basePackages = "com.example.intelliwealth")
 @EnableJpaRepositories(
-        basePackages = "com.example.intelliwealth.core"
+        basePackages = {
+                "com.example.intelliwealth.core",
+                "com.example.intelliwealth.authentication"
+        }
 )
-
-// MongoDB (Wealth + Protection + Fynix)
 @EnableMongoRepositories(
         basePackages = {
                 "com.example.intelliwealth.wealth",
@@ -22,7 +21,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
                 "com.example.intelliwealth.fynix"
         }
 )
-
 public class IntelliWealthApplication {
 
     public static void main(String[] args) {

@@ -1,101 +1,104 @@
 package com.example.intelliwealth.core.goal;
 
-import org.springframework.http.HttpStatus;
+import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.core.goal.GoalNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class GoalService {
+@RequiredArgsConstructor
+@Transactional
+@PreAuthorize("isAuthenticated()")
+public class GoalService extends SecuredService {
 
     private final GoalRepository repo;
 
-    public GoalService(GoalRepository repo) {
-        this.repo = repo;
-    }
-
-    // -------------------------
-    // CRUD Operations
-    // -------------------------
+    // ---------------- CRUD ----------------
 
     public List<GoalResponseDTO> getAllGoal() {
-        return repo.findAll().stream()
+        return repo.findAllByUserId(currentUserId())
+                .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public GoalResponseDTO getGoalById(long goalId) {
-        Goal goal = repo.findById(goalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found"));
+        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
+                .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
+
         return mapToResponse(goal);
     }
 
     public GoalResponseDTO createGoal(GoalRequestDTO request) {
         Goal goal = new Goal();
-        goal.setCurrentAmount(request.getCurrentAmount() != null ? request.getCurrentAmount() : BigDecimal.ZERO);
-        goal.setSpentAmount(BigDecimal.ZERO); // Initialize spent amount
+        goal.setUserId(currentUserId()); // 🔐 owner
 
-        updateEntityFromRequest(goal, request); // Map fields
+        goal.setCurrentAmount(
+                request.getCurrentAmount() != null
+                        ? request.getCurrentAmount()
+                        : BigDecimal.ZERO
+        );
+        goal.setSpentAmount(BigDecimal.ZERO);
 
-        Goal savedGoal = repo.save(goal);
-        return mapToResponse(savedGoal);
+        updateEntityFromRequest(goal, request);
+
+        return mapToResponse(repo.save(goal));
     }
 
     public GoalResponseDTO updateGoal(long goalId, GoalRequestDTO request) {
-        Goal goal = repo.findById(goalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found"));
+        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
+                .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
 
-        updateEntityFromRequest(goal, request); // Update fields
+        updateEntityFromRequest(goal, request);
 
-        // If current amount is passed in update, update it, otherwise keep existing
-        if(request.getCurrentAmount() != null) {
+        if (request.getCurrentAmount() != null) {
             goal.setCurrentAmount(request.getCurrentAmount());
         }
 
-        Goal savedGoal = repo.save(goal);
-        return mapToResponse(savedGoal);
+        return mapToResponse(repo.save(goal));
     }
 
     public void deleteGoalById(long goalId) {
-        if (!repo.existsById(goalId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found");
-        }
-        repo.deleteById(goalId);
+        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
+                .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
+
+        repo.delete(goal);
     }
 
     public void deleteAllGoal() {
-        repo.deleteAll();
+        repo.deleteAllByUserId(currentUserId());
     }
 
-    // -------------------------
-    // Goal Progress Operations
-    // -------------------------
+    // ---------------- PROGRESS ----------------
 
     public GoalResponseDTO addFunds(long goalId, BigDecimal amount) {
-        Goal goal = repo.findById(goalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found"));
+        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
+                .orElseThrow(() -> new com.example.intelliwealth.core.goal.GoalNotFoundException("Goal not found"));
 
-        BigDecimal current = goal.getCurrentAmount() == null ? BigDecimal.ZERO : goal.getCurrentAmount();
-        goal.setCurrentAmount(current.add(amount));
+        goal.setCurrentAmount(
+                safeAmount(goal.getCurrentAmount()).add(amount)
+        );
 
-        Goal savedGoal = repo.save(goal);
-        return mapToResponse(savedGoal);
+        return mapToResponse(repo.save(goal));
     }
 
-    // -------------------------
-    // Statistics (Unchanged mostly)
-    // -------------------------
+    // ---------------- STATS ----------------
+
     public GoalStatsResponseDTO getGoalStats() {
-        List<Goal> goals = repo.findAll();
+        List<Goal> goals = repo.findAllByUserId(currentUserId());
 
         long totalGoals = goals.size();
 
         long completedGoals = goals.stream()
-                .filter(g -> safeAmount(g.getCurrentAmount())
-                        .compareTo(safeAmount(g.getTargetAmount())) >= 0)
+                .filter(g ->
+                        safeAmount(g.getCurrentAmount())
+                                .compareTo(safeAmount(g.getTargetAmount())) >= 0
+                )
                 .count();
 
         BigDecimal totalTargetAmount = goals.stream()
@@ -114,9 +117,7 @@ public class GoalService {
         );
     }
 
-    // -------------------------
-    // Helper Methods (Manual Mapping)
-    // -------------------------
+    // ---------------- HELPERS ----------------
 
     private GoalResponseDTO mapToResponse(Goal goal) {
         GoalResponseDTO response = new GoalResponseDTO();

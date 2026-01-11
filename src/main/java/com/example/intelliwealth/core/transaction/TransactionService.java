@@ -1,7 +1,11 @@
 package com.example.intelliwealth.core.transaction;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.intelliwealth.authentication.security.SecuredService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,34 +13,33 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class TransactionService {
+@RequiredArgsConstructor
+@Transactional
+@PreAuthorize("isAuthenticated()")
+public class TransactionService extends SecuredService {
 
     private final TransactionsRepository repo;
     private final TransactionMapper mapper;
 
-    @Autowired
-    public TransactionService(TransactionsRepository repo, TransactionMapper mapper) {
-        this.repo = repo;
-        this.mapper = mapper;
-    }
-
-    // ===================== GET =====================
+    // ===================== READ =====================
 
     public List<TransactionResponseDTO> getAllTransactions() {
-        return repo.findAll()
+        return repo.findAllByUserId(currentUserId())
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
     }
 
     public TransactionResponseDTO getTransactionById(int id) {
-        Transaction transaction = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + id));
-        return mapper.toResponse(transaction);
+        return repo.findByIdAndUserId(id, currentUserId())
+                .map(mapper::toResponse)
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
     }
 
     public List<TransactionResponseDTO> searchTransactions(String keyword) {
-        return repo.findByDescriptionContainingIgnoreCase(keyword)
+        return repo.findByUserIdAndDescriptionContainingIgnoreCase(
+                        currentUserId(), keyword
+                )
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
@@ -45,14 +48,14 @@ public class TransactionService {
     // ===================== CALCULATIONS =====================
 
     public BigDecimal getIncomeAmount() {
-        return repo.findByType("INCOME")
+        return repo.findByUserIdAndType(currentUserId(), "INCOME")
                 .stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getExpenseAmount() {
-        return repo.findByType("EXPENSE")
+        return repo.findByUserIdAndType(currentUserId(), "EXPENSE")
                 .stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -62,19 +65,20 @@ public class TransactionService {
         return getIncomeAmount().subtract(getExpenseAmount());
     }
 
-    // ===================== POST =====================
+    // ===================== CREATE =====================
 
     public TransactionResponseDTO createTransaction(TransactionRequestDTO request) {
         Transaction entity = mapper.toEntity(request);
-        Transaction saved = repo.save(entity);
-        return mapper.toResponse(saved);
+        entity.setUserId(currentUserId()); // 🔐 owner
+
+        return mapper.toResponse(repo.save(entity));
     }
 
-    // ===================== PUT =====================
+    // ===================== UPDATE =====================
 
     public TransactionResponseDTO updateTransaction(int id, TransactionRequestDTO request) {
-        Transaction existing = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found: " + id));
+        Transaction existing = repo.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
 
         existing.setType(request.getType());
         existing.setDescription(request.getDescription());
@@ -82,38 +86,43 @@ public class TransactionService {
         existing.setCategory(request.getCategory());
         existing.setSource(request.getSource());
 
-        Transaction updated = repo.save(existing);
-        return mapper.toResponse(updated);
+        return mapper.toResponse(repo.save(existing));
     }
 
     // ===================== DELETE =====================
 
     public void deleteAllTransactions() {
-        repo.deleteAll();
+        repo.deleteAllByUserId(currentUserId());
     }
 
+    // ===================== ANALYTICS =====================
+
     /**
-     * Calculates average monthly expense over the specified last 'n' months.
-     * Used by Contingency Module to calculate Burn Rate.
+     * Calculates average monthly expense over the last N months.
+     * Used for burn-rate / contingency calculations.
      */
     public BigDecimal getAverageMonthlyExpense(int monthsToLookBack) {
-        // 1. Calculate the cut-off date (e.g., Today minus 3 months)
         LocalDate cutoffDate = LocalDate.now().minusMonths(monthsToLookBack);
 
-        // 2. Fetch only EXPENSES after that date
-        List<Transaction> recentExpenses = repo.findByTypeAndTransactionDateAfter("EXPENSE", cutoffDate);
+        List<Transaction> recentExpenses =
+                repo.findByUserIdAndTypeAndTransactionDateAfter(
+                        currentUserId(),
+                        "EXPENSE",
+                        cutoffDate
+                );
 
         if (recentExpenses.isEmpty()) {
             return BigDecimal.ZERO;
         }
 
-        // 3. Sum them up
         BigDecimal totalExpense = recentExpenses.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 4. Divide by number of months to get the Average
-        // We use Math.max(1, ...) to prevent division by zero or skewed data if user is new
-        return totalExpense.divide(new BigDecimal(monthsToLookBack), 2, RoundingMode.HALF_UP);
+        return totalExpense.divide(
+                BigDecimal.valueOf(Math.max(1, monthsToLookBack)),
+                2,
+                RoundingMode.HALF_UP
+        );
     }
 }

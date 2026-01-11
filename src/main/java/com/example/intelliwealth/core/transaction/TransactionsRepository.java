@@ -5,15 +5,25 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface TransactionsRepository extends JpaRepository<Transaction, Integer> {
 
-    List<Transaction> findByType(String type);
+    List<Transaction> findAllByUserId(UUID userId);
 
-    List<Transaction> findByDescriptionContainingIgnoreCase(String keyword);
-    List<Transaction> findByTypeAndTransactionDateAfter(
-            String type,
-            LocalDate transactionDate
+    Optional<Transaction> findByIdAndUserId(int id, UUID userId);
+
+    List<Transaction> findByUserIdAndDescriptionContainingIgnoreCase(
+            UUID userId, String keyword
+    );
+
+    List<Transaction> findByUserIdAndType(UUID userId, String type);
+
+    void deleteAllByUserId(UUID userId);
+
+    List<Transaction> findByUserIdAndTypeAndTransactionDateAfter(
+            UUID userId, String type, LocalDate date
     );
 }

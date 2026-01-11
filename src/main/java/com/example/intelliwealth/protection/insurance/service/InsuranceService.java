@@ -1,5 +1,6 @@
 package com.example.intelliwealth.protection.insurance.service;
 
+import com.example.intelliwealth.authentication.model.Users;
 import com.example.intelliwealth.protection.insurance.domain.Insurance;
 import com.example.intelliwealth.protection.insurance.domain.InsuranceCategory;
 import com.example.intelliwealth.protection.insurance.dto.InsuranceRequestDTO;
@@ -7,65 +8,103 @@ import com.example.intelliwealth.protection.insurance.dto.InsuranceResponseDTO;
 import com.example.intelliwealth.protection.insurance.mapper.InsuranceMapper;
 import com.example.intelliwealth.protection.insurance.repository.InsuranceRepository;
 import com.example.intelliwealth.protection.insurance.validation.InsuranceValidator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class InsuranceService {
 
     private final InsuranceRepository repo;
     private final InsuranceMapper mapper;
 
-    public InsuranceService(InsuranceRepository repo, InsuranceMapper mapper) {
-        this.repo = repo;
-        this.mapper = mapper;
+    private UUID getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new AccessDeniedException("Unauthenticated");
+        }
+
+        if (auth.getPrincipal() instanceof Users user) {
+            return user.getId();
+        }
+
+        throw new AccessDeniedException("Invalid authentication principal");
     }
 
-    // --- Create ---
     public InsuranceResponseDTO create(InsuranceRequestDTO dto) {
         InsuranceValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
+
         Insurance insurance = mapper.toEntity(dto);
+        insurance.setUserId(getCurrentUserId());
+
         return mapper.toDTO(repo.save(insurance));
     }
 
-    // --- Read ---
     public List<InsuranceResponseDTO> getAll() {
-        return repo.findAll().stream().map(mapper::toDTO).toList();
+        return repo.findAllByUserId(getCurrentUserId())
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public InsuranceResponseDTO getById(String id) {
-        return repo.findById(id)
-                .map(mapper::toDTO)
-                .orElseThrow(() -> new RuntimeException("Insurance policy not found with ID: " + id));
+        Insurance insurance = repo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Policy not found"));
+
+        if (!insurance.getUserId().equals(getCurrentUserId())) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        return mapper.toDTO(insurance);
     }
 
     public List<InsuranceResponseDTO> getByCategory(InsuranceCategory category) {
-        return repo.findByCategory(category).stream().map(mapper::toDTO).toList();
+        return repo.findByUserIdAndCategory(getCurrentUserId(), category)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public List<InsuranceResponseDTO> getActivePolicies() {
-        return repo.findActivePolicies(LocalDate.now()).stream().map(mapper::toDTO).toList();
+        return repo.findActivePoliciesForUser(getCurrentUserId(), LocalDate.now())
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     public List<InsuranceResponseDTO> getExpiringSoon() {
-        LocalDate today = LocalDate.now();
-        LocalDate nextMonth = today.plusMonths(1);
-        return repo.findByEndDateBetween(today, nextMonth).stream().map(mapper::toDTO).toList();
+        LocalDate now = LocalDate.now();
+        return repo.findByUserIdAndEndDateBetween(
+                        getCurrentUserId(),
+                        now,
+                        now.plusMonths(1)
+                )
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
-    // --- Update ---
     @Transactional
     public InsuranceResponseDTO update(String id, InsuranceRequestDTO dto) {
         Insurance existing = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Insurance policy not found with ID: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Policy not found"));
 
-        // Validate potential new attributes
+        if (!existing.getUserId().equals(getCurrentUserId())) {
+            throw new AccessDeniedException("Access denied");
+        }
+
         InsuranceValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
 
-        // Update fields (Mapper logic could also handle this "partial update" if configured)
         existing.setName(dto.getName());
         existing.setProvider(dto.getProvider());
         existing.setCategory(dto.getCategory());
@@ -79,11 +118,14 @@ public class InsuranceService {
         return mapper.toDTO(repo.save(existing));
     }
 
-    // --- Delete ---
     public void delete(String id) {
-        if (!repo.existsById(id)) {
-            throw new RuntimeException("Insurance policy not found with ID: " + id);
+        Insurance insurance = repo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Policy not found"));
+
+        if (!insurance.getUserId().equals(getCurrentUserId())) {
+            throw new AccessDeniedException("Access denied");
         }
-        repo.deleteById(id);
+
+        repo.delete(insurance);
     }
 }

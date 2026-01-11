@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -22,6 +23,7 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private long id;
+    private UUID userId;
     private BigDecimal currentAmount;
     private String name;
 //    @JsonSerialize(using = CurrencySerializer.class)

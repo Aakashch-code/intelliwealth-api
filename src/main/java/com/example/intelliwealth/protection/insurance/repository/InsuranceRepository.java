@@ -9,20 +9,21 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface InsuranceRepository extends MongoRepository<Insurance, String> {
 
-    // Find by specific sub-category (e.g., Term Life, Health)
-    List<Insurance> findByCategory(InsuranceCategory category);
+    // ✅ Find ALL policies for a specific user
+    List<Insurance> findAllByUserId(UUID userId);
 
-    // Find by main category (e.g., LIFE, GENERAL)
-    List<Insurance> findByMainCategory(InsuranceMainCategory mainCategory);
+    // ✅ Find by Category for a specific user
+    List<Insurance> findByUserIdAndCategory(UUID userId, InsuranceCategory category);
 
-    // Find policies expiring soon (useful for dashboard alerts)
-    List<Insurance> findByEndDateBetween(LocalDate start, LocalDate end);
+    // ✅ Find Active policies for a specific user
+    @Query("{'userId': ?0, 'endDate': {$gte: ?1}}")
+    List<Insurance> findActivePoliciesForUser(UUID userId, LocalDate date);
 
-    // Custom Query: Find active policies (Start date <= today AND End date >= today)
-    @Query("{ 'startDate': { $lte: ?0 }, 'endDate': { $gte: ?0 } }")
-    List<Insurance> findActivePolicies(LocalDate refDate);
+    // ✅ Find Expiring policies for a specific user
+    List<Insurance> findByUserIdAndEndDateBetween(UUID userId, LocalDate start, LocalDate end);
 }

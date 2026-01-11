@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -19,6 +20,7 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private UUID userId;
     @Column(nullable = false)
     private BigDecimal amount;
 
