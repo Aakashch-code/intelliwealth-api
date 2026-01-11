@@ -12,7 +12,7 @@
 
 This repository hosts the **backend core**, focusing on domain-driven design, robust security, and a clean "Package-by-Feature" architecture.
 
-> **Current Status:** ✅ **Phase 2 Complete.** Core Architecture and Security Layer (JWT + Spring Security) are fully integrated.
+> **Current Status:** **Phase 2 Complete.** Core Architecture and Security Layer (JWT + Spring Security) are fully integrated.
 
 ---
 
