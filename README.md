@@ -2,16 +2,17 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green?style=flat-square&logo=springboot)
+![Spring Security](https://img.shields.io/badge/Security-Spring_Security-6db33f?style=flat-square&logo=springsecurity)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square&logo=postgresql)
 ![AI](https://img.shields.io/badge/AI_Engine-Fynix-purple?style=flat-square&logo=openai)
 ![Swagger](https://img.shields.io/badge/Docs-Swagger_UI-85ea2d?style=flat-square&logo=swagger)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
-**Intelli Wealth** is a modular personal finance engine built with Spring Boot. It provides a comprehensive set of RESTful APIs to track wealth, manage liabilities, calculate financial health metrics, and generate AI-driven insights via the custom **Fynix** engine.
+**Intelli Wealth** is a secured, modular personal finance engine built with Spring Boot. It provides a comprehensive set of RESTful APIs to track wealth, manage liabilities, calculate financial health metrics, and generate AI-driven insights via the custom **Fynix** engine.
 
-This repository hosts the **backend core**, focusing on domain-driven design and a clean "Package-by-Feature" architecture.
+This repository hosts the **backend core**, focusing on domain-driven design, robust security, and a clean "Package-by-Feature" architecture.
 
-> **Current Status:** 🚧 Active Development. (Security layers and Frontend integration are planned for future updates).
+> **Current Status:** ✅ **Phase 2 Complete.** Core Architecture and Security Layer (JWT + Spring Security) are fully integrated.
 
 ---
 
@@ -20,17 +21,23 @@ This repository hosts the **backend core**, focusing on domain-driven design and
 The application exposes a fully documented REST API via **Swagger UI**.
 
 ### API Modules
-The backend is divided into distinct functional domains as seen in the API interface:
+The backend is divided into distinct functional domains:
 
+* **Authentication:** Secure registration and login handling.
 * **Fynix AI:** Intelligent financial chat and summary generation.
 * **Wealth Management:** Net worth aggregation, Asset tracking, and Debt management.
 * **Protection:** Insurance policy tracking and Contingency (Emergency Fund) planning.
 * **Core Finance:** Budgeting, Goals, Transactions, and Subscriptions.
 
-![img.png](img.png)
 ---
 
 ## 🌟 Key Features
+
+### 🔐 Security & Authentication (New)
+* **Stateless Auth:** Implemented **JSON Web Tokens (JWT)** for secure, stateless session management.
+* **RBAC (Role-Based Access Control):** Granular permission management protecting sensitive endpoints.
+* **Password Encryption:** Integrated **BCrypt** hashing for secure credential storage.
+* **Custom Filters:** `JwtAuthenticationFilter` intercepts requests to validate tokens before they reach the controllers.
 
 ### 🧠 Fynix AI Module
 * **Financial Chatbot:** `FinancialChatController` handles context-aware queries about user data.
@@ -44,11 +51,10 @@ The backend is divided into distinct functional domains as seen in the API inter
 ### 📈 Wealth Management
 * **Asset & Debt Tracking:** Dedicated controllers for managing Assets (`Real Estate`, `Gold`, `Mutual Funds`) and Liabilities.
 * **Net Worth Engine:** Real-time calculation service that aggregates data from Asset and Debt repositories.
-* **Attribute Rules:** Dynamic validation rules for different asset/debt categories.
 
 ### 💸 Core Services
 * **Smart Budgeting:** Compare actual spending against defined budgets.
-* **Goal Tracking:** Monitor progress toward specific financial targets (e.g., "Buy a House").
+* **Goal Tracking:** Monitor progress toward specific financial targets.
 * **Subscription Manager:** Tracks recurring payments to identify fixed monthly costs.
 
 ---
@@ -59,13 +65,12 @@ The backend is divided into distinct functional domains as seen in the API inter
 | :--- | :--- |
 | **Language** | Java 21 |
 | **Framework** | Spring Boot 3.x |
-| **Database** | PostgreSQL |
+| **Security** | Spring Security 6, JWT, BCrypt |
+| **Database** | PostgreSQL (Relational) & MongoDB (NoSQL) |
 | **AI Integration** | Custom AI Service / Ollama (Local) |
 | **Documentation** | Swagger / OpenAPI 3.0 |
 | **Build Tool** | Maven |
 | **Architecture** | Modular Monolith (Package-by-Feature) |
-
----
 
 ## 📂 Project Structure
 
@@ -78,6 +83,16 @@ src
 └── main
     └── java
         └── com.example.intelliwealth
+            │
+            ├── authentication        <-- (New Security Module)
+            │   ├── config            # SecurityConfig, AppConfig
+            │   ├── controller        # AuthController (Login/Register)
+            │   ├── dto               # RegisterRequest, AuthResponse
+            │   ├── filter            # JwtAuthenticationFilter
+            │   ├── model             # User, Role entities
+            │   ├── repository        # UserRepository
+            │   ├── security          # Custom UserDetails, JwtService
+            │   └── service           # AuthenticationService
             │
             ├── config
             │   ├── AIConfig.java

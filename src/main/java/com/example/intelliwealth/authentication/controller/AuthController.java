@@ -1,12 +1,17 @@
 package com.example.intelliwealth.authentication.controller;
 
-
 import com.example.intelliwealth.authentication.dto.AuthResponse;
 import com.example.intelliwealth.authentication.dto.LoginRequest;
 import com.example.intelliwealth.authentication.dto.RegisterRequest;
 import com.example.intelliwealth.authentication.model.Users;
 import com.example.intelliwealth.authentication.repository.UserRepository;
 import com.example.intelliwealth.authentication.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,14 +20,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "User registration and login APIs")
 public class AuthController {
 
     private final UserRepository repo;
@@ -30,17 +33,28 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
 
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account with username, email, and password"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "409", description = "Username or email already exists",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
-
-        if (repo.existsByUsername(request.getUsername()) || repo.existsByEmail(request.getEmail())) {
-
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User registration failed");
+        if (repo.existsByUsername(request.getUsername())
+                || repo.existsByEmail(request.getEmail())) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("User registration failed");
         }
 
         Users user = new Users(
-                null, // UUID generated automatically
+                null,
                 request.getUsername(),
                 request.getEmail(),
                 encoder.encode(request.getPassword()),
@@ -51,8 +65,25 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully");
     }
 
+    @Operation(
+            summary = "Authenticate user",
+            description = "Authenticates a user using username or email and returns a JWT token"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Login successful",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = @Content(schema = @Schema(implementation = String.class))
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+
         try {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -61,13 +92,13 @@ public class AuthController {
                     )
             );
         } catch (BadCredentialsException e) {
-            // CRITICAL: Never say "Wrong Password" vs "User not found"
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid credentials");
         }
 
-        // We assume login was username OR email, but token should subject the specific username
-        // We need to fetch the actual User object to get the canonical username
-        Users user = repo.findByUsernameOrEmail(request.getLogin()).orElseThrow();
+        Users user = repo.findByUsernameOrEmail(request.getLogin())
+                .orElseThrow();
 
         String token = jwtUtil.generateToken(user.getUsername());
         return ResponseEntity.ok(new AuthResponse(token));
