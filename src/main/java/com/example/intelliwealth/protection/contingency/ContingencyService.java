@@ -2,10 +2,10 @@ package com.example.intelliwealth.protection.contingency;
 
 import com.example.intelliwealth.core.transaction.TransactionService;
 import com.example.intelliwealth.core.subscription.SubscriptionService;
-import com.example.intelliwealth.wealth.asset.dto.AssetsResponseDTO;
-import com.example.intelliwealth.wealth.debt.service.DebtService;
-import com.example.intelliwealth.wealth.asset.service.AssetService;
-import com.example.intelliwealth.wealth.asset.domain.AssetCategory;
+import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
+import com.example.intelliwealth.wealth.debt.application.DebtService;
+import com.example.intelliwealth.wealth.asset.application.AssetService;
+import com.example.intelliwealth.wealth.asset.domain.model.AssetCategory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
