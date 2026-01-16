@@ -1,6 +1,13 @@
-package com.example.intelliwealth.core.goal;
+package com.example.intelliwealth.core.goal.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.core.goal.application.dto.GoalRequestDTO;
+import com.example.intelliwealth.core.goal.application.dto.GoalResponseDTO;
+import com.example.intelliwealth.core.goal.application.dto.GoalStatsResponseDTO;
+import com.example.intelliwealth.core.goal.application.mapper.GoalMapper;
+import com.example.intelliwealth.core.goal.domain.exception.GoalNotFoundException;
+import com.example.intelliwealth.core.goal.domain.model.Goal;
+import com.example.intelliwealth.core.goal.infrastructure.persistence.GoalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -16,13 +23,14 @@ import java.util.List;
 public class GoalService extends SecuredService {
 
     private final GoalRepository repo;
+    private final GoalMapper mapper;
 
     // ---------------- CRUD ----------------
 
     public List<GoalResponseDTO> getAllGoal() {
         return repo.findAllByUserId(currentUserId())
                 .stream()
-                .map(this::mapToResponse)
+                .map(mapper::toResponse)
                 .toList();
     }
 
@@ -30,36 +38,30 @@ public class GoalService extends SecuredService {
         Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
                 .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
 
-        return mapToResponse(goal);
+        return mapper.toResponse(goal);
     }
 
     public GoalResponseDTO createGoal(GoalRequestDTO request) {
-        Goal goal = new Goal();
-        goal.setUserId(currentUserId()); // 🔐 owner
+        Goal goal = mapper.toEntity(request);
 
-        goal.setCurrentAmount(
-                request.getCurrentAmount() != null
-                        ? request.getCurrentAmount()
-                        : BigDecimal.ZERO
-        );
+        goal.setUserId(currentUserId());
         goal.setSpentAmount(BigDecimal.ZERO);
 
-        updateEntityFromRequest(goal, request);
+        if (goal.getCurrentAmount() == null) {
+            goal.setCurrentAmount(BigDecimal.ZERO);
+        }
 
-        return mapToResponse(repo.save(goal));
+        return mapper.toResponse(repo.save(goal));
     }
 
     public GoalResponseDTO updateGoal(long goalId, GoalRequestDTO request) {
         Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
                 .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
 
-        updateEntityFromRequest(goal, request);
+        // MapStruct handles the update logic automatically
+        mapper.updateEntityFromRequest(goal, request);
 
-        if (request.getCurrentAmount() != null) {
-            goal.setCurrentAmount(request.getCurrentAmount());
-        }
-
-        return mapToResponse(repo.save(goal));
+        return mapper.toResponse(repo.save(goal));
     }
 
     public void deleteGoalById(long goalId) {
@@ -73,19 +75,6 @@ public class GoalService extends SecuredService {
         repo.deleteAllByUserId(currentUserId());
     }
 
-    // ---------------- PROGRESS ----------------
-
-    public GoalResponseDTO addFunds(long goalId, BigDecimal amount) {
-        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
-                .orElseThrow(() -> new com.example.intelliwealth.core.goal.GoalNotFoundException("Goal not found"));
-
-        goal.setCurrentAmount(
-                safeAmount(goal.getCurrentAmount()).add(amount)
-        );
-
-        return mapToResponse(repo.save(goal));
-    }
-
     // ---------------- STATS ----------------
 
     public GoalStatsResponseDTO getGoalStats() {
@@ -94,10 +83,8 @@ public class GoalService extends SecuredService {
         long totalGoals = goals.size();
 
         long completedGoals = goals.stream()
-                .filter(g ->
-                        safeAmount(g.getCurrentAmount())
-                                .compareTo(safeAmount(g.getTargetAmount())) >= 0
-                )
+                .filter(g -> safeAmount(g.getCurrentAmount())
+                        .compareTo(safeAmount(g.getTargetAmount())) >= 0)
                 .count();
 
         BigDecimal totalTargetAmount = goals.stream()
@@ -116,27 +103,7 @@ public class GoalService extends SecuredService {
         );
     }
 
-    // ---------------- HELPERS ----------------
-
-    private GoalResponseDTO mapToResponse(Goal goal) {
-        GoalResponseDTO response = new GoalResponseDTO();
-        response.setId(goal.getId());
-        response.setName(goal.getName());
-        response.setTargetAmount(goal.getTargetAmount());
-        response.setCurrentAmount(goal.getCurrentAmount());
-        response.setSpentAmount(goal.getSpentAmount());
-        response.setTargetDate(goal.getTargetDate());
-        response.setPriority(goal.getPriority());
-        return response;
-    }
-
-    private void updateEntityFromRequest(Goal goal, GoalRequestDTO request) {
-        goal.setName(request.getName());
-        goal.setTargetAmount(request.getTargetAmount());
-        goal.setTargetDate(request.getTargetDate());
-        goal.setPriority(request.getPriority());
-    }
-
+    // Helper for stats calculation (BigDecimal null safety)
     private BigDecimal safeAmount(BigDecimal amount) {
         return amount == null ? BigDecimal.ZERO : amount;
     }

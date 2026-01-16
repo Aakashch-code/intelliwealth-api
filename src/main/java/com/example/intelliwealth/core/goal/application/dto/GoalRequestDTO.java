@@ -1,11 +1,11 @@
-package com.example.intelliwealth.core.goal;
+package com.example.intelliwealth.core.goal.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Schema(description = "Request object for creating or updating a goal")
@@ -23,7 +23,9 @@ public class GoalRequestDTO {
     @Schema(description = "Priority level of the goal", example = "HIGH")
     private String priority;
 
+    private boolean status;
+
     @Schema(description = "Target completion date (dd-MM-yyyy)", example = "25-12-2025", type = "string", pattern = "dd-MM-yyyy")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date targetDate;
+    private LocalDate targetDate;
 }
