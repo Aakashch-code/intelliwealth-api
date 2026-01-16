@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.asset.application;
 
-import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;

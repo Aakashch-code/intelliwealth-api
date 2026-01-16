@@ -1,6 +1,7 @@
 package com.example.intelliwealth.wealth.asset.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 
+@Hidden
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

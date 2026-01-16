@@ -1,6 +1,6 @@
 package com.example.intelliwealth.core.budget;
 
-import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.authentication.application.SecuredService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

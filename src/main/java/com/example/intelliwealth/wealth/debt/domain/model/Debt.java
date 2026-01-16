@@ -1,6 +1,7 @@
 package com.example.intelliwealth.wealth.debt.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+@Hidden
 @Document(collection = "debts")
 @Data
 @NoArgsConstructor

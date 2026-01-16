@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.networth;
 
-import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.repository.AssetRepository;
 import com.example.intelliwealth.wealth.debt.domain.repository.DebtRepository;
 import lombok.RequiredArgsConstructor;

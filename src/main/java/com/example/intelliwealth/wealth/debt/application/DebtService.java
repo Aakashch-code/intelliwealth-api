@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.debt.application;
 
-import com.example.intelliwealth.authentication.security.SecuredService;
+import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.debt.domain.rules.DebtValidator;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import com.example.intelliwealth.wealth.debt.api.dto.DebtRequestDTO;

@@ -1,6 +1,6 @@
 package com.example.intelliwealth.protection.insurance.application;
 
-import com.example.intelliwealth.authentication.model.Users;
+import com.example.intelliwealth.authentication.domain.Users;
 import com.example.intelliwealth.protection.insurance.domain.model.Insurance;
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
 import com.example.intelliwealth.protection.insurance.api.dto.InsuranceRequestDTO;

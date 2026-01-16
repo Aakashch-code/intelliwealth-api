@@ -1,0 +1,34 @@
+package com.example.intelliwealth.fynix.domain;
+
+import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+
+@Hidden
+@Document(collection = "chat_history")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ChatHistory {
+
+    @Id
+    private String id;
+
+    private String userQuery;
+
+    private String aiResponse;
+
+    private String summary;
+
+    private Double confidenceScore;
+
+    private LocalDateTime createdAt;
+}
+
