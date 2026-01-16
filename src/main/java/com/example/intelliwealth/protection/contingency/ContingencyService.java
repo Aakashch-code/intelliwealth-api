@@ -1,7 +1,7 @@
 package com.example.intelliwealth.protection.contingency;
 
 import com.example.intelliwealth.core.transaction.application.service.TransactionService;
-import com.example.intelliwealth.core.subscription.SubscriptionService;
+import com.example.intelliwealth.core.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.DebtService;
 import com.example.intelliwealth.wealth.asset.application.AssetService;

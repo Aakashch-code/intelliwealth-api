@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.budget;
+package com.example.intelliwealth.core.budget.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

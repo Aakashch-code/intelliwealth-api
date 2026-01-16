@@ -1,10 +1,14 @@
-package com.example.intelliwealth.core.budget;
+package com.example.intelliwealth.core.budget.api;
 
+import com.example.intelliwealth.core.budget.application.dto.BudgetRequestDTO;
+import com.example.intelliwealth.core.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.core.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.core.budget.application.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,10 +17,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/budget")
 @Tag(name = "Budget Controller", description = "Management APIs for Budgeting System")
+@RequiredArgsConstructor
 public class BudgetController {
 
-    @Autowired
-    private BudgetService service;
+    private final BudgetService service;
 
     @Operation(summary = "Get all budgets", description = "Retrieve a list of all budget entries.")
     @ApiResponse(responseCode = "200", description = "Found the budgets")
@@ -35,7 +39,7 @@ public class BudgetController {
         return service.getBudgetById(id);
     }
 
-    @Operation(summary = "Get budget summary", description = "Get the calculated totals for allocated and spent amounts across all budgets.")
+    @Operation(summary = "Get budget summary", description = "Get the calculated totals for allocated and spent amounts.")
     @ApiResponse(responseCode = "200", description = "Successfully calculated summary")
     @GetMapping("/summary")
     public BudgetSummaryDTO getBudgetSummary() {

@@ -2,7 +2,7 @@ package com.example.intelliwealth.fynix.application;
 
 import com.example.intelliwealth.core.goal.application.dto.GoalResponseDTO;
 import com.example.intelliwealth.core.goal.application.service.GoalService;
-import com.example.intelliwealth.core.subscription.SubscriptionService;
+import com.example.intelliwealth.core.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.core.transaction.application.service.TransactionService;
 import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
 import lombok.RequiredArgsConstructor;

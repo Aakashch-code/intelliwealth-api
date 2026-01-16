@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.budget;
+package com.example.intelliwealth.core.budget.application.dto;
 
 import com.example.intelliwealth.config.CurrencySerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;

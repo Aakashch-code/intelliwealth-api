@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Hidden;

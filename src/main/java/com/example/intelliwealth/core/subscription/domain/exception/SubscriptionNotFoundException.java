@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.domain.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

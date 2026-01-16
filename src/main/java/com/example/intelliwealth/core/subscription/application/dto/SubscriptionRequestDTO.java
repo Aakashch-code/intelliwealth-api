@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema; // Import this
 import com.fasterxml.jackson.annotation.JsonFormat;

@@ -1,6 +1,12 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.core.subscription.application.dto.SubscriptionRequestDTO;
+import com.example.intelliwealth.core.subscription.application.dto.SubscriptionResponseDTO;
+import com.example.intelliwealth.core.subscription.application.mapper.SubscriptionMapper;
+import com.example.intelliwealth.core.subscription.domain.exception.SubscriptionNotFoundException;
+import com.example.intelliwealth.core.subscription.domain.model.Subscription;
+import com.example.intelliwealth.core.subscription.infrastrcture.persistence.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

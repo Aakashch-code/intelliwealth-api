@@ -1,5 +1,6 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.infrastrcture.persistence;
 
+import com.example.intelliwealth.core.subscription.domain.model.Subscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

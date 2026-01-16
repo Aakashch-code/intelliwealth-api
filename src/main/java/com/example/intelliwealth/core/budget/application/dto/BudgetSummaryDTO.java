@@ -1,10 +1,11 @@
-package com.example.intelliwealth.core.budget;
+package com.example.intelliwealth.core.budget.application.dto;
 
 import com.example.intelliwealth.config.CurrencySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data

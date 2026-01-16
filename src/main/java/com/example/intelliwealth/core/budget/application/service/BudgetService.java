@@ -1,6 +1,13 @@
-package com.example.intelliwealth.core.budget;
+package com.example.intelliwealth.core.budget.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.core.budget.application.dto.BudgetRequestDTO;
+import com.example.intelliwealth.core.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.core.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.core.budget.application.mapper.BudgetMapper;
+import com.example.intelliwealth.core.budget.domain.exception.BudgetNotFoundException;
+import com.example.intelliwealth.core.budget.domain.model.Budget;
+import com.example.intelliwealth.core.budget.infrastructure.persistence.BudgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -41,7 +48,7 @@ public class BudgetService extends SecuredService {
         Budget existing = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
 
-        mapper.updateEntityFromRequest(request, existing);
+        mapper.updateEntityFromRequest(existing, request);
         return mapper.toResponseDTO(repo.save(existing));
     }
 
@@ -56,11 +63,11 @@ public class BudgetService extends SecuredService {
         List<Budget> budgets = repo.findAllByUserId(currentUserId());
 
         BigDecimal totalAllocated = budgets.stream()
-                .map(Budget::getAmountAllocated)
+                .map(b -> b.getAmountAllocated() != null ? b.getAmountAllocated() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalSpent = budgets.stream()
-                .map(Budget::getAmountSpent)
+                .map(b -> b.getAmountSpent() != null ? b.getAmountSpent() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return BudgetSummaryDTO.builder()

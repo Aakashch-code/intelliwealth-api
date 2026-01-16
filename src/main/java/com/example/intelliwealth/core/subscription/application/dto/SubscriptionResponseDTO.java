@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.subscription;
+package com.example.intelliwealth.core.subscription.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
