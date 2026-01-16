@@ -18,16 +18,12 @@ public class BudgetService extends SecuredService {
     private final BudgetRepository repo;
     private final BudgetMapper mapper;
 
-    // ---------------- CREATE ----------------
-
     public BudgetResponseDTO createBudget(BudgetRequestDTO request) {
         Budget budget = mapper.toEntity(request);
         budget.setUserId(currentUserId()); // 🔐 attach owner
 
         return mapper.toResponseDTO(repo.save(budget));
     }
-
-    // ---------------- READ ----------------
 
     public List<BudgetResponseDTO> getAllBudgets() {
         return mapper.toResponseDTOList(
@@ -41,8 +37,6 @@ public class BudgetService extends SecuredService {
                 .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
     }
 
-    // ---------------- UPDATE ----------------
-
     public BudgetResponseDTO updateBudget(int id, BudgetRequestDTO request) {
         Budget existing = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
@@ -51,16 +45,12 @@ public class BudgetService extends SecuredService {
         return mapper.toResponseDTO(repo.save(existing));
     }
 
-    // ---------------- DELETE ----------------
-
     public void deleteBudgetById(int id) {
         Budget budget = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
 
         repo.delete(budget);
     }
-
-    // ---------------- SUMMARY ----------------
 
     public BudgetSummaryDTO getBudgetSummary() {
         List<Budget> budgets = repo.findAllByUserId(currentUserId());

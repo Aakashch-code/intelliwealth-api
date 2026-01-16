@@ -2,6 +2,7 @@ package com.example.intelliwealth.core.goal;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Data
 @NoArgsConstructor

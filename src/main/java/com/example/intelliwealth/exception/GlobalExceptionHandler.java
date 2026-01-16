@@ -70,4 +70,5 @@ public class GlobalExceptionHandler {
                 request.getRequestURI());
         return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }

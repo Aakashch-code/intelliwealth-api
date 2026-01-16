@@ -3,7 +3,7 @@ package com.example.intelliwealth.fynix.application;
 import com.example.intelliwealth.core.goal.GoalResponseDTO;
 import com.example.intelliwealth.core.goal.GoalService;
 import com.example.intelliwealth.core.subscription.SubscriptionService;
-import com.example.intelliwealth.core.transaction.TransactionService;
+import com.example.intelliwealth.core.transaction.application.service.TransactionService;
 import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class FinancialSummaryService {
 
         FinancialSummary s = new FinancialSummary();
 
-        var txs = transactionService.getAllTransactions();
+        var txs = transactionService.getTransactions(null);
         var subs = subscriptionService.getAllSubscriptions();
         var goals = goalService.getAllGoal();
 

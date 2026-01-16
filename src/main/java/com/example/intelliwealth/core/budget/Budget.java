@@ -3,6 +3,7 @@ package com.example.intelliwealth.core.budget;
 import com.example.intelliwealth.config.CurrencySerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
+@Hidden
 @Data
 @Entity
 @AllArgsConstructor

@@ -1,6 +1,6 @@
 package com.example.intelliwealth.protection.contingency;
 
-import com.example.intelliwealth.core.transaction.TransactionService;
+import com.example.intelliwealth.core.transaction.application.service.TransactionService;
 import com.example.intelliwealth.core.subscription.SubscriptionService;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.DebtService;
@@ -35,7 +35,7 @@ public class ContingencyService {
     public ContingencyReportDTO getHealthCheck() {
         // 1. CALCULATE MONTHLY BURN (Expenses + Subs + EMIs)
         // Assuming your services return BigDecimal.ZERO if no data exists
-        BigDecimal avgExpenses = transactionService.getAverageMonthlyExpense(3);
+        BigDecimal avgExpenses = transactionService.getMonthlyAverageExpense(3);
         BigDecimal activeSubs = subscriptionService.getTotalMonthlySubscriptions();
         BigDecimal currentDebtEMI = debtService.getTotalMonthlyEMIs();
 
