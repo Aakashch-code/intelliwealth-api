@@ -38,7 +38,7 @@ public class TourService {
         TourSummaryDTO dto = new TourSummaryDTO();
         dto.setBudgetSummary(budgetSummary);
         dto.setContingency(contingency);
-        dto.setSaving(saving);
+        dto.setNetPosition(saving);
         dto.setDebtSummary(debtSummary);
         dto.setGoalStats(tripGoals);
 
