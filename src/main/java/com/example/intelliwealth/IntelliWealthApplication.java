@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EntityScan(basePackages = "com.example.intelliwealth")
 @EnableJpaRepositories(
         basePackages = {
-                "com.example.intelliwealth.core",
+                "com.example.intelliwealth.treasury",
                 "com.example.intelliwealth.authentication"
         }
 )
@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
         basePackages = {
                 "com.example.intelliwealth.wealth",
                 "com.example.intelliwealth.protection",
-                "com.example.intelliwealth.fynix"
+                "com.example.intelliwealth.ai"
         }
 )
 public class IntelliWealthApplication {

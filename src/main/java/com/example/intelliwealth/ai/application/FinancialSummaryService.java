@@ -1,10 +1,10 @@
-package com.example.intelliwealth.fynix.application;
+package com.example.intelliwealth.ai.application;
 
 import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
 import com.example.intelliwealth.treasury.goal.application.service.GoalService;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
-import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
+import com.example.intelliwealth.ai.api.dto.FinancialSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

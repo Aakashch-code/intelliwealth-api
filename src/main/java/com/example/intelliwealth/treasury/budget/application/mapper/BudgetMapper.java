@@ -1,8 +1,8 @@
-package com.example.intelliwealth.core.budget.application.mapper;
+package com.example.intelliwealth.treasury.budget.application.mapper;
 
-import com.example.intelliwealth.core.budget.application.dto.BudgetRequestDTO;
-import com.example.intelliwealth.core.budget.application.dto.BudgetResponseDTO;
-import com.example.intelliwealth.core.budget.domain.model.Budget;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.treasury.budget.domain.model.Budget;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

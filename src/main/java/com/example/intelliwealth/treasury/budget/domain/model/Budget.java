@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.budget.domain.model;
+package com.example.intelliwealth.treasury.budget.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;

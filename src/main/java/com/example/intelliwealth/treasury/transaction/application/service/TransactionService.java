@@ -1,14 +1,15 @@
-package com.example.intelliwealth.core.transaction.application.service;
+package com.example.intelliwealth.treasury.transaction.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
-import com.example.intelliwealth.core.transaction.application.dto.TransactionRequest;
-import com.example.intelliwealth.core.transaction.application.dto.TransactionResponse;
-import com.example.intelliwealth.core.transaction.application.mapper.TransactionMapper;
-import com.example.intelliwealth.core.transaction.domain.exception.TransactionNotFoundException;
-import com.example.intelliwealth.core.transaction.domain.model.Transaction;
-import com.example.intelliwealth.core.transaction.domain.model.TransactionType;
-import com.example.intelliwealth.core.transaction.domain.validation.TransactionDomainValidator;
-import com.example.intelliwealth.core.transaction.infrastructure.persistence.TransactionRepository;
+import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
+import com.example.intelliwealth.treasury.transaction.application.mapper.TransactionMapper;
+import com.example.intelliwealth.treasury.transaction.domain.exception.TransactionNotFoundException;
+import com.example.intelliwealth.treasury.transaction.domain.model.Transaction;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
+import com.example.intelliwealth.treasury.transaction.domain.validation.TransactionDomainValidator;
+import com.example.intelliwealth.treasury.transaction.infrastructure.persistence.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -73,11 +74,12 @@ public class TransactionService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public BigDecimal calculateNetPosition() {
+    public SavingResponse calculateNetPosition() {
         UUID userId = currentUserId();
         BigDecimal income = repository.sumAmountByUserIdAndType(userId, TransactionType.INCOME);
         BigDecimal expense = repository.sumAmountByUserIdAndType(userId, TransactionType.EXPENSE);
-        return income.subtract(expense);
+        BigDecimal saving  = income.subtract(expense);
+        return new SavingResponse(income,expense,saving);
     }
 
     @Transactional(readOnly = true)

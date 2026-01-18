@@ -1,6 +1,6 @@
-package com.example.intelliwealth.core.transaction.domain.validation;
+package com.example.intelliwealth.treasury.transaction.domain.validation;
 
-import com.example.intelliwealth.core.transaction.application.dto.TransactionRequest;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

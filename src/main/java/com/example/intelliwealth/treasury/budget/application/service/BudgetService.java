@@ -1,13 +1,13 @@
-package com.example.intelliwealth.core.budget.application.service;
+package com.example.intelliwealth.treasury.budget.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
-import com.example.intelliwealth.core.budget.application.dto.BudgetRequestDTO;
-import com.example.intelliwealth.core.budget.application.dto.BudgetResponseDTO;
-import com.example.intelliwealth.core.budget.application.dto.BudgetSummaryDTO;
-import com.example.intelliwealth.core.budget.application.mapper.BudgetMapper;
-import com.example.intelliwealth.core.budget.domain.exception.BudgetNotFoundException;
-import com.example.intelliwealth.core.budget.domain.model.Budget;
-import com.example.intelliwealth.core.budget.infrastructure.persistence.BudgetRepository;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.treasury.budget.application.mapper.BudgetMapper;
+import com.example.intelliwealth.treasury.budget.domain.exception.BudgetNotFoundException;
+import com.example.intelliwealth.treasury.budget.domain.model.Budget;
+import com.example.intelliwealth.treasury.budget.infrastructure.persistence.BudgetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

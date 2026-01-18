@@ -1,8 +1,8 @@
-package com.example.intelliwealth.core.subscription.application.mapper;
+package com.example.intelliwealth.treasury.subscription.application.mapper;
 
-import com.example.intelliwealth.core.subscription.application.dto.SubscriptionRequestDTO;
-import com.example.intelliwealth.core.subscription.application.dto.SubscriptionResponseDTO;
-import com.example.intelliwealth.core.subscription.domain.model.Subscription;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
+import com.example.intelliwealth.treasury.subscription.domain.model.Subscription;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

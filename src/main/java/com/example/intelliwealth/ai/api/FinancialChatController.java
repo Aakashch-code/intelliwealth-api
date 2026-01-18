@@ -1,8 +1,8 @@
-package com.example.intelliwealth.fynix.api;
+package com.example.intelliwealth.ai.api;
 
-import com.example.intelliwealth.fynix.api.dto.FynixRequest;
-import com.example.intelliwealth.fynix.api.dto.FynixResponse;
-import com.example.intelliwealth.fynix.application.FinancialChatService;
+import com.example.intelliwealth.ai.api.dto.FynixRequest;
+import com.example.intelliwealth.ai.api.dto.FynixResponse;
+import com.example.intelliwealth.ai.application.FinancialChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

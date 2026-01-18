@@ -1,19 +1,22 @@
-package com.example.intelliwealth.core.goal.application.service;
+package com.example.intelliwealth.treasury.goal.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
-import com.example.intelliwealth.core.goal.application.dto.GoalRequestDTO;
-import com.example.intelliwealth.core.goal.application.dto.GoalResponseDTO;
-import com.example.intelliwealth.core.goal.application.dto.GoalStatsResponseDTO;
-import com.example.intelliwealth.core.goal.application.mapper.GoalMapper;
-import com.example.intelliwealth.core.goal.domain.exception.GoalNotFoundException;
-import com.example.intelliwealth.core.goal.domain.model.Goal;
-import com.example.intelliwealth.core.goal.infrastructure.persistence.GoalRepository;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStatsResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.mapper.GoalMapper;
+import com.example.intelliwealth.treasury.goal.domain.exception.GoalNotFoundException;
+import com.example.intelliwealth.treasury.goal.domain.model.Goal;
+import com.example.intelliwealth.treasury.goal.domain.model.GoalPeriod;
+import com.example.intelliwealth.treasury.goal.infrastructure.persistence.GoalRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,6 +27,8 @@ public class GoalService extends SecuredService {
 
     private final GoalRepository repo;
     private final GoalMapper mapper;
+    @Autowired
+    private GoalCalculator goalCalculator;
 
     // ---------------- CRUD ----------------
 
@@ -95,11 +100,24 @@ public class GoalService extends SecuredService {
                 .map(g -> safeAmount(g.getCurrentAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        long totalMonthlyRequired = goals.stream()
+                .mapToLong(g ->
+                        goalCalculator.calculateRequiredAmount(
+                                g.getTargetAmount(),
+                                g.getCurrentAmount(),
+                                g.getTargetDate(),
+                                LocalDate.now(),
+                                GoalPeriod.MONTHLY
+                        )
+                ).sum();
+
+
         return new GoalStatsResponseDTO(
                 totalGoals,
                 completedGoals,
                 totalTargetAmount,
-                totalCurrentAmount
+                totalCurrentAmount,
+                totalMonthlyRequired
         );
     }
 

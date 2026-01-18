@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.goal.application.dto;
+package com.example.intelliwealth.treasury.goal.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,4 +11,5 @@ public class GoalStatsResponseDTO {
     private long completedGoals;
     private BigDecimal totalTargetAmount;
     private BigDecimal totalCurrentAmount;
+    private long totalMonthlyRequired;
 }

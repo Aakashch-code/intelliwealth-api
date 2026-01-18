@@ -1,6 +1,6 @@
-package com.example.intelliwealth.core.goal.infrastructure.persistence;
+package com.example.intelliwealth.treasury.goal.infrastructure.persistence;
 
-import com.example.intelliwealth.core.goal.domain.model.Goal;
+import com.example.intelliwealth.treasury.goal.domain.model.Goal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

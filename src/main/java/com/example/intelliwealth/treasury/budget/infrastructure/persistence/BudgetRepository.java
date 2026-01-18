@@ -1,6 +1,6 @@
-package com.example.intelliwealth.core.budget.infrastructure.persistence;
+package com.example.intelliwealth.treasury.budget.infrastructure.persistence;
 
-import com.example.intelliwealth.core.budget.domain.model.Budget;
+import com.example.intelliwealth.treasury.budget.domain.model.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

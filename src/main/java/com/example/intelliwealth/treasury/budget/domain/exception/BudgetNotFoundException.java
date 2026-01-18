@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.budget.domain.exception;
+package com.example.intelliwealth.treasury.budget.domain.exception;
 
 
 import org.springframework.http.HttpStatus;

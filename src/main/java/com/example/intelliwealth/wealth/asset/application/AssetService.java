@@ -6,7 +6,7 @@ import com.example.intelliwealth.wealth.asset.api.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.asset.domain.exception.AssetNotFoundException;
 import com.example.intelliwealth.wealth.asset.application.mapper.AssetsMapper;
-import com.example.intelliwealth.wealth.asset.domain.repository.AssetRepository;
+import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
 import com.example.intelliwealth.wealth.asset.domain.rules.AssetValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

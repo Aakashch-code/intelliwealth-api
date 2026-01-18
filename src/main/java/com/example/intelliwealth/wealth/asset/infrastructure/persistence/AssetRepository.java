@@ -1,15 +1,19 @@
-package com.example.intelliwealth.wealth.asset.domain.repository;
+package com.example.intelliwealth.wealth.asset.infrastructure.persistence;
 
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AssetRepository {
-    Asset save(Asset asset);
+@Repository
+public interface AssetRepository extends MongoRepository<Asset, String> {
+
     List<Asset> findAllByUserId(UUID userId);
+
     Optional<Asset> findByIdAndUserId(String id, UUID userId);
-    void deleteByIdAndUserId(String id, UUID userId);
 
-
+    long deleteByIdAndUserId(String id, UUID userId);
 }

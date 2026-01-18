@@ -1,8 +1,8 @@
-package com.example.intelliwealth.core.transaction.application.mapper;
+package com.example.intelliwealth.treasury.transaction.application.mapper;
 
-import com.example.intelliwealth.core.transaction.application.dto.TransactionRequest;
-import com.example.intelliwealth.core.transaction.application.dto.TransactionResponse;
-import com.example.intelliwealth.core.transaction.domain.model.Transaction;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
+import com.example.intelliwealth.treasury.transaction.domain.model.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

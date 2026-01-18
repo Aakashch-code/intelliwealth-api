@@ -1,6 +1,6 @@
-package com.example.intelliwealth.fynix.infrastructure.ai;
+package com.example.intelliwealth.ai.infrastructure.ai;
 
-import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
+import com.example.intelliwealth.ai.api.dto.FinancialSummary;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 

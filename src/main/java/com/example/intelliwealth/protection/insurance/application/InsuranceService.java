@@ -6,7 +6,7 @@ import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCate
 import com.example.intelliwealth.protection.insurance.api.dto.InsuranceRequestDTO;
 import com.example.intelliwealth.protection.insurance.api.dto.InsuranceResponseDTO;
 import com.example.intelliwealth.protection.insurance.application.mapper.InsuranceMapper;
-import com.example.intelliwealth.protection.insurance.domain.repository.InsuranceRepository;
+import com.example.intelliwealth.protection.insurance.infrastructure.persistence.InsuranceRepository;
 import com.example.intelliwealth.protection.insurance.domain.rules.InsuranceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;

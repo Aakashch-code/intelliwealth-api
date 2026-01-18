@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.goal.domain.model;
+package com.example.intelliwealth.treasury.goal.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -39,9 +39,11 @@ public class Goal {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate updatedAt;
 
+
     private boolean status = true;
 
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private GoalPriority priority;
 
     @PrePersist
     protected void onCreate() {

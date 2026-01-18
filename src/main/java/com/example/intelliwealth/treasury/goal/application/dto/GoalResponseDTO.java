@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.goal.application.dto;
+package com.example.intelliwealth.treasury.goal.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.transaction.domain.model;
+package com.example.intelliwealth.treasury.transaction.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;

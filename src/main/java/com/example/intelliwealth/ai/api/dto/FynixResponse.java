@@ -1,4 +1,4 @@
-package com.example.intelliwealth.fynix.api.dto;
+package com.example.intelliwealth.ai.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

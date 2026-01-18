@@ -1,9 +1,9 @@
-package com.example.intelliwealth.core.goal.api;
+package com.example.intelliwealth.treasury.goal.api;
 
-import com.example.intelliwealth.core.goal.application.dto.GoalRequestDTO;
-import com.example.intelliwealth.core.goal.application.dto.GoalResponseDTO;
-import com.example.intelliwealth.core.goal.application.dto.GoalStatsResponseDTO;
-import com.example.intelliwealth.core.goal.application.service.GoalService;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStatsResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.service.GoalService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

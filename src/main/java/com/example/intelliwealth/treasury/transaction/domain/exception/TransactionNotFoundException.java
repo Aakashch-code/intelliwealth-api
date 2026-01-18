@@ -1,4 +1,4 @@
-package com.example.intelliwealth.core.transaction.domain.exception;
+package com.example.intelliwealth.treasury.transaction.domain.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

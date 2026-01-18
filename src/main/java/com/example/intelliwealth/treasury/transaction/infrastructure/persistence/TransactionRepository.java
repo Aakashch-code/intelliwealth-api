@@ -1,7 +1,7 @@
-package com.example.intelliwealth.core.transaction.infrastructure.persistence;
+package com.example.intelliwealth.treasury.transaction.infrastructure.persistence;
 
-import com.example.intelliwealth.core.transaction.domain.model.Transaction;
-import com.example.intelliwealth.core.transaction.domain.model.TransactionType;
+import com.example.intelliwealth.treasury.transaction.domain.model.Transaction;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

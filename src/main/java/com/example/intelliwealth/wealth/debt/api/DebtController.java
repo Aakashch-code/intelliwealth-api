@@ -1,8 +1,9 @@
 package com.example.intelliwealth.wealth.debt.api;
 
 import com.example.intelliwealth.wealth.debt.application.DebtService;
-import com.example.intelliwealth.wealth.debt.api.dto.DebtRequestDTO;
-import com.example.intelliwealth.wealth.debt.api.dto.DebtResponseDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtResponseDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,68 +26,59 @@ public class DebtController {
 
     private final DebtService service;
 
-    @Operation(summary = "Get all debts", description = "Fetch all debts of the user")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Debts fetched successfully")
-    })
+    @Operation(summary = "Get all debts")
+    @ApiResponse(responseCode = "200", description = "Success")
     @GetMapping
     public List<DebtResponseDTO> getAll() {
         return service.getAll();
     }
 
-    @Operation(summary = "Get debt by ID", description = "Fetch a specific debt using its ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Debt found"),
-            @ApiResponse(responseCode = "404", description = "Debt not found")
-    })
+    @Operation(summary = "Get debt by ID")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Success"), @ApiResponse(responseCode = "404", description = "Not found")})
     @GetMapping("/{id}")
     public DebtResponseDTO getById(@PathVariable String id) {
         return service.getById(id);
     }
 
-    @Operation(summary = "Create a new debt")
+    @Operation(summary = "Create debt")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
-                    description = "Debt created successfully",
+                    description = "Created",
                     content = @Content(schema = @Schema(implementation = DebtResponseDTO.class))
             ),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
+            @ApiResponse(responseCode = "400", description = "Bad request")
     })
     @PostMapping
-    public ResponseEntity<DebtResponseDTO> create(
-            @RequestBody DebtRequestDTO dto) {
-        return new ResponseEntity<>(service.create(dto), HttpStatus.CREATED);
+    public ResponseEntity<DebtResponseDTO> create(@RequestBody DebtRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
-    @Operation(summary = "Update an existing debt")
+    @Operation(summary = "Update debt")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Debt updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Debt not found")
+            @ApiResponse(responseCode = "200", description = "Updated"),
+            @ApiResponse(responseCode = "404", description = "Not found")
     })
     @PutMapping("/{id}")
-    public DebtResponseDTO update(
-            @PathVariable String id,
-            @RequestBody DebtRequestDTO dto) {
+    public DebtResponseDTO update(@PathVariable String id, @RequestBody DebtRequestDTO dto) {
         return service.update(id, dto);
     }
 
-    @Operation(summary = "Delete a debt")
+    @Operation(summary = "Delete debt")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Debt deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Debt not found")
+            @ApiResponse(responseCode = "204", description = "Deleted"),
+            @ApiResponse(responseCode = "404", description = "Not found")
     })
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String id) {
         service.delete(id);
     }
 
-    @Operation(summary = "Get total outstanding debt amount")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Total debt calculated")
-    })
-    @GetMapping("/total")
-    public BigDecimal totalDebt() {
-        return service.totalDebt();
+    @Operation(summary = "Get debt statistics")
+    @ApiResponse(responseCode = "200", description = "Success")
+    @GetMapping("/stats")
+    public DebtStatsDTO stats() {
+        return service.debtAmountSummary();
     }
 }

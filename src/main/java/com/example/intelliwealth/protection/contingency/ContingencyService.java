@@ -1,7 +1,7 @@
 package com.example.intelliwealth.protection.contingency;
 
-import com.example.intelliwealth.core.transaction.application.service.TransactionService;
-import com.example.intelliwealth.core.subscription.application.service.SubscriptionService;
+import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
+import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.DebtService;
 import com.example.intelliwealth.wealth.asset.application.AssetService;
@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+
+
 
 @Service
 public class ContingencyService {
@@ -64,7 +66,7 @@ public class ContingencyService {
         return new ContingencyReportDTO(monthlyBurn, liquidWealth, survivalMonths, gap,status);
     }
 
-    private BigDecimal calculateLiquidWealth(List<AssetsResponseDTO> assets) {
+    public BigDecimal calculateLiquidWealth(List<AssetsResponseDTO> assets) {
         BigDecimal totalLiquid = BigDecimal.ZERO;
 
         for (AssetsResponseDTO asset : assets) {
@@ -90,7 +92,8 @@ public class ContingencyService {
         return totalLiquid;
     }
 
-    private String determineStatus(BigDecimal months) {
+
+    public String determineStatus(BigDecimal months) {
         if (months.compareTo(new BigDecimal("3")) < 0) return "DANGER";
         if (months.compareTo(new BigDecimal("6")) < 0) return "WARNING";
         return "SAFE";

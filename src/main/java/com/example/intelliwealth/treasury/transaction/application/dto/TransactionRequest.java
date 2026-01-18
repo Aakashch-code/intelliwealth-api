@@ -1,9 +1,8 @@
-package com.example.intelliwealth.core.transaction.application.dto;
+package com.example.intelliwealth.treasury.transaction.application.dto;
 
-import com.example.intelliwealth.core.transaction.domain.model.TransactionCategory;
-import com.example.intelliwealth.core.transaction.domain.model.TransactionSource;
-import com.example.intelliwealth.core.transaction.domain.model.TransactionType;
-import com.mongodb.lang.Nullable;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionCategory;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionSource;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;

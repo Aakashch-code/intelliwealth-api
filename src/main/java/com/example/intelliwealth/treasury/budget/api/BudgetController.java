@@ -1,9 +1,9 @@
-package com.example.intelliwealth.core.budget.api;
+package com.example.intelliwealth.treasury.budget.api;
 
-import com.example.intelliwealth.core.budget.application.dto.BudgetRequestDTO;
-import com.example.intelliwealth.core.budget.application.dto.BudgetResponseDTO;
-import com.example.intelliwealth.core.budget.application.dto.BudgetSummaryDTO;
-import com.example.intelliwealth.core.budget.application.service.BudgetService;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

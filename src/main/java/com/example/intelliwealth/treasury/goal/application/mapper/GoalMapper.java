@@ -1,8 +1,8 @@
-package com.example.intelliwealth.core.goal.application.mapper;
+package com.example.intelliwealth.treasury.goal.application.mapper;
 
-import com.example.intelliwealth.core.goal.application.dto.GoalRequestDTO;
-import com.example.intelliwealth.core.goal.application.dto.GoalResponseDTO;
-import com.example.intelliwealth.core.goal.domain.model.Goal;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
+import com.example.intelliwealth.treasury.goal.domain.model.Goal;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

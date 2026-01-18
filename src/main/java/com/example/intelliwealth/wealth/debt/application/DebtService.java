@@ -1,13 +1,14 @@
 package com.example.intelliwealth.wealth.debt.application;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
 import com.example.intelliwealth.wealth.debt.domain.rules.DebtValidator;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
-import com.example.intelliwealth.wealth.debt.api.dto.DebtRequestDTO;
-import com.example.intelliwealth.wealth.debt.api.dto.DebtResponseDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtResponseDTO;
 import com.example.intelliwealth.wealth.debt.domain.exception.DebtNotFoundException;
 import com.example.intelliwealth.wealth.debt.application.mapper.DebtMapper;
-import com.example.intelliwealth.wealth.debt.domain.repository.DebtRepository;
+import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -84,13 +85,29 @@ public class DebtService extends SecuredService {
         repo.deleteByIdAndUserId(id,currentUserId());
     }
 
-    public BigDecimal totalDebt() {
+    public BigDecimal totalOutstandingAmount() {
         return repo.findAllByUserId(currentUserId())
                 .stream()
                 .map(d -> d.getOutstandingAmount() == null
                         ? BigDecimal.ZERO
                         : d.getOutstandingAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal totalDebtAmount() {
+        return repo.findAllByUserId(currentUserId())
+                .stream()
+                .map(a-> a.getTotalAmount() == null
+                        ? BigDecimal.ZERO
+                        : a.getTotalAmount())
+                .reduce(BigDecimal.ZERO , BigDecimal::add);
+    }
+
+    public DebtStatsDTO debtAmountSummary() {
+        return DebtStatsDTO.builder()
+                .totalDebtAmount(totalDebtAmount())
+                .totalOutstandingAmount(totalOutstandingAmount())
+                .build();
     }
 
     public BigDecimal getTotalMonthlyEMIs() {

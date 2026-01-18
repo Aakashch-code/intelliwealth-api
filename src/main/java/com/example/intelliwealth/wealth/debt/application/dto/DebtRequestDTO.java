@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.debt.api.dto;
+package com.example.intelliwealth.wealth.debt.application.dto;
 
 import com.example.intelliwealth.wealth.debt.domain.model.DebtCategory;
 import com.example.intelliwealth.wealth.debt.domain.model.DebtMainCategory;

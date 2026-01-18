@@ -1,6 +1,6 @@
-package com.example.intelliwealth.fynix.infrastructure.ai;
+package com.example.intelliwealth.ai.infrastructure.ai;
 
-import com.example.intelliwealth.fynix.api.dto.FynixResponse;
+import com.example.intelliwealth.ai.api.dto.FynixResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 

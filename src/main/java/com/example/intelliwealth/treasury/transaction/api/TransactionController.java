@@ -1,8 +1,9 @@
-package com.example.intelliwealth.core.transaction.api;
+package com.example.intelliwealth.treasury.transaction.api;
 
-import com.example.intelliwealth.core.transaction.application.dto.TransactionRequest;
-import com.example.intelliwealth.core.transaction.application.dto.TransactionResponse;
-import com.example.intelliwealth.core.transaction.application.service.TransactionService;
+import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
+import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -57,7 +58,7 @@ public class TransactionController {
 
     @GetMapping("/summary/net")
     @Operation(summary = "Get net financial position")
-    public ResponseEntity<BigDecimal> getNetSummary() {
+    public ResponseEntity<SavingResponse> getNetSummary() {
         return ResponseEntity.ok(service.calculateNetPosition());
     }
 }

@@ -1,8 +1,8 @@
-package com.example.intelliwealth.core.subscription.api;
+package com.example.intelliwealth.treasury.subscription.api;
 
-import com.example.intelliwealth.core.subscription.application.dto.SubscriptionRequestDTO;
-import com.example.intelliwealth.core.subscription.application.dto.SubscriptionResponseDTO;
-import com.example.intelliwealth.core.subscription.application.service.SubscriptionService;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
+import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

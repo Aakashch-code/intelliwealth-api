@@ -1,8 +1,8 @@
 package com.example.intelliwealth.wealth.networth;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
-import com.example.intelliwealth.wealth.asset.domain.repository.AssetRepository;
-import com.example.intelliwealth.wealth.debt.domain.repository.DebtRepository;
+import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
+import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

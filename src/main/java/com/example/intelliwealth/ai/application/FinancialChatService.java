@@ -1,10 +1,10 @@
-package com.example.intelliwealth.fynix.application;
+package com.example.intelliwealth.ai.application;
 
-import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
-import com.example.intelliwealth.fynix.api.dto.FynixRequest;
-import com.example.intelliwealth.fynix.api.dto.FynixResponse;
-import com.example.intelliwealth.fynix.infrastructure.ai.AiResponseParser;
-import com.example.intelliwealth.fynix.infrastructure.ai.FynixPromptBuilder;
+import com.example.intelliwealth.ai.api.dto.FinancialSummary;
+import com.example.intelliwealth.ai.api.dto.FynixRequest;
+import com.example.intelliwealth.ai.api.dto.FynixResponse;
+import com.example.intelliwealth.ai.infrastructure.ai.AiResponseParser;
+import com.example.intelliwealth.ai.infrastructure.ai.FynixPromptBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;

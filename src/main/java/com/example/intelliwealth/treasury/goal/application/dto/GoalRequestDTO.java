@@ -1,7 +1,10 @@
-package com.example.intelliwealth.core.goal.application.dto;
+package com.example.intelliwealth.treasury.goal.application.dto;
 
+import com.example.intelliwealth.treasury.goal.domain.model.GoalPriority;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,7 +24,8 @@ public class GoalRequestDTO {
     private BigDecimal currentAmount;
 
     @Schema(description = "Priority level of the goal", example = "HIGH")
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private GoalPriority priority;
 
     private boolean status;
 
