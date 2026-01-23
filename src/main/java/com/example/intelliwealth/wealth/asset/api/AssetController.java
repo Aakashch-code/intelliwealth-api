@@ -1,8 +1,8 @@
 package com.example.intelliwealth.wealth.asset.api;
 
 import com.example.intelliwealth.wealth.asset.application.AssetService;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsRequestDTO;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

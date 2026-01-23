@@ -1,4 +1,4 @@
-package com.example.intelliwealth.protection.insurance.api.dto;
+package com.example.intelliwealth.protection.insurance.application.dto;
 
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceMainCategory;

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class DebtRequestDTO {
     )
     private Map<String, Object> attributes;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @Schema(example = "25-12-2026")
-    private Date dueDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Schema(example = "2026-12-23")
+    private LocalDate dueDate;
 }

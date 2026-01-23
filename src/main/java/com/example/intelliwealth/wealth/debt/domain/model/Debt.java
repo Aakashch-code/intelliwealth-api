@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -38,6 +39,6 @@ public class Debt {
 
     private Map<String, Object> attributes;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date dueDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
 }

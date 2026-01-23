@@ -2,8 +2,8 @@ package com.example.intelliwealth.wealth.asset.application;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsRequestDTO;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.asset.domain.exception.AssetNotFoundException;
 import com.example.intelliwealth.wealth.asset.application.mapper.AssetsMapper;
 import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;

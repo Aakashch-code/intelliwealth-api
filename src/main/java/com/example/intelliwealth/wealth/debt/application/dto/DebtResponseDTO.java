@@ -5,6 +5,7 @@ import com.example.intelliwealth.wealth.debt.domain.model.DebtMainCategory;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -22,5 +23,5 @@ public class DebtResponseDTO {
     private DebtMainCategory mainCategory;
 
     private Map<String, Object> attributes;
-    private Date dueDate;
+    private LocalDate dueDate;
 }

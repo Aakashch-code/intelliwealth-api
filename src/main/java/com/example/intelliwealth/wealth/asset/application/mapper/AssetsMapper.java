@@ -1,8 +1,8 @@
 package com.example.intelliwealth.wealth.asset.application.mapper;
 
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsRequestDTO;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

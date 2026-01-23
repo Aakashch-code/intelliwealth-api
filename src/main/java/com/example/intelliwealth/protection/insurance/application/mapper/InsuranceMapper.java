@@ -1,8 +1,8 @@
 package com.example.intelliwealth.protection.insurance.application.mapper;
 
 import com.example.intelliwealth.protection.insurance.domain.model.Insurance;
-import com.example.intelliwealth.protection.insurance.api.dto.InsuranceRequestDTO;
-import com.example.intelliwealth.protection.insurance.api.dto.InsuranceResponseDTO;
+import com.example.intelliwealth.protection.insurance.application.dto.InsuranceRequestDTO;
+import com.example.intelliwealth.protection.insurance.application.dto.InsuranceResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -5,5 +5,5 @@ public enum DebtCategory {
     CAR_LOAN,
     CREDIT_CARD,
     EMI,
-    FRIEND_LOAN
+    FRIEND_LOAN,
 }

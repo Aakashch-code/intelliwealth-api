@@ -2,7 +2,7 @@ package com.example.intelliwealth.protection.contingency;
 
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
-import com.example.intelliwealth.wealth.asset.api.dto.AssetsResponseDTO;
+import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.DebtService;
 import com.example.intelliwealth.wealth.asset.application.AssetService;
 import com.example.intelliwealth.wealth.asset.domain.model.AssetCategory;

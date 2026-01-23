@@ -1,8 +1,8 @@
 package com.example.intelliwealth.authentication.api;
 
-import com.example.intelliwealth.authentication.api.dto.AuthResponse;
-import com.example.intelliwealth.authentication.api.dto.LoginRequest;
-import com.example.intelliwealth.authentication.api.dto.RegisterRequest;
+import com.example.intelliwealth.authentication.application.dto.AuthResponse;
+import com.example.intelliwealth.authentication.application.dto.LoginRequest;
+import com.example.intelliwealth.authentication.application.dto.RegisterRequest;
 import com.example.intelliwealth.authentication.domain.Users;
 import com.example.intelliwealth.authentication.infrastrucutre.persistence.UserRepository;
 import com.example.intelliwealth.authentication.infrastrucutre.security.JwtUtil;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "User registration and login APIs")
 public class AuthController {

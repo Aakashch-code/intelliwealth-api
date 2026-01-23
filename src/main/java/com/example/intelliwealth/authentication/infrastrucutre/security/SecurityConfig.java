@@ -35,7 +35,7 @@ public class SecurityConfig {
                 // Enable CORS for frontend access
                 .cors(httpSecurityCorsConfigurer -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Your frontend
+                    configuration.setAllowedOrigins(List.of("http://localhost:5173"));
                     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
                     configuration.setAllowedHeaders(List.of("*"));
                     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -1,8 +1,6 @@
 package com.example.intelliwealth.treasury.budget.application.dto;
 
-import com.example.intelliwealth.config.CurrencySerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -24,10 +22,8 @@ public class BudgetResponseDTO {
     private Date billingPeriod;
 
     @Schema(description = "Total amount allocated", example = "500.00")
-    @JsonSerialize(using = CurrencySerializer.class)
     private BigDecimal amountAllocated;
 
     @Schema(description = "Total amount spent", example = "150.75")
-    @JsonSerialize(using = CurrencySerializer.class)
     private BigDecimal amountSpent;
 }

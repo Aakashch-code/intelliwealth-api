@@ -1,8 +1,8 @@
 package com.example.intelliwealth.protection.insurance.api;
 
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
-import com.example.intelliwealth.protection.insurance.api.dto.InsuranceRequestDTO;
-import com.example.intelliwealth.protection.insurance.api.dto.InsuranceResponseDTO;
+import com.example.intelliwealth.protection.insurance.application.dto.InsuranceRequestDTO;
+import com.example.intelliwealth.protection.insurance.application.dto.InsuranceResponseDTO;
 import com.example.intelliwealth.protection.insurance.application.InsuranceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 public class TourSummaryDTO {
-
+    private String timeframe = "The collected data is from all time.";
     private BudgetSummaryDTO budgetSummary;
     private ContingencyReportDTO contingency;
     private SavingResponse netPosition;

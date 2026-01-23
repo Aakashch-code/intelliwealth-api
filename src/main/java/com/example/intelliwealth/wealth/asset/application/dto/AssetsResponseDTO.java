@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.asset.api.dto;
+package com.example.intelliwealth.wealth.asset.application.dto;
 
 import com.example.intelliwealth.wealth.asset.domain.model.AssetCategory;
 import com.example.intelliwealth.wealth.asset.domain.model.AssetMainCategory;
