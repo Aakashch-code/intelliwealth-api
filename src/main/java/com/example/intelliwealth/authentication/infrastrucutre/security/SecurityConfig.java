@@ -32,29 +32,23 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                // Enable CORS for frontend access
-                .cors(httpSecurityCorsConfigurer -> {
-                    CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-                    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-                    configuration.setAllowedHeaders(List.of("*"));
-                    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                    source.registerCorsConfiguration("/**", configuration);
-                    httpSecurityCorsConfigurer.configurationSource(source);
-                })
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Swagger must be PUBLIC
+                        // 🔥 REQUIRED for CORS preflight
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Public endpoints
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/auth/**"
                         ).permitAll()
 
-                        // ✅ Auth endpoints
-                        .requestMatchers("/auth/**").permitAll()
-
-                        // 🔐 Everything else secured
+                        // Everything else
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -80,4 +74,24 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12); // Strength 12 is better than default 10
     }
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("https://intelli-wealth-ui.netlify.app")
+        );
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        );
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // 🔥 REQUIRED
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
 }
