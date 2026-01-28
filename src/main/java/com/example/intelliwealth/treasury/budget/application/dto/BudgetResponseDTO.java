@@ -1,29 +1,33 @@
 package com.example.intelliwealth.treasury.budget.application.dto;
 
+import com.example.intelliwealth.treasury.budget.domain.model.BudgetCategory;
+import com.example.intelliwealth.treasury.budget.domain.model.BudgetStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Schema(description = "Response object containing budget details")
 public class BudgetResponseDTO {
 
-    @Schema(description = "Unique identifier of the budget", example = "1")
-    private int id;
+    private Long id;
+    private String title;
+    private BudgetCategory category;
 
-    @Schema(description = "The category of the budget", example = "Groceries")
-    private String category;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
 
-    @Schema(description = "The billing date formatted as dd-MM-yyyy", example = "01-12-2023")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date billingPeriod;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
-    @Schema(description = "Total amount allocated", example = "500.00")
     private BigDecimal amountAllocated;
-
-    @Schema(description = "Total amount spent", example = "150.75")
     private BigDecimal amountSpent;
+    private BigDecimal remainingAmount; // Derived
+    private BudgetStatus status;        // Derived
+
+    private boolean recurring;
+    private String note;
 }
