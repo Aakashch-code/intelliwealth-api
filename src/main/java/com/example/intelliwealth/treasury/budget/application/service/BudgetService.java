@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,52 +28,63 @@ public class BudgetService extends SecuredService {
 
     public BudgetResponseDTO createBudget(BudgetRequestDTO request) {
         Budget budget = mapper.toEntity(request);
-        budget.setUserId(currentUserId()); // 🔐 attach owner
-
+        budget.setUserId(currentUserId());
         return mapper.toResponseDTO(repo.save(budget));
     }
 
+    @Transactional(readOnly = true)
     public List<BudgetResponseDTO> getAllBudgets() {
         return mapper.toResponseDTOList(
                 repo.findAllByUserId(currentUserId())
         );
     }
 
-    public BudgetResponseDTO getBudgetById(int id) {
+    @Transactional(readOnly = true)
+    public BudgetResponseDTO getBudgetById(Long id) {
         return repo.findByIdAndUserId(id, currentUserId())
                 .map(mapper::toResponseDTO)
-                .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
+                .orElseThrow(() -> new BudgetNotFoundException("Budget with ID " + id + " not found"));
     }
 
-    public BudgetResponseDTO updateBudget(int id, BudgetRequestDTO request) {
+    public BudgetResponseDTO updateBudget(Long id, BudgetRequestDTO request) {
         Budget existing = repo.findByIdAndUserId(id, currentUserId())
-                .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
+                .orElseThrow(() -> new BudgetNotFoundException("Budget with ID " + id + " not found"));
 
         mapper.updateEntityFromRequest(existing, request);
         return mapper.toResponseDTO(repo.save(existing));
     }
 
-    public void deleteBudgetById(int id) {
+    public void deleteBudgetById(Long id) {
         Budget budget = repo.findByIdAndUserId(id, currentUserId())
-                .orElseThrow(() -> new BudgetNotFoundException("Budget not found"));
+                .orElseThrow(() -> new BudgetNotFoundException("Budget with ID " + id + " not found"));
 
         repo.delete(budget);
     }
-
+    @Transactional(readOnly = true)
     public BudgetSummaryDTO getBudgetSummary() {
+
         List<Budget> budgets = repo.findAllByUserId(currentUserId());
 
+        // Sum allocated
         BigDecimal totalAllocated = budgets.stream()
-                .map(b -> b.getAmountAllocated() != null ? b.getAmountAllocated() : BigDecimal.ZERO)
+                .map(Budget::getAmountAllocated)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Sum spent
         BigDecimal totalSpent = budgets.stream()
-                .map(b -> b.getAmountSpent() != null ? b.getAmountSpent() : BigDecimal.ZERO)
+                .map(Budget::getAmountSpent)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Remaining
+        BigDecimal totalRemaining = totalAllocated.subtract(totalSpent);
 
         return BudgetSummaryDTO.builder()
                 .totalAllocated(totalAllocated)
                 .totalSpent(totalSpent)
+                .totalRemaining(totalRemaining)
                 .build();
     }
+
 }

@@ -3,17 +3,25 @@ package com.example.intelliwealth.treasury.budget.api;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.treasury.budget.application.service.BudgetExportService;
 import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
+import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
+import com.example.intelliwealth.treasury.transaction.application.service.TransactionExportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/budget")
 @Tag(name = "Budget Controller", description = "Management APIs for Budgeting System")
@@ -22,8 +30,7 @@ public class BudgetController {
 
     private final BudgetService service;
 
-    @Operation(summary = "Get all budgets", description = "Retrieve a list of all budget entries.")
-    @ApiResponse(responseCode = "200", description = "Found the budgets")
+    @Operation(summary = "Get all budgets", description = "Retrieve a list of all budget entries for the current user.")
     @GetMapping
     public List<BudgetResponseDTO> getAllBudgets() {
         return service.getAllBudgets();
@@ -35,41 +42,38 @@ public class BudgetController {
             @ApiResponse(responseCode = "404", description = "Budget not found")
     })
     @GetMapping("/{id}")
-    public BudgetResponseDTO getBudgetById(@PathVariable int id) {
+    public BudgetResponseDTO getBudgetById(@PathVariable Long id) {
         return service.getBudgetById(id);
     }
 
-    @Operation(summary = "Get budget summary", description = "Get the calculated totals for allocated and spent amounts.")
-    @ApiResponse(responseCode = "200", description = "Successfully calculated summary")
+    @Operation(summary = "Get budget summary", description = "Get calculated totals for allocated and spent amounts.")
     @GetMapping("/summary")
     public BudgetSummaryDTO getBudgetSummary() {
         return service.getBudgetSummary();
     }
 
-    @Operation(summary = "Create a new budget", description = "Add a new budget entry to the database.")
-    @ApiResponse(responseCode = "200", description = "Budget created successfully")
+    @Operation(summary = "Create a new budget", description = "Add a new budget entry.")
     @PostMapping
-    public BudgetResponseDTO createBudget(@RequestBody BudgetRequestDTO request) {
+    @ResponseStatus(HttpStatus.CREATED) // Explicit 201 Created
+    public BudgetResponseDTO createBudget(@Valid @RequestBody BudgetRequestDTO request) {
         return service.createBudget(request);
     }
 
-    @Operation(summary = "Update an existing budget", description = "Update the details of an existing budget by ID.")
+    @Operation(summary = "Update an existing budget", description = "Update details of an existing budget by ID.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Budget updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Budget to update not found")
+            @ApiResponse(responseCode = "200", description = "Budget updated"),
+            @ApiResponse(responseCode = "404", description = "Budget not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PutMapping("/{id}")
-    public BudgetResponseDTO updateBudget(@PathVariable int id, @RequestBody BudgetRequestDTO request) {
+    public BudgetResponseDTO updateBudget(@PathVariable Long id, @Valid @RequestBody BudgetRequestDTO request) {
         return service.updateBudget(id, request);
     }
 
-    @Operation(summary = "Delete a budget", description = "Remove a budget entry from the database by ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Budget deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Budget to delete not found")
-    })
+    @Operation(summary = "Delete a budget", description = "Remove a budget entry.")
     @DeleteMapping("/{id}")
-    public void deleteBudgetById(@PathVariable int id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Explicit 204 No Content
+    public void deleteBudgetById(@PathVariable Long id) {
         service.deleteBudgetById(id);
     }
 }
