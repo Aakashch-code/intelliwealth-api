@@ -12,19 +12,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
+// Changed ID type to Long
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findAllByUserIdOrderByTransactionDateDesc(UUID userId);
 
-    Optional<Transaction> findByIdAndUserId(Integer id, UUID userId);
+    Optional<Transaction> findByIdAndUserId(Long id, UUID userId);
 
     List<Transaction> findByUserIdAndDescriptionContainingIgnoreCase(UUID userId, String keyword);
 
-    // Efficient Aggregation: Calculates Net on Database side
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type")
     BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId, @Param("type") TransactionType type);
 
-    // Efficient Aggregation: Average on Database side
     @Query("SELECT COALESCE(AVG(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = 'EXPENSE' AND t.transactionDate >= :startDate")
     BigDecimal getAverageExpenseSince(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate);
 }

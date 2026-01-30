@@ -4,7 +4,10 @@ import com.example.intelliwealth.treasury.transaction.domain.model.TransactionCa
 import com.example.intelliwealth.treasury.transaction.domain.model.TransactionSource;
 import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,9 +17,8 @@ import java.time.LocalDate;
 public class TransactionRequest {
 
     @NotNull(message = "Type is required")
-    @Schema(example = "EXPENSE & INCOME")
+    @Schema(example = "EXPENSE")
     private TransactionType type;
-
 
     @NotBlank(message = "Description required")
     @Size(max = 255)
@@ -28,9 +30,8 @@ public class TransactionRequest {
     @Schema(example = "1200.50")
     private BigDecimal amount;
 
-    @Schema(description = "Transaction category. Determines the nature of the transaction (expense, income, or investment).")
+    @Schema(description = "Transaction category")
     private TransactionCategory category;
-
 
     @Schema(example = "UPI")
     private TransactionSource source;
