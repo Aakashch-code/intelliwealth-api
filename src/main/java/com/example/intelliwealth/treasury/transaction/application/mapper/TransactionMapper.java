@@ -9,6 +9,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
     Transaction toEntity(TransactionRequest dto);
+
     TransactionResponse toResponse(Transaction entity);
+
     void updateEntityFromRequest(TransactionRequest dto, @MappingTarget Transaction entity);
 }

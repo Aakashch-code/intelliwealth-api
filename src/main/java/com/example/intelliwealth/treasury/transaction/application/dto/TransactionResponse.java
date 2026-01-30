@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Data
 @Schema(description = "Transaction response details")
 public class TransactionResponse {
-    private Long id;
     private String type;
     private String description;
     private BigDecimal amount;
