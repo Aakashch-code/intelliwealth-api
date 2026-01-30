@@ -1,4 +1,4 @@
-# 💰 Intelli Wealth (Personal Project)
+# 💰 Intelli Wealth
 
 <div align="center">
 
