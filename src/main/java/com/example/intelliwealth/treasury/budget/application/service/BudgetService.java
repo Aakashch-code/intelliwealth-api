@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,24 +61,19 @@ public class BudgetService extends SecuredService {
 
         repo.delete(budget);
     }
+
+
     @Transactional(readOnly = true)
     public BudgetSummaryDTO getBudgetSummary() {
 
-        List<Budget> budgets = repo.findAllByUserId(currentUserId());
+        // find current user
+        UUID userId = currentUserId();
 
-        // Sum allocated
-        BigDecimal totalAllocated = budgets.stream()
-                .map(Budget::getAmountAllocated)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // calculated from DB
+        BigDecimal totalAllocated = repo.sumAllocatedByUserId(userId);
+        BigDecimal totalSpent = repo.sumSpentAmountByUserId(userId);
 
-        // Sum spent
-        BigDecimal totalSpent = budgets.stream()
-                .map(Budget::getAmountSpent)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Remaining
+        // remaining
         BigDecimal totalRemaining = totalAllocated.subtract(totalSpent);
 
         return BudgetSummaryDTO.builder()
@@ -86,5 +82,6 @@ public class BudgetService extends SecuredService {
                 .totalRemaining(totalRemaining)
                 .build();
     }
+
 
 }
