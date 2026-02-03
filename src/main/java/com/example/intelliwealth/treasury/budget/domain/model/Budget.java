@@ -1,8 +1,9 @@
 package com.example.intelliwealth.treasury.budget.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mongodb.lang.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,10 +13,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
+
 @Entity
+@Table(name = "budget")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Budget {
@@ -24,18 +27,30 @@ public class Budget {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private UUID userId;
 
+    @Column(nullable = false)
+    private String title;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private BudgetCategory category;
 
+    @Column(nullable = false)
     private LocalDate startDate;
+
+    @Column(nullable = false)
     private LocalDate endDate;
 
+    @Column(nullable = false)
     private BigDecimal amountAllocated;
+
+    @Column(nullable = false)
     private BigDecimal amountSpent;
 
     private boolean recurring;
+
     private String note;
 
     @CreationTimestamp
@@ -45,21 +60,19 @@ public class Budget {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // ===== Derived Fields =====
 
-    @Transient
     public BigDecimal getRemainingAmount() {
-        return amountAllocated.subtract(
-                amountSpent != null ? amountSpent : BigDecimal.ZERO
-        );
+        BigDecimal allocated = amountAllocated != null ? amountAllocated : BigDecimal.ZERO;
+        BigDecimal spent = amountSpent != null ? amountSpent : BigDecimal.ZERO;
+        return allocated.subtract(spent);
     }
 
-    @Transient
     public BudgetStatus getStatus() {
-        if (amountSpent == null || amountAllocated == null) return BudgetStatus.SAFE;
+        if (amountSpent == null || amountAllocated == null || amountAllocated.compareTo(BigDecimal.ZERO) == 0) {
+            return BudgetStatus.SAFE;
+        }
 
-        BigDecimal usage =
-                amountSpent.divide(amountAllocated, 2, RoundingMode.HALF_UP);
+        BigDecimal usage = amountSpent.divide(amountAllocated, 2, RoundingMode.HALF_UP);
 
         if (usage.compareTo(BigDecimal.ONE) >= 0) return BudgetStatus.EXCEEDED;
         if (usage.compareTo(new BigDecimal("0.8")) >= 0) return BudgetStatus.WARNING;

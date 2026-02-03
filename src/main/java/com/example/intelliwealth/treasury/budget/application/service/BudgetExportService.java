@@ -15,9 +15,7 @@ import java.util.List;
 @Service
 public class BudgetExportService {
 
-    // =========================
     // Public API
-    // =========================
     public void generate(HttpServletResponse response, List<BudgetResponseDTO> budgets)
             throws IOException {
 
@@ -32,9 +30,7 @@ public class BudgetExportService {
         document.close();
     }
 
-    // =========================
     // Title
-    // =========================
     private void addTitle(Document document) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15);
 
@@ -45,9 +41,7 @@ public class BudgetExportService {
         document.add(title);
     }
 
-    // =========================
     // Table
-    // =========================
     private void addTable(Document document, List<BudgetResponseDTO> budgets)
             throws DocumentException {
 
@@ -65,9 +59,7 @@ public class BudgetExportService {
         document.add(table);
     }
 
-    // =========================
     // Header
-    // =========================
     private void addHeader(PdfPTable table) {
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
         Color headerBg = new Color(33, 150, 243);
@@ -94,10 +86,7 @@ public class BudgetExportService {
         cell.setMinimumHeight(28);
         table.addCell(cell);
     }
-
-    // =========================
     // Rows
-    // =========================
     private void addRows(PdfPTable table, List<BudgetResponseDTO> budgets) {
         Font bodyFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
         boolean alternate = false;
@@ -123,9 +112,7 @@ public class BudgetExportService {
         }
     }
 
-    // =========================
     // Cell Helpers
-    // =========================
     private PdfPCell dataCell(String value, Font font, Color bg) {
         PdfPCell cell = new PdfPCell(new Phrase(value, font));
         cell.setPadding(6);
@@ -169,10 +156,7 @@ public class BudgetExportService {
 
         return cell;
     }
-
-    // =========================
     // Branding
-    // =========================
     private void addWatermark(PdfWriter writer) {
         PdfContentByte canvas = writer.getDirectContentUnder();
         Font font = FontFactory.getFont(
@@ -202,9 +186,7 @@ public class BudgetExportService {
         document.add(footer);
     }
 
-    // =========================
     // Utils
-    // =========================
     private String value(Object obj) {
         return obj == null ? "-" : obj.toString();
     }

@@ -2,11 +2,13 @@ package com.example.intelliwealth.treasury.budget.infrastructure.persistence;
 
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
 import com.example.intelliwealth.treasury.budget.domain.model.Budget;
+import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,4 +19,13 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     List<Budget> findAllByUserId(UUID userId);
 
     Optional<Budget> findByIdAndUserId(Long id, UUID userId);
+
+    @Query("SELECT COALESCE(SUM(b.amountSpent),0) FROM Budget b WHERE b.userId = :userId")
+    BigDecimal sumSpentAmountByUserId(@Param("userId") UUID userId);
+
+    @Query("SELECT COALESCE(SUM(b.amountAllocated),0) FROM Budget b WHERE b.userId = :userId")
+    BigDecimal sumAllocatedByUserId(@Param("userId") UUID userId);
+
+
+
 }

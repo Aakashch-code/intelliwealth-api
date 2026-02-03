@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -41,33 +42,37 @@ public class TransactionService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public TransactionResponse getTransactionById(Integer id) {
+    public TransactionResponse getTransactionById(Long id) { // Changed Integer to Long
         return repository.findByIdAndUserId(id, currentUserId())
                 .map(mapper::toResponse)
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction not found: " + id));
     }
 
     public TransactionResponse createTransaction(TransactionRequest request) {
-        validator.validate(request);
-
+        // Map first, then validate the DOMAIN object
         Transaction transaction = mapper.toEntity(request);
         transaction.setUserId(currentUserId());
+
+        // Domain validation checks business rules (e.g., "No future dates")
+        validator.validate(transaction);
 
         return mapper.toResponse(repository.save(transaction));
     }
 
-    public TransactionResponse updateTransaction(Integer id, TransactionRequest request) {
-        validator.validate(request);
-
+    public TransactionResponse updateTransaction(Long id, TransactionRequest request) {
         Transaction existing = repository.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction not found: " + id));
 
+        // Update fields
         mapper.updateEntityFromRequest(request, existing);
+
+        // Re-validate the merged entity
+        validator.validate(existing);
 
         return mapper.toResponse(repository.save(existing));
     }
 
-    public void deleteTransaction(Integer id) {
+    public void deleteTransaction(Long id) {
         Transaction existing = repository.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction not found: " + id));
         repository.delete(existing);
@@ -79,12 +84,16 @@ public class TransactionService extends SecuredService {
         BigDecimal income = repository.sumAmountByUserIdAndType(userId, TransactionType.INCOME);
         BigDecimal expense = repository.sumAmountByUserIdAndType(userId, TransactionType.EXPENSE);
         BigDecimal saving  = income.subtract(expense);
-        return new SavingResponse(income,expense,saving);
+        return new SavingResponse(income, expense, saving);
     }
 
     @Transactional(readOnly = true)
     public BigDecimal getMonthlyAverageExpense(int months) {
         if (months <= 0) throw new IllegalArgumentException("Months must be > 0");
-        return repository.getAverageExpenseSince(currentUserId(), LocalDate.now().minusMonths(months));
+
+        BigDecimal average = repository.getAverageExpenseSince(currentUserId(), LocalDate.now().minusMonths(months));
+
+        // Add rounding to prevent API displaying 1200.33333333
+        return average.setScale(2, RoundingMode.HALF_UP);
     }
 }

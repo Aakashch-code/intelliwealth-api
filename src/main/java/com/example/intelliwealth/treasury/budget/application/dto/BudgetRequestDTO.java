@@ -37,7 +37,7 @@ public class BudgetRequestDTO {
 
     @PositiveOrZero(message = "Amount spent cannot be negative")
     @Schema(description = "Amount currently spent (default 0)", example = "0.00")
-    private BigDecimal amountSpent = BigDecimal.ZERO; // Default to 0 if null
+    private BigDecimal amountSpent = BigDecimal.ZERO;
 
     @Schema(description = "Is this a recurring budget?", example = "true")
     private boolean recurring;
