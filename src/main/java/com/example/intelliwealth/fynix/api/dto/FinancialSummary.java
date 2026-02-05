@@ -1,4 +1,4 @@
-package com.example.intelliwealth.ai.api.dto;
+package com.example.intelliwealth.fynix.api.dto;
 
 import lombok.Data;
 import java.util.ArrayList;
