@@ -2,6 +2,9 @@ package com.example.intelliwealth.wealth.debt.application.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.bson.types.Decimal128;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 
@@ -9,6 +12,6 @@ import java.math.BigDecimal;
 @Data
 public class DebtStatsDTO {
 
-    private BigDecimal totalDebtAmount;
+    private Decimal128 totalDebtAmount;
     private BigDecimal totalOutstandingAmount;
 }

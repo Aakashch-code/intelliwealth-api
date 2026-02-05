@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.debt.api;
 
-import com.example.intelliwealth.wealth.debt.application.DebtService;
+import com.example.intelliwealth.wealth.debt.application.service.DebtService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController

@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.debt.application;
+package com.example.intelliwealth.wealth.debt.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
@@ -10,6 +10,7 @@ import com.example.intelliwealth.wealth.debt.domain.exception.DebtNotFoundExcept
 import com.example.intelliwealth.wealth.debt.application.mapper.DebtMapper;
 import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.Decimal128;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -94,13 +95,8 @@ public class DebtService extends SecuredService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal totalDebtAmount() {
-        return repo.findAllByUserId(currentUserId())
-                .stream()
-                .map(a-> a.getTotalAmount() == null
-                        ? BigDecimal.ZERO
-                        : a.getTotalAmount())
-                .reduce(BigDecimal.ZERO , BigDecimal::add);
+    public Decimal128 totalDebtAmount() {
+        return repo.sumOfTotalDebtByUserId(currentUserId());
     }
 
     public DebtStatsDTO debtAmountSummary() {
