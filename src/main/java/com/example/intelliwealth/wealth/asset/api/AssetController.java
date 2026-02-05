@@ -1,22 +1,21 @@
 package com.example.intelliwealth.wealth.asset.api;
 
-import com.example.intelliwealth.wealth.asset.application.AssetService;
+import com.example.intelliwealth.wealth.asset.application.service.AssetService;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.Decimal128;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/assets")
-@CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 @Tag(name = "Asset Management", description = "Operations related to managing financial assets")
 public class AssetController {
@@ -58,7 +57,8 @@ public class AssetController {
 
     @GetMapping("/total-value")
     @Operation(summary = "Calculate total portfolio value")
-    public ResponseEntity<BigDecimal> allAssetsAmount() {
-        return ResponseEntity.ok(service.allAssetsAmount());
+    public ResponseEntity<Decimal128> allAssetsAmount() {
+        Decimal128 assetSum = service.allAssetsAmount();
+        return ResponseEntity.ok(assetSum);
     }
 }

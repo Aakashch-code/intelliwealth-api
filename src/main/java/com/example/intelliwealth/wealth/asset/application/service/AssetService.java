@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.asset.application;
+package com.example.intelliwealth.wealth.asset.application.service;
 
 import com.example.intelliwealth.authentication.application.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
@@ -9,13 +9,13 @@ import com.example.intelliwealth.wealth.asset.application.mapper.AssetsMapper;
 import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
 import com.example.intelliwealth.wealth.asset.domain.rules.AssetValidator;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.Decimal128;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -81,12 +81,13 @@ public class AssetService extends SecuredService {
 
     // ---------------- AGGREGATE ----------------
 
-    public BigDecimal allAssetsAmount() {
-        return repo.findAllByUserId(currentUserId())
-                .stream()
-                .map(Asset::getCurrentValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public Decimal128 allAssetsAmount() {
+
+        UUID userId = currentUserId();
+        return repo.sumAssetValueByUserId(userId);
     }
+
+
 
     // ---------------- DELETE ----------------
 
