@@ -28,6 +28,5 @@ public class AssetsRequestDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateAcquired;
 
-    // This allows the user to send dynamic fields
     private Map<String, Object> attributes;
 }
