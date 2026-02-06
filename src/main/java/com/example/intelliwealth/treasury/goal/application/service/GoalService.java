@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -83,34 +84,32 @@ public class GoalService extends SecuredService {
     // ---------------- STATS ----------------
 
     public GoalStatsResponseDTO getGoalStats() {
-        List<Goal> goals = repo.findAllByUserId(currentUserId());
+        UUID userId = currentUserId();
+        LocalDate today = LocalDate.now();
+
+        List<Goal> goals = repo.findAllByUserId(userId);
 
         long totalGoals = goals.size();
 
         long completedGoals = goals.stream()
-                .filter(g -> safeAmount(g.getCurrentAmount())
-                        .compareTo(safeAmount(g.getTargetAmount())) >= 0)
+                .filter(this::isGoalCompleted)
                 .count();
 
-        BigDecimal totalTargetAmount = goals.stream()
-                .map(g -> safeAmount(g.getTargetAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalTargetAmount =
+                safeAmount(repo.sumTargetAmountByUserId(userId));
 
-        BigDecimal totalCurrentAmount = goals.stream()
-                .map(g -> safeAmount(g.getCurrentAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalCurrentAmount =
+                safeAmount(repo.sumCurrentAmountByUserId(userId));
 
         long totalMonthlyRequired = goals.stream()
-                .mapToLong(g ->
-                        goalCalculator.calculateRequiredAmount(
-                                g.getTargetAmount(),
-                                g.getCurrentAmount(),
-                                g.getTargetDate(),
-                                LocalDate.now(),
-                                GoalPeriod.MONTHLY
-                        )
-                ).sum();
-
+                .mapToLong(goal -> goalCalculator.calculateRequiredAmount(
+                        goal.getTargetAmount(),
+                        goal.getCurrentAmount(),
+                        goal.getTargetDate(),
+                        today,
+                        GoalPeriod.MONTHLY
+                ))
+                .sum();
 
         return new GoalStatsResponseDTO(
                 totalGoals,
@@ -119,6 +118,11 @@ public class GoalService extends SecuredService {
                 totalCurrentAmount,
                 totalMonthlyRequired
         );
+    }
+
+    private boolean isGoalCompleted(Goal goal) {
+        return safeAmount(goal.getCurrentAmount())
+                .compareTo(safeAmount(goal.getTargetAmount())) >= 0;
     }
 
     // Helper for stats calculation (BigDecimal null safety)

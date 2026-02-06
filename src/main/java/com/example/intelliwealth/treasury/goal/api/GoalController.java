@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api")
 @Tag(name = "Goal Management", description = "APIs for managing financial goals, tracking progress, and statistics")
 @RequiredArgsConstructor

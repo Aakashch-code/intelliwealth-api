@@ -1,4 +1,4 @@
-package com.example.intelliwealth.ai.api.dto;
+package com.example.intelliwealth.fynix.api.dto;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ public class GoalAlignment {
 
     private String goalName;
 
-    private String alignment; // Aligned | Partially aligned | Not aligned
+    private String alignment;
 
     private String notes;
 }
