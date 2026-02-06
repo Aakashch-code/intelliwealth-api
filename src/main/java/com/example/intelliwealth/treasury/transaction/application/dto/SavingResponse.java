@@ -1,16 +1,13 @@
 package com.example.intelliwealth.treasury.transaction.application.dto;
 
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
 public class SavingResponse {
-
     private BigDecimal totalIncome;
     private BigDecimal totalExpense;
-    private BigDecimal saving;
+    private BigDecimal netSavings;
 }

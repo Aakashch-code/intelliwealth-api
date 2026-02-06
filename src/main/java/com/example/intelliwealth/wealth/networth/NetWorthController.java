@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/networth")
 @RequiredArgsConstructor
 @Tag(name = "Net Worth", description = "APIs for calculating user net worth")
-@CrossOrigin(origins = "http://localhost:5173")
 public class NetWorthController {
 
     private final NetWorthService netWorthService;

@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
         basePackages = {
                 "com.example.intelliwealth.wealth",
                 "com.example.intelliwealth.protection",
-                "com.example.intelliwealth.ai"
+                "com.example.intelliwealth.fynix"
         }
 )
 public class IntelliWealthApplication {

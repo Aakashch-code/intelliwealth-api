@@ -8,13 +8,11 @@ import com.example.intelliwealth.treasury.goal.application.dto.GoalStatsResponse
 import com.example.intelliwealth.treasury.goal.application.service.GoalService;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
-import com.example.intelliwealth.wealth.debt.application.DebtService;
+import com.example.intelliwealth.wealth.debt.application.service.DebtService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

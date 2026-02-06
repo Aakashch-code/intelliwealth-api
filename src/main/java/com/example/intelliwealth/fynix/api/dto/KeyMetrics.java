@@ -1,4 +1,4 @@
-package com.example.intelliwealth.ai.api.dto;
+package com.example.intelliwealth.fynix.api.dto;
 
 import lombok.Data;
 import java.math.BigDecimal;
@@ -12,5 +12,5 @@ public class KeyMetrics {
 
     private BigDecimal monthlySubscriptionCost;
 
-    private BigDecimal savingsRate; // percentage
+    private BigDecimal savingsRate;
 }
