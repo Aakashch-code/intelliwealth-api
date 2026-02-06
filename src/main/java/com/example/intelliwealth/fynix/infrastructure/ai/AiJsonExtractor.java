@@ -1,4 +1,4 @@
-package com.example.intelliwealth.ai.infrastructure.ai;
+package com.example.intelliwealth.fynix.infrastructure.ai;
 
     public class AiJsonExtractor {
 
