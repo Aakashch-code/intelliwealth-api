@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Subscription Management", description = "Manage user subscriptions")
 public class SubscriptionController {
 

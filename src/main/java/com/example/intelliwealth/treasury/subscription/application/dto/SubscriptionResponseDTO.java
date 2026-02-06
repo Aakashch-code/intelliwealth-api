@@ -10,12 +10,12 @@ import java.time.LocalDate;
 public class SubscriptionResponseDTO {
 
     private int id;
-    private String title; //Spotify
-    private BigDecimal amount; //199
-    private String billingCycle; //Monthly
-    private String category; //Entertainment
+    private String title;
+    private BigDecimal amount;
+    private String billingCycle;
+    private String category;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate nextRecurrence; //Next Recurring Date
-    private boolean isActive = true; // always true
+    private LocalDate nextRecurrence;
+    private boolean isActive = true;
 
 }
