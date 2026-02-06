@@ -1,4 +1,4 @@
-package com.example.intelliwealth.ai.api.dto;
+package com.example.intelliwealth.fynix.domain.model;
 
 import lombok.Data;
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package com.example.intelliwealth.fynix.domain;
+package com.example.intelliwealth.fynix.domain.model;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Id;

@@ -1,8 +1,8 @@
-package com.example.intelliwealth.fynix.application;
+package com.example.intelliwealth.fynix.application.service;
 
-import com.example.intelliwealth.fynix.api.dto.FinancialSummary;
-import com.example.intelliwealth.fynix.api.dto.FynixRequest;
-import com.example.intelliwealth.fynix.api.dto.FynixResponse;
+import com.example.intelliwealth.fynix.application.dto.FinancialSummary;
+import com.example.intelliwealth.fynix.application.dto.FynixRequest;
+import com.example.intelliwealth.fynix.application.dto.FynixResponse;
 import com.example.intelliwealth.fynix.infrastructure.ai.AiResponseParser;
 import com.example.intelliwealth.fynix.infrastructure.ai.FynixPromptBuilder;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
-package com.example.intelliwealth.fynix.api.dto;
+package com.example.intelliwealth.fynix.application.dto;
 
+
+import com.example.intelliwealth.fynix.domain.model.Recommendation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.util.List;

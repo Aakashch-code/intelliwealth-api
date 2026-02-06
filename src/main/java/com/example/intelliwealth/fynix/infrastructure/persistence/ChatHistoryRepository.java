@@ -1,6 +1,6 @@
 package com.example.intelliwealth.fynix.infrastructure.persistence;
 
-import com.example.intelliwealth.fynix.domain.ChatHistory;
+import com.example.intelliwealth.fynix.domain.model.ChatHistory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

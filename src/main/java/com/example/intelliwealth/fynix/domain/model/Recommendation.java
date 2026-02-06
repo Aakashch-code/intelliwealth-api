@@ -1,11 +1,11 @@
-package com.example.intelliwealth.ai.api.dto;
+package com.example.intelliwealth.fynix.domain.model;
 
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-class Recommendation {
+public class Recommendation {
     private String id;
     private String title;
     private String description;

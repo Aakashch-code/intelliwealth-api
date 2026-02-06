@@ -1,4 +1,4 @@
-package com.example.intelliwealth.fynix.api.dto;
+package com.example.intelliwealth.fynix.application.dto;
 
 import lombok.Data;
 
