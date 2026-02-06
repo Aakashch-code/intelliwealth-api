@@ -3,15 +3,14 @@ package com.example.intelliwealth.protection.contingency;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
-import com.example.intelliwealth.wealth.debt.application.DebtService;
-import com.example.intelliwealth.wealth.asset.application.AssetService;
+import com.example.intelliwealth.wealth.debt.application.service.DebtService;
+import com.example.intelliwealth.wealth.asset.application.service.AssetService;
 import com.example.intelliwealth.wealth.asset.domain.model.AssetCategory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-
 
 
 @Service
@@ -67,28 +66,38 @@ public class ContingencyService {
     }
 
     public BigDecimal calculateLiquidWealth(List<AssetsResponseDTO> assets) {
+
         BigDecimal totalLiquid = BigDecimal.ZERO;
 
         for (AssetsResponseDTO asset : assets) {
-            BigDecimal value = asset.getCurrentValue(); // Assuming this field exists
+
+            BigDecimal value = asset.getCurrentValue();
+
             if (value == null) continue;
 
-            // APPLY LIQUIDITY LOGIC BASED ON YOUR ENUMS
             if (asset.getCategory() == AssetCategory.CASH ||
                     asset.getCategory() == AssetCategory.FIXED_INCOME) {
-                totalLiquid = totalLiquid.add(value); // 100% Value
+
+                totalLiquid = totalLiquid.add(value);
+
             }
             else if (asset.getCategory() == AssetCategory.MUTUAL_FUND ||
                     asset.getCategory() == AssetCategory.EQUITY) {
-                // Conservative approach: Count only 80% due to market volatility
-                totalLiquid = totalLiquid.add(value.multiply(new BigDecimal("0.8")));
+
+                // 80% liquidity
+                BigDecimal adjusted = value.multiply(new BigDecimal("0.8"));
+                totalLiquid = totalLiquid.add(adjusted);
+
             }
             else if (asset.getCategory() == AssetCategory.CRYPTO) {
-                // High risk: Count only 50%
-                totalLiquid = totalLiquid.add(value.multiply(new BigDecimal("0.5")));
+
+                // 50% liquidity
+                BigDecimal adjusted = value.multiply(new BigDecimal("0.5"));
+                totalLiquid = totalLiquid.add(adjusted);
             }
-            // REAL_ESTATE and VEHICLE are ignored (0% liquidity)
+            // REAL_ESTATE, VEHICLE = ignored
         }
+
         return totalLiquid;
     }
 
