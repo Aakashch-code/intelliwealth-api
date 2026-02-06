@@ -21,8 +21,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByUserIdAndDescriptionContainingIgnoreCase(UUID userId, String keyword);
 
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type")
-    BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId, @Param("type") TransactionType type);
+//    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type")
+//    BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId, @Param("type") TransactionType type);
+//
+    @Query("SELECT COALESCE(SUM(t.amount),0) FROM Transaction t where t.userId = :userId AND t.type = :type")
+    BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId,@Param("type") TransactionType type);
 
     @Query("SELECT COALESCE(AVG(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = 'EXPENSE' AND t.transactionDate >= :startDate")
     BigDecimal getAverageExpenseSince(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate);
