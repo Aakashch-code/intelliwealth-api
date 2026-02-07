@@ -98,9 +98,12 @@ public class AuthController {
         }
 
         Users user = repo.findByUsernameOrEmail(request.getLogin())
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new BadCredentialsException("User not found")
+                );
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getId());
+
         return ResponseEntity.ok(new AuthResponse(token));
     }
 }
