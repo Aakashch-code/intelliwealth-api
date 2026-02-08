@@ -64,7 +64,7 @@ public class BudgetExportService {
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
         Color headerBg = new Color(33, 150, 243);
 
-        headerCell(table, "ID", headerFont, headerBg);
+        headerCell(table, "Sr. No", headerFont, headerBg);
         headerCell(table, "Title", headerFont, headerBg);
         headerCell(table, "Category", headerFont, headerBg);
         headerCell(table, "Start Date", headerFont, headerBg);
@@ -90,12 +90,12 @@ public class BudgetExportService {
     private void addRows(PdfPTable table, List<BudgetResponseDTO> budgets) {
         Font bodyFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
         boolean alternate = false;
-
+        int srNo = 1;
         for (BudgetResponseDTO b : budgets) {
             Color rowBg = alternate ? new Color(245, 247, 250) : Color.WHITE;
             alternate = !alternate;
 
-            table.addCell(dataCell(value(b.getId()), bodyFont, rowBg));
+            table.addCell(dataCell(String.valueOf(srNo++), bodyFont, rowBg));
             table.addCell(dataCell(value(b.getTitle()), bodyFont, rowBg));
             table.addCell(dataCell(value(b.getCategory()), bodyFont, rowBg));
 

@@ -129,4 +129,5 @@ public class GoalService extends SecuredService {
     private BigDecimal safeAmount(BigDecimal amount) {
         return amount == null ? BigDecimal.ZERO : amount;
     }
+
 }

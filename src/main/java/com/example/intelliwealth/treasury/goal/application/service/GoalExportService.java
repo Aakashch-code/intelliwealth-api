@@ -1,6 +1,6 @@
-package com.example.intelliwealth.treasury.subscription.application.service;
+package com.example.intelliwealth.treasury.goal.application.service;
 
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
@@ -10,28 +10,29 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
 @Service
-public class SubscriptionExportService {
+public class GoalExportService {
 
     private static final Locale INDIA = new Locale("en", "IN");
     private static final NumberFormat INR = NumberFormat.getCurrencyInstance(INDIA);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    public void generate(HttpServletResponse response, List<SubscriptionResponseDTO> subscriptions) throws IOException {
+    public void generate(HttpServletResponse response, List<GoalResponseDTO> goals) throws IOException {
 
-        // A4 Landscape allows more width for Title and Category columns
+        // Setup Document (A4 Landscape)
         Document document = new Document(PageSize.A4.rotate(), 20, 20, 20, 20);
         PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
 
         addTitle(document);
-        addTable(document, subscriptions);
+        addTable(document, goals);
 
         document.close();
     }
@@ -42,7 +43,7 @@ public class SubscriptionExportService {
     private void addTitle(Document document) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
 
-        Paragraph title = new Paragraph("Subscription Report", titleFont);
+        Paragraph title = new Paragraph("Financial Goals Report", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(15);
 
@@ -50,20 +51,20 @@ public class SubscriptionExportService {
     }
 
     // ----------------------------------------------------
-    // Table Structure
+    // Table Setup
     // ----------------------------------------------------
-    private void addTable(Document document, List<SubscriptionResponseDTO> subscriptions) throws DocumentException {
+    private void addTable(Document document, List<GoalResponseDTO> goals) throws DocumentException {
 
-        // 7 Columns
-        PdfPTable table = new PdfPTable(7);
+        // 8 Columns
+        PdfPTable table = new PdfPTable(8);
         table.setWidthPercentage(100);
 
-        // Widths: Sr.No, Title, Category, Cycle, Amount, Next Due, Status
-        table.setWidths(new float[]{1f, 3.5f, 2.5f, 2f, 2.5f, 2.5f, 1.5f});
+        // Widths: Sr.No, Name, Priority, Target, Saved, Progress, Date, Status
+        table.setWidths(new float[]{1f, 3f, 2f, 2.5f, 2.5f, 1.5f, 2.5f, 1.5f});
         table.setSpacingBefore(10);
 
         addHeader(table);
-        addRows(table, subscriptions);
+        addRows(table, goals);
 
         document.add(table);
     }
@@ -78,11 +79,12 @@ public class SubscriptionExportService {
         Color headerBg = new Color(33, 150, 243); // Fintech Blue
 
         headerCell(table, "Sr. No", headerFont, headerBg);
-        headerCell(table, "Title", headerFont, headerBg);
-        headerCell(table, "Category", headerFont, headerBg);
-        headerCell(table, "Billing Cycle", headerFont, headerBg);
-        headerCell(table, "Amount (₹)", headerFont, headerBg);
-        headerCell(table, "Next Due Date", headerFont, headerBg);
+        headerCell(table, "Goal Name", headerFont, headerBg);
+        headerCell(table, "Priority", headerFont, headerBg);
+        headerCell(table, "Target (₹)", headerFont, headerBg);
+        headerCell(table, "Saved (₹)", headerFont, headerBg);
+        headerCell(table, "Progress", headerFont, headerBg);
+        headerCell(table, "Target Date", headerFont, headerBg);
         headerCell(table, "Status", headerFont, headerBg);
     }
 
@@ -96,44 +98,49 @@ public class SubscriptionExportService {
     }
 
     // ----------------------------------------------------
-    // Data Rows
+    // Rows
     // ----------------------------------------------------
-    private void addRows(PdfPTable table, List<SubscriptionResponseDTO> subscriptions) {
+    private void addRows(PdfPTable table, List<GoalResponseDTO> goals) {
         Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
 
         int srNo = 1;
 
-        for (SubscriptionResponseDTO sub : subscriptions) {
-            // 1. Sr No
+        for (GoalResponseDTO g : goals) {
+            // 1. Sr No (Generated)
             table.addCell(dataCell(String.valueOf(srNo++), normalFont));
 
-            // 2. Title
-            table.addCell(dataCell(value(sub.getTitle()), normalFont));
+            // 2. Name
+            table.addCell(dataCell(value(g.getName()), normalFont));
 
-            // 3. Category
-            table.addCell(dataCell(value(sub.getCategory()), normalFont));
+            // 3. Priority (Color Coded)
+            table.addCell(priorityCell(g.getPriority()));
 
-            // 4. Billing Cycle (Capitalize first letter for display)
-            table.addCell(dataCell(formatCycle(sub.getBillingCycle()), normalFont));
+            // 4. Target Amount
+            table.addCell(amountCell(g.getTargetAmount()));
 
-            // 5. Amount
-            table.addCell(amountCell(sub.getAmount()));
+            // 5. Current (Saved) Amount
+            table.addCell(amountCell(g.getCurrentAmount()));
 
-            // 6. Next Recurrence Date
-            table.addCell(dataCell(formatDate(sub), normalFont));
+            // 6. Progress %
+            table.addCell(progressCell(g));
 
-            // 7. Status
-            table.addCell(statusCell(sub.isActive()));
+            // 7. Target Date
+            table.addCell(dataCell(formatDate(g), normalFont));
+
+            // 8. Status
+            table.addCell(statusCell(g.isStatus()));
         }
     }
 
     // ----------------------------------------------------
     // Cell Builders
     // ----------------------------------------------------
+
     private PdfPCell dataCell(String value, Font font) {
         PdfPCell cell = new PdfPCell(new Phrase(value, font));
         cell.setPadding(5);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        // Center text slightly for better readability
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         return cell;
     }
@@ -142,21 +149,60 @@ public class SubscriptionExportService {
         Font font = FontFactory.getFont(FontFactory.HELVETICA, 10);
         PdfPCell cell = new PdfPCell(new Phrase(formatAmount(amount), font));
         cell.setPadding(5);
-        cell.setHorizontalAlignment(Element.ALIGN_RIGHT); // Right align numbers
+        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        return cell;
+    }
+
+    private PdfPCell priorityCell(String priority) {
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+
+        if (priority != null) {
+            if ("HIGH".equalsIgnoreCase(priority)) {
+                font.setColor(Color.RED);
+            } else if ("MEDIUM".equalsIgnoreCase(priority)) {
+                font.setColor(Color.ORANGE);
+            } else if ("LOW".equalsIgnoreCase(priority)) {
+                font.setColor(new Color(0, 153, 0)); // Dark Green
+            } else {
+                font.setColor(Color.BLACK);
+            }
+        }
+
+        PdfPCell cell = new PdfPCell(new Phrase(value(priority), font));
+        cell.setPadding(5);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        return cell;
+    }
+
+    private PdfPCell progressCell(GoalResponseDTO g) {
+        BigDecimal target = g.getTargetAmount();
+        BigDecimal current = g.getCurrentAmount();
+        String percentStr = "0%";
+
+        if (target != null && target.compareTo(BigDecimal.ZERO) > 0 && current != null) {
+            BigDecimal percent = current.divide(target, 2, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal(100));
+            percentStr = percent.intValue() + "%";
+        }
+
+        PdfPCell cell = new PdfPCell(new Phrase(percentStr, FontFactory.getFont(FontFactory.HELVETICA, 10)));
+        cell.setPadding(5);
+        cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         return cell;
     }
 
     private PdfPCell statusCell(boolean isActive) {
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+        Font font = FontFactory.getFont(FontFactory.HELVETICA, 10);
 
-        String text;
-        if (isActive) {
-            text = "Active";
-            font.setColor(new Color(0, 153, 0)); // Green
-        } else {
-            text = "Inactive";
+        String text = isActive ? "Active" : "Completed";
+
+        if (!isActive) {
             font.setColor(Color.GRAY);
+        } else {
+            font.setColor(new Color(0, 102, 204)); // Darker Blue
         }
 
         PdfPCell cell = new PdfPCell(new Phrase(text, font));
@@ -167,20 +213,14 @@ public class SubscriptionExportService {
     }
 
     // ----------------------------------------------------
-    // Helpers
+    // Formatting Helpers
     // ----------------------------------------------------
     private String formatAmount(BigDecimal amount) {
         return amount == null ? "-" : INR.format(amount);
     }
 
-    private String formatDate(SubscriptionResponseDTO sub) {
-        return sub.getNextRecurrence() == null ? "-" : sub.getNextRecurrence().format(DATE_FORMAT);
-    }
-
-    private String formatCycle(String cycle) {
-        if (cycle == null || cycle.isEmpty()) return "-";
-        // Convert "MONTHLY" -> "Monthly"
-        return cycle.substring(0, 1).toUpperCase() + cycle.substring(1).toLowerCase();
+    private String formatDate(GoalResponseDTO g) {
+        return g.getTargetDate() == null ? "-" : g.getTargetDate().format(DATE_FORMAT);
     }
 
     private String value(Object o) {
