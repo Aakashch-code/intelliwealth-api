@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.goal.application.service;
 
-import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
 import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
 import com.example.intelliwealth.treasury.goal.application.dto.GoalStatsResponseDTO;
