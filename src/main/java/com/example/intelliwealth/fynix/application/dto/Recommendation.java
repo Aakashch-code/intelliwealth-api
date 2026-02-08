@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/example/intelliwealth/fynix/application/dto/Recommendation.java
-package com.example.intelliwealth.fynix.api.dto;
-========
-package com.example.intelliwealth.fynix.domain.model;
->>>>>>>> main:src/main/java/com/example/intelliwealth/fynix/domain/model/Recommendation.java
+package com.example.intelliwealth.fynix.application.dto;
 
 import lombok.Data;
 import java.math.BigDecimal;
