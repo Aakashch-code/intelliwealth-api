@@ -1,5 +1,6 @@
-package com.example.intelliwealth.protection.insurance.application;
+package com.example.intelliwealth.protection.insurance.application.service;
 
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.authentication.domain.Users;
 import com.example.intelliwealth.protection.insurance.domain.model.Insurance;
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
@@ -22,36 +23,23 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class InsuranceService {
+public class InsuranceService extends SecuredService {
 
     private final InsuranceRepository repo;
     private final InsuranceMapper mapper;
 
-    private UUID getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new AccessDeniedException("Unauthenticated");
-        }
-
-        if (auth.getPrincipal() instanceof Users user) {
-            return user.getId();
-        }
-
-        throw new AccessDeniedException("Invalid authentication principal");
-    }
 
     public InsuranceResponseDTO create(InsuranceRequestDTO dto) {
         InsuranceValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
 
         Insurance insurance = mapper.toEntity(dto);
-        insurance.setUserId(getCurrentUserId());
+        insurance.setUserId(currentUserId());
 
         return mapper.toDTO(repo.save(insurance));
     }
 
     public List<InsuranceResponseDTO> getAll() {
-        return repo.findAllByUserId(getCurrentUserId())
+        return repo.findAllByUserId(currentUserId())
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
@@ -61,7 +49,7 @@ public class InsuranceService {
         Insurance insurance = repo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Policy not found"));
 
-        if (!insurance.getUserId().equals(getCurrentUserId())) {
+        if (!insurance.getUserId().equals(currentUserId())) {
             throw new AccessDeniedException("Access denied");
         }
 
@@ -69,14 +57,14 @@ public class InsuranceService {
     }
 
     public List<InsuranceResponseDTO> getByCategory(InsuranceCategory category) {
-        return repo.findByUserIdAndCategory(getCurrentUserId(), category)
+        return repo.findByUserIdAndCategory(currentUserId(), category)
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
     }
 
     public List<InsuranceResponseDTO> getActivePolicies() {
-        return repo.findActivePoliciesForUser(getCurrentUserId(), LocalDate.now())
+        return repo.findActivePoliciesForUser(currentUserId(), LocalDate.now())
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
@@ -85,7 +73,7 @@ public class InsuranceService {
     public List<InsuranceResponseDTO> getExpiringSoon() {
         LocalDate now = LocalDate.now();
         return repo.findByUserIdAndEndDateBetween(
-                        getCurrentUserId(),
+                        currentUserId(),
                         now,
                         now.plusMonths(1)
                 )
@@ -99,7 +87,7 @@ public class InsuranceService {
         Insurance existing = repo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Policy not found"));
 
-        if (!existing.getUserId().equals(getCurrentUserId())) {
+        if (!existing.getUserId().equals(currentUserId())) {
             throw new AccessDeniedException("Access denied");
         }
 
@@ -122,7 +110,7 @@ public class InsuranceService {
         Insurance insurance = repo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Policy not found"));
 
-        if (!insurance.getUserId().equals(getCurrentUserId())) {
+        if (!insurance.getUserId().equals(currentUserId())) {
             throw new AccessDeniedException("Access denied");
         }
 

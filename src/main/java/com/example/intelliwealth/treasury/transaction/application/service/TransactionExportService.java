@@ -83,7 +83,7 @@ public class TransactionExportService {
 
         Color headerBg = new Color(33, 150, 243); // fintech blue
 
-        headerCell(table, "ID", headerFont, headerBg);
+        headerCell(table, "Sr.No", headerFont, headerBg);
         headerCell(table, "Type", headerFont, headerBg);
         headerCell(table, "Description", headerFont, headerBg);
         headerCell(table, "Category", headerFont, headerBg);
@@ -115,9 +115,10 @@ public class TransactionExportService {
         Font normalFont =
                 FontFactory.getFont(FontFactory.HELVETICA, 10);
 
+        int srNo = 1;
         for (TransactionResponse t : transactions) {
 
-            table.addCell(dataCell(value(t.getId()), normalFont));
+            table.addCell(dataCell(value(srNo++), normalFont));
             table.addCell(dataCell(value(t.getType()), normalFont));
             table.addCell(dataCell(value(t.getDescription()), normalFont));
             table.addCell(dataCell(value(t.getCategory()), normalFont));
