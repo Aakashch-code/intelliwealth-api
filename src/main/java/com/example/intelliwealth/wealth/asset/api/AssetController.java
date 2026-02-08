@@ -1,5 +1,6 @@
 package com.example.intelliwealth.wealth.asset.api;
 
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.wealth.asset.application.service.AssetService;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/assets")
 @RequiredArgsConstructor
 @Tag(name = "Asset Management", description = "Operations related to managing financial assets")
-public class AssetController {
+public class AssetController extends SecuredService {
 
     private final AssetService service;
 
@@ -58,7 +59,7 @@ public class AssetController {
     @GetMapping("/total-value")
     @Operation(summary = "Calculate total portfolio value")
     public ResponseEntity<Decimal128> allAssetsAmount() {
-        Decimal128 assetSum = service.allAssetsAmount();
+        Decimal128 assetSum = service.allAssetsAmount(currentUserId());
         return ResponseEntity.ok(assetSum);
     }
 }

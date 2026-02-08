@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.asset.application.service;
 
-import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
@@ -10,6 +10,7 @@ import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRe
 import com.example.intelliwealth.wealth.asset.domain.rules.AssetValidator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Decimal128;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,9 +82,8 @@ public class AssetService extends SecuredService {
 
     // ---------------- AGGREGATE ----------------
 
-    public Decimal128 allAssetsAmount() {
-
-        UUID userId = currentUserId();
+    @Cacheable(value = "asset_sum" , key = "#userId")
+    public Decimal128 allAssetsAmount(UUID userId) {
         return repo.sumAssetValueByUserId(userId);
     }
 

@@ -121,7 +121,11 @@
             <version>2.4.0</version>
         </dependency>
 
-        <!-- ===== DEV TOOLS ===== -->
+        <!-- ===== Redis ===== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
         <!-- ===== TESTING ===== -->
         <dependency>
