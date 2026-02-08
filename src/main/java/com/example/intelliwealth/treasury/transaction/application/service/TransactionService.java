@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.transaction.application.service;
 
-import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;

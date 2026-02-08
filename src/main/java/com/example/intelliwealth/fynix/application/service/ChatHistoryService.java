@@ -1,7 +1,7 @@
-package com.example.intelliwealth.fynix.application;
+package com.example.intelliwealth.fynix.application.service;
 
-import com.example.intelliwealth.fynix.api.dto.FynixResponse;
-import com.example.intelliwealth.fynix.domain.ChatHistory;
+import com.example.intelliwealth.fynix.application.dto.FynixResponse;
+import com.example.intelliwealth.fynix.domain.model.ChatHistory;
 import com.example.intelliwealth.fynix.infrastructure.persistence.ChatHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

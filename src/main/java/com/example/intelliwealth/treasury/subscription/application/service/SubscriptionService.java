@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.subscription.application.service;
 
-import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
 import com.example.intelliwealth.treasury.subscription.application.mapper.SubscriptionMapper;

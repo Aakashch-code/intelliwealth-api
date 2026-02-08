@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.budget.application.service;
 
-import com.example.intelliwealth.authentication.application.SecuredService;
+import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
