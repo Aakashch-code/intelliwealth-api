@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public abstract class SecuredService {
 
-    protected UUID currentUserId() {
+    public UUID currentUserId() {
 
         Authentication auth =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -22,4 +22,9 @@ public abstract class SecuredService {
 
         return user.id();
     }
+
+    public String cacheKey() {
+        return currentUserId().toString();
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.intelliwealth.treasury.budget.application.mapper;
+package com.example.intelliwealth.treasury.budget.infrastructure.mapper;
 
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
