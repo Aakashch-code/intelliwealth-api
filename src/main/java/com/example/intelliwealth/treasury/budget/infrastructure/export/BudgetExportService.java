@@ -1,4 +1,4 @@
-package com.example.intelliwealth.treasury.budget.application.service;
+package com.example.intelliwealth.treasury.budget.infrastructure.export;
 
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
 import com.example.intelliwealth.treasury.budget.domain.model.BudgetStatus;
@@ -6,35 +6,51 @@ import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BudgetExportService {
 
+    private static final Font STATUS_FONT =
+            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+
     // Public API
-    public void generate(HttpServletResponse response, List<BudgetResponseDTO> budgets)
+    public void generate(HttpServletResponse response, Page<BudgetResponseDTO> budgets)
             throws IOException {
 
         Document document = new Document(PageSize.A4.rotate(), 20, 20, 20, 20);
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
-        addWatermark(writer);
         addTitle(document);
         addTable(document, budgets);
         addFooterStamp(document);
         document.close();
+
+        writer.setPageEvent(new PdfPageEventHelper() {
+            @Override
+            public void onEndPage(PdfWriter writer, Document document) {
+                ColumnText.showTextAligned(
+                        writer.getDirectContent(),
+                        Element.ALIGN_CENTER,
+                        new Phrase("Page " + writer.getPageNumber()),
+                        420, 20, 0
+                );
+            }
+        });
     }
 
     // Title
     private void addTitle(Document document) throws DocumentException {
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15);
 
-        Paragraph title = new Paragraph("Budget History", titleFont);
+        Paragraph title = new Paragraph("Budget Report", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(18);
 
@@ -42,7 +58,7 @@ public class BudgetExportService {
     }
 
     // Table
-    private void addTable(Document document, List<BudgetResponseDTO> budgets)
+    private void addTable(Document document, Page<BudgetResponseDTO> budgets)
             throws DocumentException {
 
         PdfPTable table = new PdfPTable(11);
@@ -64,17 +80,17 @@ public class BudgetExportService {
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE);
         Color headerBg = new Color(33, 150, 243);
 
-        headerCell(table, "Sr. No", headerFont, headerBg);
-        headerCell(table, "Title", headerFont, headerBg);
+        headerCell(table, "#", headerFont, headerBg);
+        headerCell(table, "Budget", headerFont, headerBg);
         headerCell(table, "Category", headerFont, headerBg);
-        headerCell(table, "Start Date", headerFont, headerBg);
-        headerCell(table, "End Date", headerFont, headerBg);
-        headerCell(table, "Allocated (₹)", headerFont, headerBg);
-        headerCell(table, "Spent (₹)", headerFont, headerBg);
-        headerCell(table, "Remaining (₹)", headerFont, headerBg);
+        headerCell(table, "From", headerFont, headerBg);
+        headerCell(table, "To", headerFont, headerBg);
+        headerCell(table, "Allocated", headerFont, headerBg);
+        headerCell(table, "Spent", headerFont, headerBg);
+        headerCell(table, "Balance", headerFont, headerBg);
         headerCell(table, "Status", headerFont, headerBg);
-        headerCell(table, "Recurring", headerFont, headerBg);
-        headerCell(table, "Note", headerFont, headerBg);
+        headerCell(table, "Repeat", headerFont, headerBg);
+        headerCell(table, "Notes", headerFont, headerBg);
     }
 
     private void headerCell(PdfPTable table, String text, Font font, Color bg) {
@@ -87,7 +103,7 @@ public class BudgetExportService {
         table.addCell(cell);
     }
     // Rows
-    private void addRows(PdfPTable table, List<BudgetResponseDTO> budgets) {
+    private void addRows(PdfPTable table, Page<BudgetResponseDTO> budgets) {
         Font bodyFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
         boolean alternate = false;
         int srNo = 1;
@@ -97,7 +113,7 @@ public class BudgetExportService {
 
             table.addCell(dataCell(String.valueOf(srNo++), bodyFont, rowBg));
             table.addCell(dataCell(value(b.getTitle()), bodyFont, rowBg));
-            table.addCell(dataCell(value(b.getCategory()), bodyFont, rowBg));
+            table.addCell(dataCell(value(b.getCategory().getLabel()), bodyFont, rowBg));
 
             table.addCell(dataCell(value(b.getStartDate()), bodyFont, rowBg));
             table.addCell(dataCell(value(b.getEndDate()), bodyFont, rowBg));
@@ -133,44 +149,34 @@ public class BudgetExportService {
         return cell;
     }
 
+
+    private static final Map<BudgetStatus, Color> STATUS_COLORS = Map.of(
+            BudgetStatus.SAFE, new Color(200, 230, 201),
+            BudgetStatus.WARNING, new Color(255, 224, 178),
+            BudgetStatus.EXCEEDED, new Color(255, 205, 210)
+    );
+
     private PdfPCell statusCell(BudgetStatus status) {
-        Font statusFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
-        PdfPCell cell = new PdfPCell(new Phrase(
-                status == null ? "-" : status.name(), statusFont));
+
+        String text = status == null ? "-" : status.getLabel();
+
+        PdfPCell cell = new PdfPCell(
+                new Phrase(text, STATUS_FONT)
+        );
 
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setPadding(6);
         cell.setMinimumHeight(24);
 
-        if (status == null) return cell;
-
-        switch (status) {
-            case SAFE ->
-                    cell.setBackgroundColor(new Color(200, 230, 201));
-            case WARNING ->
-                    cell.setBackgroundColor(new Color(255, 224, 178));
-            case EXCEEDED ->
-                    cell.setBackgroundColor(new Color(255, 205, 210));
+        Color bg = STATUS_COLORS.get(status);
+        if (bg != null) {
+            cell.setBackgroundColor(bg);
         }
 
         return cell;
     }
-    // Branding
-    private void addWatermark(PdfWriter writer) {
-        PdfContentByte canvas = writer.getDirectContentUnder();
-        Font font = FontFactory.getFont(
-                FontFactory.HELVETICA_BOLD, 60, new Color(235, 235, 235));
 
-        Phrase watermark = new Phrase("INTELLI_WEALTH", font);
-
-        ColumnText.showTextAligned(
-                canvas,
-                Element.ALIGN_CENTER,
-                watermark,
-                420, 300, 45
-        );
-    }
 
     private void addFooterStamp(Document document) throws DocumentException {
         Font footerFont = FontFactory.getFont(
