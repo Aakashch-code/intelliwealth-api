@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.budget.domain.model;
 
-import com.mongodb.lang.Nullable;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

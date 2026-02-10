@@ -1,46 +1,49 @@
 package com.example.intelliwealth.treasury.budget.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum BudgetCategory {
 
-    // Essentials
-    GROCERIES,
-    RENT,
-    UTILITIES,
-    TRANSPORT,
-    HEALTHCARE,
-    INSURANCE,
+    GROCERIES("Groceries"),
+    RENT("Rent"),
+    UTILITIES("Utilities"),
+    TRANSPORT("Transport"),
+    HEALTHCARE("Healthcare"),
+    INSURANCE("Insurance"),
 
-    // Lifestyle
-    ENTERTAINMENT,
-    DINING,
-    SHOPPING,
-    TRAVEL,
-    FITNESS,
-    PERSONAL_CARE,
+    ENTERTAINMENT("Entertainment"),
+    DINING("Dining"),
+    SHOPPING("Shopping"),
+    TRAVEL("Travel"),
+    FITNESS("Fitness"),
+    PERSONAL_CARE("Personal Care"),
 
-    // Financial
-    SAVINGS,
-    INVESTMENTS,
-    LOANS,
-    CREDIT_CARD,
-    TAXES,
+    SAVINGS("Savings"),
+    INVESTMENTS("Investments"),
+    LOANS("Loans"),
+    CREDIT_CARD("Credit Card"),
+    TAXES("Taxes"),
 
-    // Digital & Services
-    SUBSCRIPTIONS,
-    INTERNET,
-    MOBILE_RECHARGE,
+    SUBSCRIPTIONS("Subscriptions"),
+    INTERNET("Internet"),
+    MOBILE_RECHARGE("Mobile Recharge"),
 
-    // Family & Social
-    EDUCATION,
-    CHILDCARE,
-    GIFTS,
-    DONATIONS,
+    EDUCATION("Education"),
+    CHILDCARE("Childcare"),
+    GIFTS("Gifts"),
+    DONATIONS("Donations"),
 
-    // Work & Business
-    OFFICE_EXPENSES,
-    BUSINESS,
+    OFFICE_EXPENSES("Office Expenses"),
+    BUSINESS("Business"),
 
-    // Misc
-    EMERGENCY,
-    MISCELLANEOUS
+    EMERGENCY("Emergency"),
+    MISCELLANEOUS("Miscellaneous");
+
+    private final String label;
+
+
+
 }
