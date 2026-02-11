@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/tour")
 public class TourController {
-
-    @Autowired
-    private TourService service;
-
-    @GetMapping
-    public TourSummaryDTO getTourDetails() {
-        return service.getTourSummary();
-    }
+//
+//    @Autowired
+//    private TourService service;
+//
+//    @GetMapping
+//    public TourSummaryDTO getTourDetails() {
+//        return service.getTourSummary();
+//    }
 }
