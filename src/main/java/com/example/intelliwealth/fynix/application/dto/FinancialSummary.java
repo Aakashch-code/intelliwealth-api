@@ -11,7 +11,7 @@ public class FinancialSummary {
     private double totalExpense;
     private double netWorth;
 
-    private int activeSubscriptions;
+    private long activeSubscriptions;
     private double monthlySubscriptionCost;
 
     private long totalGoals;

@@ -30,7 +30,8 @@ public class Subscription {
     private String title;
 
     @Column(nullable = false)
-    private String billingCycle;
+    @Enumerated(EnumType.STRING)
+    private BillingCycle billingCycle;
 
     @Column(nullable = false)
     private String category;
