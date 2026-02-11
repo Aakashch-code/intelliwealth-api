@@ -1,5 +1,6 @@
 package com.example.intelliwealth.treasury.subscription.application.dto;
 
+import com.example.intelliwealth.treasury.subscription.domain.model.BillingCycle;
 import io.swagger.v3.oas.annotations.media.Schema; // Import this
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class SubscriptionRequestDTO {
     private BigDecimal amount;
 
     @Schema(description = "Billing frequency", example = "Monthly")
-    private String billingCycle;
+    private BillingCycle billingCycle;
 
     @Schema(description = "Category of the expense", example = "Entertainment")
     private String category;

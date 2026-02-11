@@ -1,10 +1,12 @@
 package com.example.intelliwealth.treasury.subscription.api;
 
-import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionExportService;
+import com.example.intelliwealth.treasury.subscription.infrastrcture.export.SubscriptionExportService;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +24,8 @@ public class SubscriptionExportPdfController {
     private final SubscriptionExportService subscriptionExportService;
 
     @GetMapping("/pdf")
-    public void exportGoalToPdf(HttpServletResponse response)
+    @Operation(summary = "Export subscriptions as PDF")
+    public void exportGoalToPdf(HttpServletResponse response, Pageable pageable)
             throws IOException {
 
         response.setContentType("application/pdf");
@@ -34,7 +37,7 @@ public class SubscriptionExportPdfController {
 
         subscriptionExportService.generate(
                 response,
-                subscriptionService.getAllSubscriptions()
+                subscriptionService.getAllSubscriptions(pageable)
         );
     }
 }

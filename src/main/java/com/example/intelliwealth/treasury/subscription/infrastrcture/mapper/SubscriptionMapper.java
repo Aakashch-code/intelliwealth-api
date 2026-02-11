@@ -1,4 +1,4 @@
-package com.example.intelliwealth.treasury.subscription.application.mapper;
+package com.example.intelliwealth.treasury.subscription.infrastrcture.mapper;
 
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
