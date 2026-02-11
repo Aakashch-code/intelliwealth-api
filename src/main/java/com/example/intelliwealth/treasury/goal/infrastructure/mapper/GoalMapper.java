@@ -1,4 +1,4 @@
-package com.example.intelliwealth.treasury.goal.application.mapper;
+package com.example.intelliwealth.treasury.goal.infrastructure.mapper;
 
 import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
 import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
@@ -12,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface GoalMapper {
 
     // Entity to Response DTO
+
     GoalResponseDTO toResponse(Goal goal);
 
     // Request DTO to Entity (for creation)

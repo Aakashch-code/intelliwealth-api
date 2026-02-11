@@ -2,16 +2,16 @@ package com.example.intelliwealth.treasury.goal.api;
 
 import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
 import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalStatsResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO;
 import com.example.intelliwealth.treasury.goal.application.service.GoalService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -23,8 +23,8 @@ public class GoalController {
 
     @Operation(summary = "Get all goals")
     @GetMapping("/goal")
-    public List<GoalResponseDTO> getAllGoal() {
-        return service.getAllGoal();
+    public Page<GoalResponseDTO> getAllGoal(Pageable pageable) {
+        return service.getAllGoal(pageable);
     }
 
     @Operation(summary = "Get goal by ID")
@@ -62,7 +62,7 @@ public class GoalController {
 
     @Operation(summary = "Get goal statistics")
     @GetMapping("/goal/stats")
-    public GoalStatsResponseDTO getGoalStats() {
+    public GoalStatDTO getGoalStats() {
         return service.getGoalStats();
     }
 }
