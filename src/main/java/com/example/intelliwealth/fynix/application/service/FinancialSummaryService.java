@@ -24,7 +24,7 @@ public class FinancialSummaryService {
 
         var txs = transactionService.getTransactions(null);
         var subs = subscriptionService.getAllSubscriptions();
-        var goals = goalService.getAllGoal();
+        var goals = goalService.getAllGoal(null);
 
         // --- Income ---
         double totalIncome = txs.stream()
@@ -75,7 +75,7 @@ public class FinancialSummaryService {
         s.setNetWorth(totalIncome - totalExpense);
         s.setMonthlySubscriptionCost(subscriptionCost);
         s.setActiveSubscriptions(subs.size());
-        s.setTotalGoals(goals.size());
+        s.setTotalGoals(goals.getTotalElements());
         s.setGoalProgress(goalProgress);
 
         return s;

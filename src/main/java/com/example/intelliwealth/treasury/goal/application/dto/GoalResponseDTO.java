@@ -2,13 +2,17 @@ package com.example.intelliwealth.treasury.goal.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @Schema(description = "Response object representing a saved goal")
+@NoArgsConstructor
+@AllArgsConstructor
 public class GoalResponseDTO {
 
     private long id;

@@ -14,7 +14,7 @@ public class FinancialSummary {
     private int activeSubscriptions;
     private double monthlySubscriptionCost;
 
-    private int totalGoals;
+    private long totalGoals;
     private double goalProgress; // Average %
 
     // New field to carry context to the AI
