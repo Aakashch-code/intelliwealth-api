@@ -2,6 +2,8 @@ package com.example.intelliwealth.treasury.transaction.infrastructure.persistenc
 
 import com.example.intelliwealth.treasury.transaction.domain.model.Transaction;
 import com.example.intelliwealth.treasury.transaction.domain.model.TransactionType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,15 +17,12 @@ import java.util.UUID;
 // Changed ID type to Long
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findAllByUserIdOrderByTransactionDateDesc(UUID userId);
+    Page<Transaction> findAllByUserIdOrderByTransactionDateDesc(UUID userId, Pageable pageable);
 
     Optional<Transaction> findByIdAndUserId(Long id, UUID userId);
 
-    List<Transaction> findByUserIdAndDescriptionContainingIgnoreCase(UUID userId, String keyword);
+    Page<Transaction> findByUserIdAndDescriptionContainingIgnoreCase(UUID userId, String keyword, Pageable pageable);
 
-//    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type")
-//    BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId, @Param("type") TransactionType type);
-//
     @Query("SELECT COALESCE(SUM(t.amount),0) FROM Transaction t where t.userId = :userId AND t.type = :type")
     BigDecimal sumAmountByUserIdAndType(@Param("userId") UUID userId,@Param("type") TransactionType type);
 

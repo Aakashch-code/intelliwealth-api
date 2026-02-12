@@ -1,4 +1,4 @@
-package com.example.intelliwealth.treasury.transaction.application.mapper;
+package com.example.intelliwealth.treasury.transaction.infrastructure.mapper;
 
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
