@@ -22,7 +22,7 @@ public class FinancialSummaryService {
 
         FinancialSummary s = new FinancialSummary();
 
-        var txs = transactionService.getTransactions(null);
+        var txs = transactionService.getTransactions(null,null);
         var subs = subscriptionService.getAllSubscriptions(null);
         var goals = goalService.getAllGoal(null);
 
