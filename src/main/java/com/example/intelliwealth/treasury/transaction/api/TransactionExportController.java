@@ -1,10 +1,10 @@
 package com.example.intelliwealth.treasury.transaction.api;
-import com.example.intelliwealth.treasury.transaction.application.service.TransactionExportService;
+import com.example.intelliwealth.treasury.transaction.infrastructure.export.TransactionExportService;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +22,7 @@ public class TransactionExportController {
     private final TransactionExportService transactionExportService;
 
     @GetMapping("/pdf")
-    public void exportTransactionsToPdf(HttpServletResponse response)
+    public void exportTransactionsToPdf(HttpServletResponse response, Pageable pageable)
             throws IOException {
 
         response.setContentType("application/pdf");
@@ -34,7 +34,7 @@ public class TransactionExportController {
 
         transactionExportService.generate(
                 response,
-                transactionService.getTransactions(null)
+                transactionService.getTransactions(null,pageable)
         );
     }
 }

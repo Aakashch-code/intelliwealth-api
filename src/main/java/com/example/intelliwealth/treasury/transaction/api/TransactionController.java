@@ -3,23 +3,19 @@ package com.example.intelliwealth.treasury.transaction.api;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
-import com.example.intelliwealth.treasury.transaction.application.service.TransactionExportService;
+import com.example.intelliwealth.treasury.transaction.infrastructure.export.TransactionExportService;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
-import com.example.intelliwealth.treasury.transaction.domain.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,16 +24,12 @@ import java.util.List;
 @Tag(name = "Transactions", description = "Financial transaction management")
 public class TransactionController {
 
-    @Autowired
-    private final TransactionExportService exportService;
-
-    @Autowired
     private final TransactionService service;
 
     @GetMapping
     @Operation(summary = "Search transactions")
-    public ResponseEntity<List<TransactionResponse>> getTransactions(@RequestParam(required = false) String keyword) {
-        return ResponseEntity.ok(service.getTransactions(keyword));
+    public ResponseEntity<Page<TransactionResponse>> getTransactions(@RequestParam(required = false) String keyword, Pageable pageable) {
+        return ResponseEntity.ok(service.getTransactions(keyword,pageable));
     }
 
     @PostMapping
