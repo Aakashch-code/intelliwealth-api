@@ -59,7 +59,7 @@ public class AssetController extends SecuredService {
     @GetMapping("/total-value")
     @Operation(summary = "Calculate total portfolio value")
     public ResponseEntity<Decimal128> allAssetsAmount() {
-        Decimal128 assetSum = service.allAssetsAmount(currentUserId());
+        Decimal128 assetSum = service.allAssetsAmount();
         return ResponseEntity.ok(assetSum);
     }
 }

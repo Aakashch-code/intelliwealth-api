@@ -4,6 +4,7 @@ import com.example.intelliwealth.treasury.subscription.application.dto.Subscript
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
 import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStatDTO;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -61,5 +63,11 @@ public class SubscriptionController {
     @Operation(summary = "Get subscription stats")
     public SubscriptionStatDTO fetchStats() {
         return service.getStats();
+    }
+
+    @Hidden
+    @PostMapping("/bulk")
+    public ResponseEntity<List<SubscriptionResponseDTO>> createSubscriptions(@RequestBody List<SubscriptionRequestDTO> requests) {
+        return ResponseEntity.ok(service.saveAll(requests));
     }
 }

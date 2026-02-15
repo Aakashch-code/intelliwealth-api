@@ -72,6 +72,22 @@ public class SubscriptionService extends SecuredService {
         return mapper.toResponse(repo.save(entity));
     }
 
+
+    public List<SubscriptionResponseDTO> saveAll(List<SubscriptionRequestDTO> dtos) {
+        // 1. Map DTOs to Entities
+        List<Subscription> entities = dtos.stream()
+                .map(mapper::toEntity)
+                .toList();
+
+        // 2. Save all to DB
+        List<Subscription> savedEntities = repo.saveAll(entities);
+
+        // 3. Map back to Response DTOs
+        return savedEntities.stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
     // ---------------- UPDATE ----------------
 
 

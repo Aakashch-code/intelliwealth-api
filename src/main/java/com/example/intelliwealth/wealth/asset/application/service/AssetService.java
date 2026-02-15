@@ -82,8 +82,9 @@ public class AssetService extends SecuredService {
 
     // ---------------- AGGREGATE ----------------
 
-    @Cacheable(value = "asset_sum" , key = "#userId")
-    public Decimal128 allAssetsAmount(UUID userId) {
+    @Cacheable(value = "asset_sum" , key = "#root.target.cacheKey()")
+    public Decimal128 allAssetsAmount() {
+        UUID userId = currentUserId();
         return repo.sumAssetValueByUserId(userId);
     }
 
