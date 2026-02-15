@@ -1,5 +1,6 @@
 package com.example.intelliwealth.treasury.budget.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,10 +10,15 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BudgetSummaryDTO {
     private BigDecimal totalAllocated;
     private BigDecimal totalSpent;
     private BigDecimal totalRemaining;
 
-
+    public BudgetSummaryDTO(BigDecimal totalAllocated, BigDecimal totalSpent, BigDecimal totalRemaining) {
+        this.totalAllocated = totalAllocated;
+        this.totalSpent = totalSpent;
+        this.totalRemaining = totalRemaining;
+    }
 }

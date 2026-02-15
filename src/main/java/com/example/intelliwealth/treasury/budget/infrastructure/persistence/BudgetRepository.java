@@ -21,12 +21,16 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     Page<Budget> findAllByUserId(UUID userId, Pageable pageable);
 
     Optional<Budget> findByIdAndUserId(Long id, UUID userId);
-
-    @Query("SELECT (" +
-            "COALESCE(SUM(b.amountAllocated), 0), " +
-            "COALESCE(SUM(b.amountSpent), 0), " +
-            "COALESCE(SUM(b.amountAllocated) - SUM(b.amountSpent), 0)) " +
-            "FROM Budget b WHERE b.userId = :userId")
+    @Query("""
+SELECT new com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO(
+    COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)),
+    COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal)),
+    COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)) 
+        - COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal))
+)
+FROM Budget b
+WHERE b.userId = :userId
+""")
     BudgetSummaryDTO findBudgetSummaryByUserId(@Param("userId") UUID userId);
 
 
