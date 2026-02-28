@@ -1,4 +1,4 @@
-package com.example.intelliwealth.protection.insurance.application.mapper;
+package com.example.intelliwealth.protection.insurance.infrastructure.mapper;
 
 import com.example.intelliwealth.protection.insurance.domain.model.Insurance;
 import com.example.intelliwealth.protection.insurance.application.dto.InsuranceRequestDTO;

@@ -7,7 +7,7 @@ import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtResponseDTO;
 import com.example.intelliwealth.wealth.debt.domain.exception.DebtNotFoundException;
-import com.example.intelliwealth.wealth.debt.application.mapper.DebtMapper;
+import com.example.intelliwealth.wealth.debt.infrastructure.mapper.DebtMapper;
 import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Decimal128;

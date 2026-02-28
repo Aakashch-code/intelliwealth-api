@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.asset.application.mapper;
+package com.example.intelliwealth.wealth.asset.infrastructure.mapper;
 
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;

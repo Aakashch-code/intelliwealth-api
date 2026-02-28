@@ -1,6 +1,6 @@
-package com.example.intelliwealth.wealth.asset.application.service;
+package com.example.intelliwealth.protection.insurance.infrastructure.export;
 
-import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
+import com.example.intelliwealth.protection.insurance.application.dto.InsuranceResponseDTO;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Rectangle;
@@ -19,17 +19,17 @@ import java.util.Locale;
 import java.util.Map;
 
 @Service
-public class AssetExportService {
+public class InsuranceExportService {
 
     // --- Configuration ---
     private static final Locale INDIA = new Locale("en", "IN");
     private static final NumberFormat INR = NumberFormat.getCurrencyInstance(INDIA);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    // --- Colors ---
-    private static final Color COL_PRIMARY_BG = new Color(0, 51, 102);    // Navy Blue
+    // --- Colors (Teal / Protection Theme) ---
+    private static final Color COL_PRIMARY_BG = new Color(0, 128, 128);   // Teal (Distinct from Asset Blue)
     private static final Color COL_HEADER_TXT = Color.WHITE;
-    private static final Color COL_LABEL_TXT = new Color(100, 100, 100); // Dark Gray
+    private static final Color COL_LABEL_TXT = new Color(100, 100, 100);  // Dark Gray
     private static final Color COL_VALUE_TXT = Color.BLACK;
     private static final Color COL_CARD_BG = Color.WHITE;
     private static final Color COL_BORDER = new Color(220, 220, 220);
@@ -37,13 +37,13 @@ public class AssetExportService {
     // --- Fonts ---
     private static final Font FONT_TITLE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, COL_PRIMARY_BG);
     private static final Font FONT_CARD_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, COL_HEADER_TXT);
-    private static final Font FONT_CARD_AMOUNT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15, new Color(144, 238, 144)); // Light Green
+    private static final Font FONT_CARD_AMOUNT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15, new Color(255, 255, 224)); // Light Yellow for contrast
     private static final Font FONT_LABEL = FontFactory.getFont(FontFactory.HELVETICA, 9, COL_LABEL_TXT);
     private static final Font FONT_VALUE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, COL_VALUE_TXT);
     private static final Font FONT_SECTION_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, COL_PRIMARY_BG);
 
 
-    public void generate(HttpServletResponse response, List<AssetsResponseDTO> assets) throws IOException {
+    public void generate(HttpServletResponse response, List<InsuranceResponseDTO> policies) throws IOException {
         // A4 with moderate margins
         Document document = new Document(PageSize.A4, 36, 36, 36, 36);
         PdfWriter.getInstance(document, response.getOutputStream());
@@ -52,15 +52,13 @@ public class AssetExportService {
         addReportTitle(document);
 
         int count = 0;
-        for (AssetsResponseDTO asset : assets) {
-            // New Page Logic: Trigger every 2 items (excluding the very first start)
+        for (InsuranceResponseDTO policy : policies) {
+            // New Page Logic: Trigger every 2 items
             if (count > 0 && count % 2 == 0) {
                 document.newPage();
-                // Optional: Re-add title on subsequent pages or just leave blank?
-                // Usually blank or small header is better. Leaving blank for clean look.
             }
 
-            addAssetCard(document, asset);
+            addInsuranceCard(document, policy);
             count++;
         }
 
@@ -68,38 +66,39 @@ public class AssetExportService {
     }
 
     private void addReportTitle(Document document) throws DocumentException {
-        Paragraph p = new Paragraph("Portfolio Valuation Report", FONT_TITLE);
+        Paragraph p = new Paragraph("Insurance Coverage Report", FONT_TITLE);
         p.setAlignment(Element.ALIGN_CENTER);
         p.setSpacingAfter(30);
         document.add(p);
     }
 
-    private void addAssetCard(Document document, AssetsResponseDTO asset) throws DocumentException {
+    private void addInsuranceCard(Document document, InsuranceResponseDTO policy) throws DocumentException {
         // Container Table (The Card)
         PdfPTable card = new PdfPTable(1);
         card.setWidthPercentage(100);
-        card.setKeepTogether(true); // Try to prevent page breaks inside a card
-        card.setSpacingAfter(40); // Large gap between the two cards
+        card.setKeepTogether(true);
+        card.setSpacingAfter(40); // Large gap
 
-        // 1. Header Section (Name + Value)
+        // 1. Header Section (Provider/Name + Coverage Amount)
         PdfPCell headerCell = new PdfPCell();
         headerCell.setBackgroundColor(COL_PRIMARY_BG);
         headerCell.setPadding(12);
         headerCell.setBorderColor(COL_PRIMARY_BG);
 
-        // Header Inner Layout: Left (Name) - Right (Price)
         PdfPTable headerContent = new PdfPTable(2);
         headerContent.setWidthPercentage(100);
-        headerContent.setWidths(new float[]{3f, 1f}); // Name gets more space
+        headerContent.setWidths(new float[]{3f, 1.5f}); // Name gets more space
 
-        // Name
-        PdfPCell nameCell = new PdfPCell(new Phrase(value(asset.getName()).toUpperCase(), FONT_CARD_HEADER));
+        // Name & Provider
+        String titleText = value(policy.getProvider()) + " - " + value(policy.getName());
+        PdfPCell nameCell = new PdfPCell(new Phrase(titleText.toUpperCase(), FONT_CARD_HEADER));
         nameCell.setBorder(Rectangle.NO_BORDER);
         nameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         headerContent.addCell(nameCell);
 
-        // Price
-        PdfPCell priceCell = new PdfPCell(new Phrase(formatAmount(asset.getCurrentValue()), FONT_CARD_AMOUNT));
+        // Coverage Amount (Sum Assured)
+        String coverText = "Cover: " + formatAmount(policy.getCoverageAmount());
+        PdfPCell priceCell = new PdfPCell(new Phrase(coverText, FONT_CARD_AMOUNT));
         priceCell.setBorder(Rectangle.NO_BORDER);
         priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         priceCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -115,50 +114,49 @@ public class AssetExportService {
         bodyCell.setPadding(15);
         bodyCell.setPaddingBottom(20);
 
-        // Core Details (Category / Date)
-        bodyCell.addElement(createCoreDetailsTable(asset));
+        // Core Details (Premium, Dates)
+        bodyCell.addElement(createCoreDetailsTable(policy));
 
         // Separator Line
         bodyCell.addElement(createSeparator());
 
-        // Dynamic Attributes (Grid Layout)
-        bodyCell.addElement(createAttributesGrid(asset.getAttributes()));
+        // Dynamic Attributes
+        bodyCell.addElement(createAttributesGrid(policy.getAttributes()));
 
         card.addCell(bodyCell);
-
         document.add(card);
     }
 
     // --- Sub-components ---
 
-    private PdfPTable createCoreDetailsTable(AssetsResponseDTO asset) {
-        PdfPTable table = new PdfPTable(4); // 4 Columns: Label Val Label Val
+    private PdfPTable createCoreDetailsTable(InsuranceResponseDTO policy) {
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
         table.setSpacingAfter(5);
 
-        // Row 1: Main Category | Sub Category
-        addKvCell(table, "Main Category", value(asset.getMainCategory()));
-        addKvCell(table, "Asset Class", value(asset.getCategory()));
+        // Row 1: Category | Premium
+        addKvCell(table, "Category", value(policy.getMainCategory()) + " (" + value(policy.getCategory()) + ")");
+        addKvCell(table, "Premium Amount", formatAmount(policy.getPremiumAmount()));
 
-        // Row 2: Acquired Date | ROI (Example placeholder or calculated)
-        addKvCell(table, "Date Acquired", formatDate(asset.getDateAcquired()));
-        addKvCell(table, "Status", "Active"); // Example static field
+        // Row 2: Start Date | End Date
+        addKvCell(table, "Policy Start Date", formatDate(policy.getStartDate()));
+        addKvCell(table, "Policy End Date", formatDate(policy.getEndDate()));
 
         return table;
     }
 
     private PdfPTable createAttributesGrid(Map<String, Object> attributes) {
-        PdfPTable table = new PdfPTable(4); // 2 sets of Key-Value pairs per row
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{1.5f, 2f, 1.5f, 2f}); // Adjust column ratios
+        table.setWidths(new float[]{1.5f, 2f, 1.5f, 2f});
         table.setSpacingBefore(10);
 
         if (attributes == null || attributes.isEmpty()) {
             return table;
         }
 
-        // Add "Technical Details" Header inside the grid area
-        PdfPCell titleCell = new PdfPCell(new Phrase("Technical Specifications", FONT_SECTION_HEADER));
+        // Section Header
+        PdfPCell titleCell = new PdfPCell(new Phrase("Policy Details & Benefits", FONT_SECTION_HEADER));
         titleCell.setColspan(4);
         titleCell.setBorder(Rectangle.NO_BORDER);
         titleCell.setPaddingBottom(8);
@@ -170,7 +168,6 @@ public class AssetExportService {
             count++;
         }
 
-        // Fill empty cells if odd number of attributes to keep borders clean
         if (count % 2 != 0) {
             addKvCell(table, "", "");
         }
@@ -179,14 +176,12 @@ public class AssetExportService {
     }
 
     private void addKvCell(PdfPTable table, String key, String val) {
-        // Label Cell
         PdfPCell label = new PdfPCell(new Phrase(key, FONT_LABEL));
         label.setBorder(Rectangle.NO_BORDER);
         label.setPaddingTop(5);
         label.setPaddingBottom(5);
         table.addCell(label);
 
-        // Value Cell
         PdfPCell value = new PdfPCell(new Phrase(val, FONT_VALUE));
         value.setBorder(Rectangle.NO_BORDER);
         value.setPaddingTop(5);
@@ -196,9 +191,7 @@ public class AssetExportService {
 
     private Paragraph createSeparator() {
         Paragraph p = new Paragraph(" ");
-        p.setLeading(5); // Small height
-        // Drawing a line using a table or border is harder in pure Element,
-        // so we use a thin empty table with a bottom border
+        p.setLeading(5);
         PdfPTable line = new PdfPTable(1);
         line.setWidthPercentage(100);
         PdfPCell c = new PdfPCell(new Phrase(" "));
@@ -214,8 +207,8 @@ public class AssetExportService {
     private String formatAttributeValue(String key, Object value) {
         if (value == null) return "-";
         String k = key.toLowerCase();
-        if (k.contains("rate") || k.contains("yield") || k.contains("tax")) return value + "%";
-        if (k.contains("price") || k.contains("value") || k.contains("amount")) {
+        if (k.contains("rate") || k.contains("tax") || k.contains("bonus")) return value + "%";
+        if (k.contains("amount") || k.contains("cost") || k.contains("premium")) {
             try {
                 return INR.format(new BigDecimal(value.toString()));
             } catch (Exception e) { return value.toString(); }

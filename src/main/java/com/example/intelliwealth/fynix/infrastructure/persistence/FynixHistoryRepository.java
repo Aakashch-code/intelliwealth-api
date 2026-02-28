@@ -17,15 +17,5 @@ public interface FynixHistoryRepository extends MongoRepository<FynixHistory, St
             String userId,
             String conversationId
     );
-    @Query("""
-SELECT DISTINCT f.conversationId,
-       ,MIN(f.createdAt), 
-       MIN(f.query)
-FROM FynixHistory f
-WHERE f.userId = :userId
-GROUP BY f.conversationId
-ORDER BY MIN(f.createdAt) DESC
-""")
-    List<Object[]> findConversations(String userId);
 
 }

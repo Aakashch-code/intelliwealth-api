@@ -10,22 +10,19 @@ import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
 import com.example.intelliwealth.wealth.networth.NetWorthResponseDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder; // Added Builder for easier object creation
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.Decimal128;
 
-import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@Builder // Useful for aggregation
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FynixSummary {
 
     private String period;
 
-    // Treasury & Wealth Data
     private BudgetSummaryDTO budgetStats;
     private GoalStatDTO goalStats;
     private SubscriptionStatDTO subscriptionStat;
@@ -33,7 +30,6 @@ public class FynixSummary {
     private DebtStatsDTO debtStats;
     private NetWorthResponseDTO netWorthStats;
     private ContingencyReportDTO contingencyStats;
-    // Protection Data (Specific for LLM Context)
     private InsuranceCategorySummary healthInsuranceSummary;
     private InsuranceCategorySummary lifeInsuranceSummary;
 }

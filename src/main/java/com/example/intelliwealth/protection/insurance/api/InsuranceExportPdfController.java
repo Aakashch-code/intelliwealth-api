@@ -2,7 +2,7 @@ package com.example.intelliwealth.protection.insurance.api;
 
 
 
-import com.example.intelliwealth.protection.insurance.application.service.InsuranceExportService;
+import com.example.intelliwealth.protection.insurance.infrastructure.export.InsuranceExportService;
 import com.example.intelliwealth.protection.insurance.application.service.InsuranceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;

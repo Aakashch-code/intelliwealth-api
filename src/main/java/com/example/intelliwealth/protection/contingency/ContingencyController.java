@@ -22,7 +22,7 @@ public class ContingencyController {
     )
     @GetMapping("/health")
     public ResponseEntity<ContingencyReportDTO> getFinancialHealth() {
-        // Corrected method name to match Service
+
         ContingencyReportDTO report = contingencyService.getHealthCheck();
         return ResponseEntity.ok(report);
     }

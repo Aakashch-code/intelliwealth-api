@@ -1,6 +1,6 @@
 package com.example.intelliwealth.wealth.debt.api;
 
-import com.example.intelliwealth.wealth.debt.application.service.DebtExportService;
+import com.example.intelliwealth.wealth.debt.infrastructure.export.DebtExportService;
 import com.example.intelliwealth.wealth.debt.application.service.DebtService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;

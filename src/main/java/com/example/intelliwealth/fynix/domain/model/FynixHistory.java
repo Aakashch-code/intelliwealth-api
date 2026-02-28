@@ -22,7 +22,6 @@ public class FynixHistory {
     @Column(nullable = false)
     private String conversationId;
 
-    // Changed from UUID to String to match standard MongoDB and Controller usage
     private String userId;
 
     private String query;

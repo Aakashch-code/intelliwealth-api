@@ -62,9 +62,7 @@ public class ChatService extends SecuredService {
 
         //Protection
         ContingencyReportDTO contingency = contingencyService.getHealthCheck();
-        // 1. Get raw data
         List<InsuranceResponseDTO> allPolicies = insuranceService.getActivePolicies();
-        // 2. Group by Category
         Map<InsuranceCategory, List<InsuranceResponseDTO>> grouped = allPolicies.stream()
                 .collect(Collectors.groupingBy(InsuranceResponseDTO::getCategory));
 

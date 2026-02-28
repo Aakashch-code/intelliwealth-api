@@ -5,7 +5,7 @@ import com.example.intelliwealth.wealth.asset.domain.model.Asset;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.asset.domain.exception.AssetNotFoundException;
-import com.example.intelliwealth.wealth.asset.application.mapper.AssetsMapper;
+import com.example.intelliwealth.wealth.asset.infrastructure.mapper.AssetsMapper;
 import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
 import com.example.intelliwealth.wealth.asset.domain.rules.AssetValidator;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.debt.application.mapper;
+package com.example.intelliwealth.wealth.debt.infrastructure.mapper;
 
 import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtResponseDTO;

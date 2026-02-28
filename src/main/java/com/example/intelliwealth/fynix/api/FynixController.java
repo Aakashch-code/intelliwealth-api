@@ -51,7 +51,7 @@ public class FynixController {
 
             String conversationId = request.getConversationId();
 
-            // Generate ONLY if first message
+
             if (conversationId == null || conversationId.isBlank()) {
                 conversationId = UUID.randomUUID().toString();
             }
@@ -62,7 +62,7 @@ public class FynixController {
                     LLMService.getFinancialAdvice(request.getQuery());
 
             historyService.saveChat(
-                    conversationId, // 🔥 pass it
+                    conversationId,
                     request.getQuery(),
                     contextJson,
                     aiAnswer

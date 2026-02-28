@@ -6,8 +6,6 @@ import com.example.intelliwealth.fynix.domain.exception.TooManyRequestsException
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,9 +34,6 @@ public class LLMService {
                 .build();
     }
 
-    /**
-     * Main public API
-     */
     public String getFinancialAdvice(String userQuestion) {
         try {
             String context = generateFinancialContext();
@@ -55,9 +50,6 @@ public class LLMService {
         }
     }
 
-    /**
-     * Builds YAML context to drastically save LLM tokens
-     */
     public String generateFinancialContext() throws JsonProcessingException {
         // Fetch the raw DTO
         Object contextData = chatService.generateContext();
@@ -66,9 +58,6 @@ public class LLMService {
         return yamlMapper.writeValueAsString(contextData);
     }
 
-    /**
-     * Builds professional prompt
-     */
     private String buildPrompt(String context, String question) {
         return """
 You are Fynix, a calm, practical, and professional financial advisor.
@@ -103,9 +92,6 @@ USER QUESTION:
 """.formatted(context, question);
     }
 
-    /**
-     * Calls Gemini API
-     */
     private GeminiResponse callGemini(GeminiRequest request) {
         try {
             return webClient.post()
@@ -124,9 +110,6 @@ USER QUESTION:
         }
     }
 
-    /**
-     * Extracts AI text safely
-     */
     private String extractAnswer(GeminiResponse response) {
         if (response == null ||
                 response.candidates() == null ||

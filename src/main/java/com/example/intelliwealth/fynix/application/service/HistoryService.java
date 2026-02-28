@@ -17,9 +17,8 @@ public class HistoryService extends SecuredService {
 
     private final FynixHistoryRepository repository;
 
-    // Added userId to the parameters to match the Controller call
     public void saveChat(
-            String conversationId, // 🔥 receive it
+            String conversationId,
             String question,
             String contextJson,
             String aiAnswer) {
@@ -29,7 +28,7 @@ public class HistoryService extends SecuredService {
         repository.save(
                 FynixHistory.builder()
                         .userId(userId)
-                        .conversationId(conversationId) // 🔥 use it
+                        .conversationId(conversationId)
                         .query(question)
                         .context(contextJson)
                         .response(aiAnswer)

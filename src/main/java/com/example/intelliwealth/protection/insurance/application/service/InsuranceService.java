@@ -1,25 +1,21 @@
 package com.example.intelliwealth.protection.insurance.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
-import com.example.intelliwealth.authentication.domain.Users;
 import com.example.intelliwealth.protection.insurance.domain.model.Insurance;
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
 import com.example.intelliwealth.protection.insurance.application.dto.InsuranceRequestDTO;
 import com.example.intelliwealth.protection.insurance.application.dto.InsuranceResponseDTO;
-import com.example.intelliwealth.protection.insurance.application.mapper.InsuranceMapper;
+import com.example.intelliwealth.protection.insurance.infrastructure.mapper.InsuranceMapper;
 import com.example.intelliwealth.protection.insurance.infrastructure.persistence.InsuranceRepository;
 import com.example.intelliwealth.protection.insurance.domain.rules.InsuranceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
