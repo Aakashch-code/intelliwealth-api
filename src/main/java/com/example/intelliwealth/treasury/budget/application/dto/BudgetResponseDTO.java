@@ -1,6 +1,7 @@
 package com.example.intelliwealth.treasury.budget.application.dto;
 
 import com.example.intelliwealth.treasury.budget.domain.model.BudgetCategory;
+import com.example.intelliwealth.treasury.budget.domain.model.BudgetMode;
 import com.example.intelliwealth.treasury.budget.domain.model.BudgetStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,8 +26,9 @@ public class BudgetResponseDTO {
 
     private BigDecimal amountAllocated;
     private BigDecimal amountSpent;
-    private BigDecimal remainingAmount; // Derived
-    private BudgetStatus status;        // Derived
+    private BigDecimal remainingAmount;
+    private BudgetStatus status;
+    private BudgetMode mode;
 
     private boolean recurring;
     private String note;

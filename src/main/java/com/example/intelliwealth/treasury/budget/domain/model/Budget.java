@@ -60,6 +60,8 @@ public class Budget {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Enumerated(EnumType.STRING)
+    private BudgetMode mode;
 
     public BigDecimal getRemainingAmount() {
         BigDecimal allocated = amountAllocated != null ? amountAllocated : BigDecimal.ZERO;
@@ -77,5 +79,12 @@ public class Budget {
         if (usage.compareTo(BigDecimal.ONE) >= 0) return BudgetStatus.EXCEEDED;
         if (usage.compareTo(new BigDecimal("0.8")) >= 0) return BudgetStatus.WARNING;
         return BudgetStatus.SAFE;
+    }
+    public void addSpentAmount(BigDecimal amount) {
+        if (this.amountSpent == null) {
+            this.amountSpent = BigDecimal.ZERO;
+        }
+
+        this.amountSpent = this.amountSpent.add(amount);
     }
 }

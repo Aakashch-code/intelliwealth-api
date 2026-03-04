@@ -54,6 +54,7 @@ public class Transaction {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    private Long budgetId;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -61,7 +62,8 @@ public class Transaction {
         Transaction that = (Transaction) o;
         return id != null && Objects.equals(id, that.id);
     }
-
+    @Column(nullable = false)
+    private boolean systemGenerated = false;
     @Override
     public int hashCode() {
         return getClass().hashCode();
