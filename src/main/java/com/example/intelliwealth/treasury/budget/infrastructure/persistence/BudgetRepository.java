@@ -32,7 +32,18 @@ FROM Budget b
 WHERE b.userId = :userId
 """)
     BudgetSummaryDTO findBudgetSummaryByUserId(@Param("userId") UUID userId);
-
+    // Notice we changed 'ACTIVE' to :mode and added it as a parameter
+    @Query("""
+    SELECT new com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO(
+        COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)),
+        COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal)),
+        COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)) 
+            - COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal))
+    )
+    FROM Budget b
+    WHERE b.userId = :userId AND b.mode = :mode
+    """)
+    BudgetSummaryDTO findBudgetSummaryByUserIdAndMode(@Param("userId") UUID userId, @Param("mode") com.example.intelliwealth.treasury.budget.domain.model.BudgetMode mode);
 
 
 }

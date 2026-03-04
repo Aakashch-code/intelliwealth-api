@@ -13,10 +13,10 @@ public interface BudgetMapper {
     // Helper methods to access domain logic during mapping
     @Mapping(target = "remainingAmount", expression = "java(budget.getRemainingAmount())")
     @Mapping(target = "status", expression = "java(budget.getStatus())")
+    @Mapping(target = "mode", expression = "java(budget.getMode())")
     BudgetResponseDTO toResponseDTO(Budget budget);
 
     List<BudgetResponseDTO> toResponseDTOList(List<Budget> budgets);
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

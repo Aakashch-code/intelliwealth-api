@@ -1,6 +1,7 @@
 package com.example.intelliwealth.treasury.budget.application.dto;
 
 import com.example.intelliwealth.treasury.budget.domain.model.BudgetCategory;
+import com.example.intelliwealth.treasury.budget.domain.model.BudgetMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -34,6 +35,10 @@ public class BudgetRequestDTO {
     @Positive(message = "Allocated amount must be positive")
     @Schema(description = "Total amount allocated", example = "500.00")
     private BigDecimal amountAllocated;
+
+    @NotNull(message = "Mode is required")
+    @Schema(description = "State your Budget Mode", example = "ACTIVE")
+    private BudgetMode mode;
 
     @PositiveOrZero(message = "Amount spent cannot be negative")
     @Schema(description = "Amount currently spent (default 0)", example = "0.00")
