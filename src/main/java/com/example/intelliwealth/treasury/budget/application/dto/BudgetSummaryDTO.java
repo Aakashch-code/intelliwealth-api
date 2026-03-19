@@ -16,4 +16,9 @@ public class BudgetSummaryDTO {
     private BigDecimal totalSpent;
     private BigDecimal totalRemaining;
 
+    public BudgetSummaryDTO(BigDecimal totalAllocated, BigDecimal totalSpent, BigDecimal totalRemaining) {
+        this.totalAllocated = totalAllocated;
+        this.totalSpent = totalSpent;
+        this.totalRemaining = totalRemaining;
+    }
 }

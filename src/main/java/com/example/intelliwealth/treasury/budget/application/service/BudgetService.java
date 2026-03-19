@@ -111,14 +111,23 @@ public class BudgetService extends SecuredService {
     }
 
     // -------- SPENDING --------
-
-    public void addSpentAmount(Long budgetId, BigDecimal amount) {
+    @CacheEvict(value = "budget_summary", key = "#root.target.cacheKey()")
+    public void addSpentAmount(Long budgetId, AddExpenseRequest request) {
 
         Budget budget = getBudget(budgetId);
 
-        budget.addSpentAmount(amount);
+        budget.addSpentAmount(request);
 
-        repo.save(budget);
+        Budget saved = repo.save(budget);
+
+        if (isPositive(request.amount())) {
+            transactionService.createSystemExpense(
+                    saved.getId(),
+                    request.amount(),
+                    request.title(),
+                    saved.getNote()
+            );
+        }
     }
 
     @Transactional(readOnly = true)
