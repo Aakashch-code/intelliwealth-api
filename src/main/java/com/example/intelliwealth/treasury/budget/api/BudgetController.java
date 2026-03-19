@@ -1,5 +1,6 @@
 package com.example.intelliwealth.treasury.budget.api;
 
+import com.example.intelliwealth.treasury.budget.application.dto.AddExpenseRequest;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
@@ -85,8 +86,8 @@ public class BudgetController {
 
     //new
     @PutMapping("/spent/{id}")
-    public void addSpentAmount(@PathVariable Long id, BigDecimal amount) {
-         service.addSpentAmount(id,amount);
+    public void addSpentAmount(@PathVariable Long id, @RequestBody AddExpenseRequest request) {
+         service.addSpentAmount(id,request);
     }
 
 }

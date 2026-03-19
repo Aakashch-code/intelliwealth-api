@@ -1,6 +1,7 @@
 package com.example.intelliwealth.treasury.budget.domain.model;
 
 
+import com.example.intelliwealth.treasury.budget.application.dto.AddExpenseRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,11 +81,11 @@ public class Budget {
         if (usage.compareTo(new BigDecimal("0.8")) >= 0) return BudgetStatus.WARNING;
         return BudgetStatus.SAFE;
     }
-    public void addSpentAmount(BigDecimal amount) {
+    public void addSpentAmount(AddExpenseRequest request) {
         if (this.amountSpent == null) {
             this.amountSpent = BigDecimal.ZERO;
         }
 
-        this.amountSpent = this.amountSpent.add(amount);
+        this.amountSpent = this.amountSpent.add(request.amount());
     }
 }

@@ -1,5 +1,6 @@
 package com.example.intelliwealth.treasury.transaction.api;
 
+import com.example.intelliwealth.treasury.budget.application.dto.AddExpenseRequest;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionResponse;
@@ -35,7 +36,7 @@ public class TransactionController {
     @PostMapping
     @Operation(summary = "Create transaction")
     public ResponseEntity<TransactionResponse> createTransaction(@RequestBody @Valid TransactionRequest request) {
-        return new ResponseEntity<>(service.createTransaction(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createTransaction(request,null), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -49,14 +50,14 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> updateTransaction(
             @PathVariable Long id,
             @RequestBody @Valid TransactionRequest request) {
-        return ResponseEntity.ok(service.updateTransaction(id, request));
+        return ResponseEntity.ok(service.updateTransaction(id, request,null));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete transaction")
-    public void deleteTransaction(@PathVariable Long id) {
-        service.deleteTransaction(id);
+    public void deleteTransaction(@PathVariable Long id, AddExpenseRequest request) {
+        service.deleteTransaction(id,request);
     }
 
     @GetMapping("/summary/net")

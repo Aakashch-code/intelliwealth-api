@@ -1,6 +1,7 @@
 package com.example.intelliwealth.treasury.transaction.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
+import com.example.intelliwealth.treasury.budget.application.dto.AddExpenseRequest;
 import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.dto.TransactionRequest;
@@ -61,7 +62,7 @@ public class TransactionService extends SecuredService {
     // ------- WRITE OPERATIONS (MUTATIONS) -----
 
     @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
-    public TransactionResponse createTransaction(TransactionRequest request) {
+    public TransactionResponse createTransaction(TransactionRequest request, AddExpenseRequest expenseRequest) {
         Transaction transaction = mapper.toEntity(request);
         transaction.setUserId(currentUserId());
 
@@ -76,14 +77,14 @@ public class TransactionService extends SecuredService {
 
         // Update the budget's spent amount if it's an expense
         if (transaction.getType() == TransactionType.EXPENSE && transaction.getBudgetId() != null) {
-            budgetService.addSpentAmount(transaction.getBudgetId(), transaction.getAmount());
+            budgetService.addSpentAmount(transaction.getBudgetId(), expenseRequest);
         }
 
         return mapper.toResponse(saved);
     }
 
     @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
-    public TransactionResponse updateTransaction(Long id, TransactionRequest request) {
+    public TransactionResponse updateTransaction(Long id, TransactionRequest request,AddExpenseRequest expenseRequest) {
         Transaction existing = findById(id)
                 .orElseThrow(() -> notFound(id));
 
@@ -94,6 +95,7 @@ public class TransactionService extends SecuredService {
         // Track the old amount to calculate the difference for the budget
         BigDecimal oldAmount = existing.getAmount();
 
+
         mapper.updateEntityFromRequest(request, existing);
         validate(existing);
 
@@ -101,7 +103,7 @@ public class TransactionService extends SecuredService {
         if (existing.getType() == TransactionType.EXPENSE && existing.getBudgetId() != null) {
             BigDecimal difference = existing.getAmount().subtract(oldAmount);
             if (difference.compareTo(BigDecimal.ZERO) != 0) {
-                budgetService.addSpentAmount(existing.getBudgetId(), difference);
+                budgetService.addSpentAmount(existing.getBudgetId(), expenseRequest);
             }
         }
 
@@ -109,7 +111,7 @@ public class TransactionService extends SecuredService {
     }
 
     @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
-    public void deleteTransaction(Long id) {
+    public void deleteTransaction(Long id,AddExpenseRequest request) {
         Transaction transaction = findById(id)
                 .orElseThrow(() -> notFound(id));
 
@@ -119,7 +121,7 @@ public class TransactionService extends SecuredService {
 
         // Refund the amount back to the budget before deleting
         if (transaction.getType() == TransactionType.EXPENSE && transaction.getBudgetId() != null) {
-            budgetService.addSpentAmount(transaction.getBudgetId(), transaction.getAmount().negate());
+            budgetService.addSpentAmount(transaction.getBudgetId(), request);
         }
 
         repository.delete(transaction);
