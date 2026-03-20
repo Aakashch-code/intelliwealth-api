@@ -65,9 +65,4 @@ public class SubscriptionController {
         return service.getStats();
     }
 
-    @Hidden
-    @PostMapping("/bulk")
-    public ResponseEntity<List<SubscriptionResponseDTO>> createSubscriptions(@RequestBody List<SubscriptionRequestDTO> requests) {
-        return ResponseEntity.ok(service.saveAll(requests));
-    }
 }

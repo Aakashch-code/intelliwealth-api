@@ -46,6 +46,7 @@ public class BudgetService extends SecuredService {
         if (isPositive(saved.getAmountSpent())) {
             transactionService.createSystemExpense(
                     saved.getId(),
+                    null,
                     saved.getAmountSpent(),
                     saved.getTitle() + " (Initial Spent)",
                     saved.getNote()
@@ -90,6 +91,7 @@ public class BudgetService extends SecuredService {
 
             transactionService.createSystemExpense(
                     updated.getId(),
+                    null,
                     diff,
                     updated.getTitle() + " (Manual Adjustment)",
                     updated.getNote()
@@ -123,6 +125,7 @@ public class BudgetService extends SecuredService {
         if (isPositive(request.amount())) {
             transactionService.createSystemExpense(
                     saved.getId(),
+                    null,
                     request.amount(),
                     request.title(),
                     saved.getNote()

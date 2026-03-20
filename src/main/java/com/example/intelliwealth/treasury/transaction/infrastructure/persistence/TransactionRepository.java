@@ -34,4 +34,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Modifying
     @Query("DELETE FROM Transaction t WHERE t.budgetId = :budgetId")
     void deleteByBudgetId(@Param("budgetId") Long budgetId);
+
+    @Modifying
+    @Query("DELETE FROM Transaction t WHERE t.subscriptionId = :subscriptionId")
+    void deleteSubscriptionId(@Param("subscriptionId") Long subscriptionId);
 }
