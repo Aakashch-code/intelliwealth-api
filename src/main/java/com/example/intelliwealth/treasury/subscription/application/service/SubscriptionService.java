@@ -9,6 +9,7 @@ import com.example.intelliwealth.treasury.subscription.infrastrcture.mapper.Subs
 import com.example.intelliwealth.treasury.subscription.domain.exception.SubscriptionNotFoundException;
 import com.example.intelliwealth.treasury.subscription.domain.model.Subscription;
 import com.example.intelliwealth.treasury.subscription.infrastrcture.persistence.SubscriptionRepository;
+import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -31,7 +33,7 @@ public class SubscriptionService extends SecuredService {
 
     private final SubscriptionRepository repo;
     private final SubscriptionMapper mapper;
-
+    private final TransactionService transactionService;
     // ---------------- READ ----------------
 
     @Transactional(readOnly = true)
@@ -67,31 +69,43 @@ public class SubscriptionService extends SecuredService {
     })
     public SubscriptionResponseDTO createSubscription(SubscriptionRequestDTO dto) {
         Subscription entity = mapper.toEntity(dto);
-        entity.setUserId(currentUserId()); // 🔐 owner
+        entity.setUserId(currentUserId());
 
-        return mapper.toResponse(repo.save(entity));
+        // 1. Set the subscription as active and set the first billing date to today
+        entity.setActive(true);
+        LocalDate today = LocalDate.now();
+
+        // 2. Calculate when the NEXT charge should happen
+        entity.setNextBillingDate(calculateNextBillingDate(today, entity.getBillingCycle()));
+
+        // 3. Save the subscription
+        Subscription saved = repo.save(entity);
+
+        // 4. Log the INITIAL expense immediately into the transactions table
+        transactionService.createSystemExpense(
+                null,
+                saved.getId(),
+                saved.getAmount(),
+                saved.getTitle(),
+                "Initial subscription charge"
+        );
+
+        return mapper.toResponse(saved);
     }
-
-
-    public List<SubscriptionResponseDTO> saveAll(List<SubscriptionRequestDTO> dtos) {
-        // 1. Map DTOs to Entities
-        List<Subscription> entities = dtos.stream()
-                .map(mapper::toEntity)
-                .toList();
-
-        // 2. Save all to DB
-        List<Subscription> savedEntities = repo.saveAll(entities);
-
-        // 3. Map back to Response DTOs
-        return savedEntities.stream()
-                .map(mapper::toResponse)
-                .toList();
+    //helper
+    private LocalDate calculateNextBillingDate(LocalDate currentDate, BillingCycle cycle) {
+        return switch (cycle) {
+            case WEEKLY -> currentDate.plusWeeks(1);
+            case MONTHLY -> currentDate.plusMonths(1);
+            case QUARTERLY -> currentDate.plusMonths(3);
+            case ANNUAL -> currentDate.plusYears(1);
+            default -> currentDate.plusMonths(1); // Safe fallback
+        };
     }
 
     // ---------------- UPDATE ----------------
 
 
-    @Transactional(readOnly = true)
     @Caching(evict = {
             @CacheEvict(value = "monthly_subscription", key = "#root.target.cacheKey()"),
             @CacheEvict(value = "subscription_stats", key = "#root.target.cacheKey()")
@@ -106,7 +120,6 @@ public class SubscriptionService extends SecuredService {
 
     // ---------------- DELETE ----------------
 
-    @Transactional(readOnly = true)
     @Caching(evict = {
             @CacheEvict(value = "monthly_subscription", key = "#root.target.cacheKey()"),
             @CacheEvict(value = "subscription_stats", key = "#root.target.cacheKey()")
@@ -115,6 +128,10 @@ public class SubscriptionService extends SecuredService {
         Subscription sub = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
 
+        // 1. Wipe the transaction history (because it was a typo or full refund)
+        transactionService.deleteTransactionsBySubscriptionId(sub.getId());
+
+        // 2. Wipe the subscription
         repo.delete(sub);
     }
 

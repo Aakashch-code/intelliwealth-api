@@ -130,11 +130,12 @@ public class TransactionService extends SecuredService {
     // ---------- SYSTEM OPERATIONS -------------
 
     @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
-    public void createSystemExpense(Long budgetId, BigDecimal amount, String title, String note) {
+    public void createSystemExpense(Long budgetId, Long subscriptionId, BigDecimal amount, String title, String note) {
         Transaction transaction = new Transaction();
 
         transaction.setUserId(currentUserId());
         transaction.setBudgetId(budgetId);
+        transaction.setSubscriptionId(subscriptionId);
         transaction.setAmount(amount);
 
         // Combine title and note cleanly
@@ -155,6 +156,10 @@ public class TransactionService extends SecuredService {
         repository.deleteByBudgetId(budgetId);
     }
 
+    @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
+    public void deleteTransactionsBySubscriptionId(Long subscriptionId) {
+        repository.deleteSubscriptionId(subscriptionId);
+    }
     // -------------- ANALYTICS -----------------
 
     @Transactional(readOnly = true)

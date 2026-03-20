@@ -55,6 +55,7 @@ public class Transaction {
     private LocalDateTime updatedAt;
 
     private Long budgetId;
+    private Long subscriptionId;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

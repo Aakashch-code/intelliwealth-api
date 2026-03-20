@@ -32,7 +32,8 @@ public class Subscription {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BillingCycle billingCycle;
-
+    @Column(name = "next_billing_date")
+    private LocalDate nextBillingDate;
     @Column(nullable = false)
     private String category;
 
