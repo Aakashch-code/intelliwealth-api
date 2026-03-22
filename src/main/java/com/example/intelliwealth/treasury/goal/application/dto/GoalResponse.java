@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Schema(description = "Response object representing a saved goal")
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoalResponseDTO {
+public class GoalResponse {
 
     private long id;
     private String name;

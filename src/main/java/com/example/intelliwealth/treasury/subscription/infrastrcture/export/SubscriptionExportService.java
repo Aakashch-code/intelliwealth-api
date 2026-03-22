@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.subscription.infrastrcture.export;
 
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponse;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 @Service
 public class SubscriptionExportService {
@@ -32,7 +31,7 @@ public class SubscriptionExportService {
     // Public API
     // ----------------------------------------------------
     public void generate(HttpServletResponse response,
-                         Page<SubscriptionResponseDTO> subscriptions)
+                         Page<SubscriptionResponse> subscriptions)
             throws IOException {
 
         Document document =
@@ -90,7 +89,7 @@ public class SubscriptionExportService {
     // Table
     // ----------------------------------------------------
     private void addTable(Document document,
-                          Page<SubscriptionResponseDTO> subscriptions)
+                          Page<SubscriptionResponse> subscriptions)
             throws DocumentException {
 
         PdfPTable table = new PdfPTable(7);
@@ -150,7 +149,7 @@ public class SubscriptionExportService {
     // Rows
     // ----------------------------------------------------
     private void addRows(PdfPTable table,
-                         Page<SubscriptionResponseDTO> subscriptions) {
+                         Page<SubscriptionResponse> subscriptions) {
 
         Font bodyFont =
                 FontFactory.getFont(FontFactory.HELVETICA, 10);
@@ -158,7 +157,7 @@ public class SubscriptionExportService {
         boolean alternate = false;
         int srNo = 1;
 
-        for (SubscriptionResponseDTO sub : subscriptions) {
+        for (SubscriptionResponse sub : subscriptions) {
 
             Color rowBg =
                     alternate
@@ -286,7 +285,7 @@ public class SubscriptionExportService {
         return amount == null ? "₹ 0.00" : INR.format(amount);
     }
 
-    private String formatDate(SubscriptionResponseDTO sub) {
+    private String formatDate(SubscriptionResponse sub) {
         return sub.getNextRecurrence() == null
                 ? "-"
                 : sub.getNextRecurrence().format(DATE_FORMAT);

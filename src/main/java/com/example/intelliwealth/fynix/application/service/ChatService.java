@@ -9,11 +9,11 @@ import com.example.intelliwealth.protection.insurance.application.dto.InsuranceR
 import com.example.intelliwealth.protection.insurance.application.service.InsuranceService;
 import com.example.intelliwealth.protection.insurance.application.service.InsuranceSummaryService;
 import com.example.intelliwealth.protection.insurance.domain.model.InsuranceCategory;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary;
 import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStat;
 import com.example.intelliwealth.treasury.goal.application.service.GoalService;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStatDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStat;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
@@ -50,9 +50,9 @@ public class ChatService extends SecuredService {
 
         String note = "The provided data covers all time periods.";
         //Treasury
-        BudgetSummaryDTO budget = budgetService.getBudgetSummary();
-        GoalStatDTO goal = goalService.getGoalStats();
-        SubscriptionStatDTO subscription = subscriptionService.getStats();
+        BudgetSummary budget = budgetService.getBudgetSummary();
+        GoalStat goal = goalService.getGoalStats();
+        SubscriptionStat subscription = subscriptionService.getStats();
         SavingResponse saving = transactionService.calculateNetPosition();
 
         //Wealth

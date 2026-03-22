@@ -1,9 +1,9 @@
 package com.example.intelliwealth.treasury.subscription.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStatDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequest;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponse;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStat;
 import com.example.intelliwealth.treasury.subscription.domain.model.BillingCycle;
 import com.example.intelliwealth.treasury.subscription.infrastrcture.mapper.SubscriptionMapper;
 import com.example.intelliwealth.treasury.subscription.domain.exception.SubscriptionNotFoundException;
@@ -34,10 +34,11 @@ public class SubscriptionService extends SecuredService {
     private final SubscriptionRepository repo;
     private final SubscriptionMapper mapper;
     private final TransactionService transactionService;
+    private final SubscriptionBillingJob subscriptionBillingJob;
     // ---------------- READ ----------------
 
     @Transactional(readOnly = true)
-    public Page<SubscriptionResponseDTO> getAllSubscriptions(Pageable pageable) {
+    public Page<SubscriptionResponse> getAllSubscriptions(Pageable pageable) {
         if(pageable.getPageSize()>100) {
             throw new IllegalArgumentException("Page Size Is Too Large");
         }
@@ -45,18 +46,18 @@ public class SubscriptionService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SubscriptionResponseDTO> getActiveSubscriptions( Pageable pageable) {
+    public Page<SubscriptionResponse> getActiveSubscriptions(Pageable pageable) {
         return repo.findByUserIdAndIsActiveTrue(currentUserId(),pageable).map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<SubscriptionResponseDTO> getInactiveSubscriptions(Pageable pageable) {
+    public Page<SubscriptionResponse> getInactiveSubscriptions(Pageable pageable) {
         return repo.findByUserIdAndIsActiveFalse(currentUserId(),pageable).map(mapper::toResponse);
 
     }
 
     @Transactional(readOnly = true)
-    public SubscriptionResponseDTO getSubscriptionById(Long id) {
+    public SubscriptionResponse getSubscriptionById(Long id) {
         return repo.findByIdAndUserId(id, currentUserId())
                 .map(mapper::toResponse)
                 .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
@@ -67,21 +68,16 @@ public class SubscriptionService extends SecuredService {
             @CacheEvict(value = "monthly_subscription", key = "#root.target.cacheKey()"),
             @CacheEvict(value = "subscription_stats", key = "#root.target.cacheKey()")
     })
-    public SubscriptionResponseDTO createSubscription(SubscriptionRequestDTO dto) {
+    public SubscriptionResponse createSubscription(SubscriptionRequest dto) {
         Subscription entity = mapper.toEntity(dto);
         entity.setUserId(currentUserId());
 
-        // 1. Set the subscription as active and set the first billing date to today
         entity.setActive(true);
         LocalDate today = LocalDate.now();
 
-        // 2. Calculate when the NEXT charge should happen
-        entity.setNextBillingDate(calculateNextBillingDate(today, entity.getBillingCycle()));
+        entity.setNextBillingDate(subscriptionBillingJob.calculateNextBillingDate(today, entity.getBillingCycle()));
 
-        // 3. Save the subscription
         Subscription saved = repo.save(entity);
-
-        // 4. Log the INITIAL expense immediately into the transactions table
         transactionService.createSystemExpense(
                 null,
                 saved.getId(),
@@ -92,16 +88,7 @@ public class SubscriptionService extends SecuredService {
 
         return mapper.toResponse(saved);
     }
-    //helper
-    private LocalDate calculateNextBillingDate(LocalDate currentDate, BillingCycle cycle) {
-        return switch (cycle) {
-            case WEEKLY -> currentDate.plusWeeks(1);
-            case MONTHLY -> currentDate.plusMonths(1);
-            case QUARTERLY -> currentDate.plusMonths(3);
-            case ANNUAL -> currentDate.plusYears(1);
-            default -> currentDate.plusMonths(1); // Safe fallback
-        };
-    }
+
 
     // ---------------- UPDATE ----------------
 
@@ -110,7 +97,7 @@ public class SubscriptionService extends SecuredService {
             @CacheEvict(value = "monthly_subscription", key = "#root.target.cacheKey()"),
             @CacheEvict(value = "subscription_stats", key = "#root.target.cacheKey()")
     })
-    public SubscriptionResponseDTO toggleSubscriptionStatus(Long id) {
+    public SubscriptionResponse toggleSubscriptionStatus(Long id) {
         Subscription sub = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
 
@@ -128,10 +115,8 @@ public class SubscriptionService extends SecuredService {
         Subscription sub = repo.findByIdAndUserId(id, currentUserId())
                 .orElseThrow(() -> new SubscriptionNotFoundException("Subscription not found"));
 
-        // 1. Wipe the transaction history (because it was a typo or full refund)
         transactionService.deleteTransactionsBySubscriptionId(sub.getId());
 
-        // 2. Wipe the subscription
         repo.delete(sub);
     }
 
@@ -149,7 +134,7 @@ public class SubscriptionService extends SecuredService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "subscription_stats", key = "#root.target.cacheKey()")
-    public SubscriptionStatDTO getStats() {
+    public SubscriptionStat getStats() {
 
         List<Object[]> rows = repo.sumByCycle(currentUserId());
 
@@ -160,7 +145,6 @@ public class SubscriptionService extends SecuredService {
             BillingCycle cycle = (BillingCycle) row[0];
             BigDecimal amount  = (BigDecimal) row[1];
 
-            // Convert each cycle → monthly
             BigDecimal monthly = cycle.calculateMonthly(amount);
 
             monthlyTotal = monthlyTotal.add(monthly);
@@ -182,7 +166,7 @@ public class SubscriptionService extends SecuredService {
                 .setScale(2, RoundingMode.HALF_UP);
 
 
-        return new SubscriptionStatDTO(
+        return new SubscriptionStat(
                 daily,
                 weekly,
                 monthlyTotal,

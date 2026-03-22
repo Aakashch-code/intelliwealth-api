@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Schema(description = "Request object for creating or updating a goal")
-public class GoalRequestDTO {
+public class GoalRequest {
 
     @Schema(description = "Name of the financial goal", example = "Buy a Tesla")
     private String name;
@@ -20,8 +20,6 @@ public class GoalRequestDTO {
     @Schema(description = "The target amount to reach", example = "50000.00")
     private BigDecimal targetAmount;
 
-    @Schema(description = "Initial amount already saved (optional)", example = "1000.00")
-    private BigDecimal currentAmount;
 
     @Schema(description = "Priority level of the goal", example = "HIGH")
     @Enumerated(EnumType.STRING)

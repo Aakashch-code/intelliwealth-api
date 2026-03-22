@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 @Data
 @Schema(description = "Object used to create or update a budget")
-public class BudgetRequestDTO {
+public class BudgetRequest {
 
     @NotNull(message = "Title is required")
     @Schema(description = "The title of budget" , example = "Protein Supplement")

@@ -1,9 +1,9 @@
 package com.example.intelliwealth.treasury.budget.api;
 
 import com.example.intelliwealth.treasury.budget.application.dto.AddExpenseRequest;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequest;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponse;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary;
 import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-
 @RestController
 @RequestMapping("/api/budget")
 @Tag(name = "Budget Controller", description = "Management APIs for Budgeting System")
@@ -28,7 +26,7 @@ public class BudgetController {
 
     @Operation(summary = "Get all budgets", description = "Retrieve a list of all budget entries for the current user.")
     @GetMapping
-    public Page<BudgetResponseDTO> getAllBudgets(Pageable pageable) {
+    public Page<BudgetResponse> getAllBudgets(Pageable pageable) {
         return service.getBudgets(pageable);
     }
 
@@ -38,20 +36,20 @@ public class BudgetController {
             @ApiResponse(responseCode = "404", description = "Budget not found")
     })
     @GetMapping("/{id}")
-    public BudgetResponseDTO getBudgetById(@PathVariable Long id) {
+    public BudgetResponse getBudgetById(@PathVariable Long id) {
         return service.getBudgetById(id);
     }
 
     @Operation(summary = "Get budget summary", description = "Get calculated totals for allocated and spent amounts.")
     @GetMapping("/summary")
-    public BudgetSummaryDTO getBudgetSummary() {
+    public BudgetSummary getBudgetSummary() {
         return service.getBudgetSummary();
     }
 
     @Operation(summary = "Create a new budget", description = "Add a new budget entry.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BudgetResponseDTO createBudget(@Valid @RequestBody BudgetRequestDTO request) {
+    public BudgetResponse createBudget(@Valid @RequestBody BudgetRequest request) {
         return service.createBudget(request);
     }
 
@@ -62,7 +60,7 @@ public class BudgetController {
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PutMapping("/{id}")
-    public BudgetResponseDTO updateBudget(@PathVariable Long id, @Valid @RequestBody BudgetRequestDTO request) {
+    public BudgetResponse updateBudget(@PathVariable Long id, @Valid @RequestBody BudgetRequest request) {
         return service.updateBudget(id, request);
     }
 

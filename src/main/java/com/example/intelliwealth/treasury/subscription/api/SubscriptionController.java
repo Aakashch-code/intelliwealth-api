@@ -1,10 +1,9 @@
 package com.example.intelliwealth.treasury.subscription.api;
 
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequestDTO;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponseDTO;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStatDTO;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionRequest;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionResponse;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStat;
 import com.example.intelliwealth.treasury.subscription.application.service.SubscriptionService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions")
@@ -27,7 +23,7 @@ public class SubscriptionController {
 
     @Operation(summary = "Get all subscriptions", description = "Fetch all, or filter using ?active=true/false")
     @GetMapping
-    public Page<SubscriptionResponseDTO> getAll(
+    public Page<SubscriptionResponse> getAll(
             @Parameter(description = "Filter by status") @RequestParam(required = false) Boolean active , Pageable pageable) {
         if (active != null) {
             return active ? service.getActiveSubscriptions(pageable) : service.getInactiveSubscriptions(pageable);
@@ -37,18 +33,18 @@ public class SubscriptionController {
     @Operation(summary = "Create subscription")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SubscriptionResponseDTO create(@RequestBody SubscriptionRequestDTO dto) {
+    public SubscriptionResponse create(@RequestBody SubscriptionRequest dto) {
         return service.createSubscription(dto);
     }
     @Operation(summary = "Get by ID")
     @GetMapping("/{id}")
-    public SubscriptionResponseDTO getById(@PathVariable Long id) {
+    public SubscriptionResponse getById(@PathVariable Long id) {
         return service.getSubscriptionById(id);
     }
 
     @Operation(summary = "Toggle Status", description = "Pauses or Resumes a subscription")
     @PutMapping("/{id}/toggle")
-    public SubscriptionResponseDTO toggle(@PathVariable Long id) {
+    public SubscriptionResponse toggle(@PathVariable Long id) {
         return service.toggleSubscriptionStatus(id);
     }
 
@@ -61,7 +57,7 @@ public class SubscriptionController {
 
     @GetMapping("/stat")
     @Operation(summary = "Get subscription stats")
-    public SubscriptionStatDTO fetchStats() {
+    public SubscriptionStat fetchStats() {
         return service.getStats();
     }
 

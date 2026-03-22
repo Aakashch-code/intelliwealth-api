@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Data
 @Schema(description = "Details required to create a new subscription")
-public class SubscriptionRequestDTO {
+public class SubscriptionRequest {
 
     @Schema(description = "Name of the subscription service", example = "Spotify Premium")
     private String title;

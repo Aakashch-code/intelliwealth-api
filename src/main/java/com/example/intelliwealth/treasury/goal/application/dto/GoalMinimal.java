@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoalMinimalDTO {
+public class GoalMinimal {
 
     private BigDecimal targetAmount;
     private BigDecimal currentAmount;
