@@ -11,14 +11,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GoalStatDTO {
+public class GoalStat {
     private Long totalGoals;
     private Long completedGoals;
     private BigDecimal totalTarget;
     private BigDecimal totalCurrent;
     private Long totalMonthlyRequired;
 
-    public GoalStatDTO(Long totalGoals, Long completedGoals, BigDecimal totalTarget, BigDecimal totalCurrent) {
+    public GoalStat(Long totalGoals, Long completedGoals, BigDecimal totalTarget, BigDecimal totalCurrent) {
         this.totalGoals = totalGoals;
         this.completedGoals = completedGoals;
         this.totalTarget = totalTarget;

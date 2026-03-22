@@ -1,7 +1,7 @@
 package com.example.intelliwealth.treasury.budget.infrastructure.mapper;
 
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequestDTO;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetRequest;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponse;
 import com.example.intelliwealth.treasury.budget.domain.model.Budget;
 import org.mapstruct.*;
 
@@ -14,19 +14,19 @@ public interface BudgetMapper {
     @Mapping(target = "remainingAmount", expression = "java(budget.getRemainingAmount())")
     @Mapping(target = "status", expression = "java(budget.getStatus())")
     @Mapping(target = "mode", expression = "java(budget.getMode())")
-    BudgetResponseDTO toResponseDTO(Budget budget);
+    BudgetResponse toResponseDTO(Budget budget);
 
-    List<BudgetResponseDTO> toResponseDTOList(List<Budget> budgets);
+    List<BudgetResponse> toResponseDTOList(List<Budget> budgets);
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Budget toEntity(BudgetRequestDTO requestDTO);
+    Budget toEntity(BudgetRequest requestDTO);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromRequest(@MappingTarget Budget entity, BudgetRequestDTO requestDTO);
+    void updateEntityFromRequest(@MappingTarget Budget entity, BudgetRequest requestDTO);
 }

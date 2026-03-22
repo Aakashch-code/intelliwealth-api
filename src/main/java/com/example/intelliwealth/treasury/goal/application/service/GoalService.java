@@ -1,15 +1,13 @@
 package com.example.intelliwealth.treasury.goal.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalMinimalDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalRequestDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.*;
 import com.example.intelliwealth.treasury.goal.domain.exception.GoalNotFoundException;
 import com.example.intelliwealth.treasury.goal.domain.model.Goal;
 import com.example.intelliwealth.treasury.goal.domain.model.GoalPeriod;
 import com.example.intelliwealth.treasury.goal.infrastructure.mapper.GoalMapper;
 import com.example.intelliwealth.treasury.goal.infrastructure.persistence.GoalRepository;
+import com.example.intelliwealth.treasury.transaction.application.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,11 +30,11 @@ public class GoalService extends SecuredService {
     private final GoalRepository repo;
     private final GoalMapper mapper;
     private final GoalCalculator goalCalculator;
-
+    private final TransactionService transactionService;
     // ---------------- CRUD OPERATIONS ----------------
 
     @Transactional(readOnly = true)
-    public Page<GoalResponseDTO> getAllGoal(Pageable pageable) {
+    public Page<GoalResponse> getAllGoal(Pageable pageable) {
         if (pageable.getPageSize() > 100) {
             throw new IllegalArgumentException("Page size is too high");
         }
@@ -45,14 +43,14 @@ public class GoalService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public GoalResponseDTO getGoalById(long goalId) {
+    public GoalResponse getGoalById(long goalId) {
         Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
                 .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
         return mapper.toResponse(goal);
     }
 
     @CacheEvict(value = "goal_stat", key = "#root.target.cacheKey()")
-    public GoalResponseDTO createGoal(GoalRequestDTO request) {
+    public GoalResponse createGoal(GoalRequest request) {
         Goal goal = mapper.toEntity(request);
         goal.setUserId(currentUserId());
         goal.setSpentAmount(BigDecimal.ZERO);
@@ -65,7 +63,7 @@ public class GoalService extends SecuredService {
     }
 
     @CacheEvict(value = "goal_stat", key = "#root.target.cacheKey()")
-    public GoalResponseDTO updateGoal(long goalId, GoalRequestDTO request) {
+    public GoalResponse updateGoal(long goalId, GoalRequest request) {
         Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
                 .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
 
@@ -84,14 +82,45 @@ public class GoalService extends SecuredService {
     public void deleteAllGoal() {
         repo.deleteAllByUserId(currentUserId());
     }
+// ---------------- GOAL FUNDING ----------------
 
+    @CacheEvict(value = {"goal_stat", "net_position"}, key = "#root.target.cacheKey()")
+    public GoalResponse addFundsToGoal(long goalId, StashRequest request) {
+
+        BigDecimal amountToAdd = request.amount();
+
+        if (amountToAdd == null || amountToAdd.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount to add must be greater than zero");
+        }
+
+        Goal goal = repo.findByIdAndUserId(goalId, currentUserId())
+                .orElseThrow(() -> new GoalNotFoundException("Goal not found"));
+
+        goal.setCurrentAmount(
+                goal.getCurrentAmount().add(amountToAdd)
+        );
+
+//        if (goal.getCurrentAmount().compareTo(goal.getTargetAmount()) >= 0) {
+//            goal.setStatus(GoalStatus.COMPLETED);
+//        }
+
+        Goal updatedGoal = repo.save(goal);
+
+        transactionService.createGoalAllocation(
+                goal.getId(),
+                amountToAdd,
+                goal.getName()
+        );
+
+        return mapper.toResponse(updatedGoal);
+    }
     // ---------------- AGGREGATION / STATS ----------------
 
     @Transactional(readOnly = true)
     @Cacheable(value = "goal_stat", key = "#root.target.cacheKey()")
-    public GoalStatDTO getGoalStats() {
-        GoalStatDTO stats = repo.getStats(currentUserId());
-        List<GoalMinimalDTO> goals = repo.findMinimalGoal(currentUserId());
+    public GoalStat getGoalStats() {
+        GoalStat stats = repo.getStats(currentUserId());
+        List<GoalMinimal> goals = repo.findMinimalGoal(currentUserId());
 
         long totalMonthlyRequired = goals.stream()
                 .mapToLong(goal -> goalCalculator.calculateRequiredAmount(
@@ -103,7 +132,7 @@ public class GoalService extends SecuredService {
                 ))
                 .sum();
 
-        return new GoalStatDTO(
+        return new GoalStat(
                 stats.getTotalGoals(),
                 stats.getCompletedGoals(),
                 stats.getTotalTarget(),

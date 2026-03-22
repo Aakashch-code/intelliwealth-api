@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.budget.infrastructure.export;
 
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponseDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponse;
 import com.example.intelliwealth.treasury.budget.domain.model.BudgetStatus;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -21,7 +20,7 @@ public class BudgetExportService {
             FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
 
     // Public API
-    public void generate(HttpServletResponse response, Page<BudgetResponseDTO> budgets)
+    public void generate(HttpServletResponse response, Page<BudgetResponse> budgets)
             throws IOException {
 
         Document document = new Document(PageSize.A4.rotate(), 20, 20, 20, 20);
@@ -58,7 +57,7 @@ public class BudgetExportService {
     }
 
     // Table
-    private void addTable(Document document, Page<BudgetResponseDTO> budgets)
+    private void addTable(Document document, Page<BudgetResponse> budgets)
             throws DocumentException {
 
         PdfPTable table = new PdfPTable(11);
@@ -103,11 +102,11 @@ public class BudgetExportService {
         table.addCell(cell);
     }
     // Rows
-    private void addRows(PdfPTable table, Page<BudgetResponseDTO> budgets) {
+    private void addRows(PdfPTable table, Page<BudgetResponse> budgets) {
         Font bodyFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
         boolean alternate = false;
         int srNo = 1;
-        for (BudgetResponseDTO b : budgets) {
+        for (BudgetResponse b : budgets) {
             Color rowBg = alternate ? new Color(245, 247, 250) : Color.WHITE;
             alternate = !alternate;
 

@@ -1,7 +1,7 @@
 package com.example.intelliwealth.treasury.goal.infrastructure.persistence;
 
-import com.example.intelliwealth.treasury.goal.application.dto.GoalMinimalDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalMinimal;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStat;
 import com.example.intelliwealth.treasury.goal.domain.model.Goal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface GoalRepository extends JpaRepository<Goal, Long> {
     Page<Goal> findAllByUserId(UUID userId, Pageable pageable);
     @Query("""
-SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalMinimalDTO(
+SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalMinimal(
        g.targetAmount,
        g.currentAmount,
        g.targetDate
@@ -25,13 +25,13 @@ SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalMinimalDT
 FROM Goal g
 WHERE g.userId = :userId
 """)
-    List<GoalMinimalDTO> findMinimalGoal(UUID userId);
+    List<GoalMinimal> findMinimalGoal(UUID userId);
 
     Optional<Goal> findByIdAndUserId(long id, UUID userId);
     void deleteAllByUserId(UUID userId);
 
     @Query("""
-SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO(
+SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalStat(
 
    COUNT(g),
 
@@ -46,7 +46,7 @@ SELECT new com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO(
 FROM Goal g
 WHERE g.userId = :userId
 """)
-    GoalStatDTO getStats(UUID userId);
+    GoalStat getStats(UUID userId);
 
 
 

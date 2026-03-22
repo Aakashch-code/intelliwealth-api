@@ -1,6 +1,6 @@
 package com.example.intelliwealth.treasury.goal.infrastructure.export;
 
-import com.example.intelliwealth.treasury.goal.application.dto.GoalResponseDTO;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalResponse;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
@@ -31,7 +31,7 @@ public class GoalExportService {
     // Public API
     // ----------------------------------------------------
     public void generate(HttpServletResponse response,
-                         Page<GoalResponseDTO> goals) throws IOException {
+                         Page<GoalResponse> goals) throws IOException {
 
         Document document = new Document(PageSize.A4.rotate(), 20, 20, 20, 20);
         PdfWriter writer = PdfWriter.getInstance(document,
@@ -80,7 +80,7 @@ public class GoalExportService {
     // Table
     // ----------------------------------------------------
     private void addTable(Document document,
-                          Page<GoalResponseDTO> goals)
+                          Page<GoalResponse> goals)
             throws DocumentException {
 
         PdfPTable table = new PdfPTable(8);
@@ -138,7 +138,7 @@ public class GoalExportService {
     // Rows
     // ----------------------------------------------------
     private void addRows(PdfPTable table,
-                         Page<GoalResponseDTO> goals) {
+                         Page<GoalResponse> goals) {
 
         Font bodyFont =
                 FontFactory.getFont(FontFactory.HELVETICA, 10);
@@ -146,7 +146,7 @@ public class GoalExportService {
         boolean alternate = false;
         int srNo = 1;
 
-        for (GoalResponseDTO g : goals) {
+        for (GoalResponse g : goals) {
 
             Color rowBg =
                     alternate ? new Color(245, 247, 250)
@@ -249,7 +249,7 @@ public class GoalExportService {
         return cell;
     }
 
-    private PdfPCell progressCell(GoalResponseDTO g,
+    private PdfPCell progressCell(GoalResponse g,
                                   Font font,
                                   Color bg) {
 
@@ -334,7 +334,7 @@ public class GoalExportService {
         return amount == null ? "₹ 0.00" : INR.format(amount);
     }
 
-    private String formatDate(GoalResponseDTO g) {
+    private String formatDate(GoalResponse g) {
         return g.getTargetDate() == null ?
                 "-" :
                 g.getTargetDate().format(DATE_FORMAT);

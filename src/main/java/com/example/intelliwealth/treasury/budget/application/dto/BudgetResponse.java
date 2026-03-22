@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Schema(description = "Response object containing budget details")
-public class BudgetResponseDTO {
+public class BudgetResponse {
 
     private Long id;
     private String title;

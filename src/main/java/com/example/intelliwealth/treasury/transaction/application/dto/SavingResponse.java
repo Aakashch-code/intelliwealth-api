@@ -14,5 +14,6 @@ import java.math.BigDecimal;
 public class SavingResponse {
     private BigDecimal totalIncome;
     private BigDecimal totalExpense;
+    private BigDecimal totalAllocated;
     private BigDecimal netSavings;
 }

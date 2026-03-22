@@ -56,6 +56,7 @@ public class Transaction {
 
     private Long budgetId;
     private Long subscriptionId;
+    private Long goalId;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

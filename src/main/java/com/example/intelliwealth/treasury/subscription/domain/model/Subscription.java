@@ -35,7 +35,8 @@ public class Subscription {
     @Column(name = "next_billing_date")
     private LocalDate nextBillingDate;
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private SubscriptionCategory category;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate nextRecurrence;

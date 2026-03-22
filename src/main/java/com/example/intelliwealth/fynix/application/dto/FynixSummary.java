@@ -2,9 +2,9 @@ package com.example.intelliwealth.fynix.application.dto;
 
 import com.example.intelliwealth.protection.contingency.ContingencyReportDTO;
 import com.example.intelliwealth.protection.insurance.application.dto.InsuranceCategorySummary;
-import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummaryDTO;
-import com.example.intelliwealth.treasury.goal.application.dto.GoalStatDTO;
-import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStatDTO;
+import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary;
+import com.example.intelliwealth.treasury.goal.application.dto.GoalStat;
+import com.example.intelliwealth.treasury.subscription.application.dto.SubscriptionStat;
 import com.example.intelliwealth.treasury.transaction.application.dto.SavingResponse;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
 import com.example.intelliwealth.wealth.networth.NetWorthResponseDTO;
@@ -23,9 +23,9 @@ public class FynixSummary {
 
     private String period;
 
-    private BudgetSummaryDTO budgetStats;
-    private GoalStatDTO goalStats;
-    private SubscriptionStatDTO subscriptionStat;
+    private BudgetSummary budgetStats;
+    private GoalStat goalStats;
+    private SubscriptionStat subscriptionStat;
     private SavingResponse transactionStats;
     private DebtStatsDTO debtStats;
     private NetWorthResponseDTO netWorthStats;

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class SubscriptionResponseDTO {
+public class SubscriptionResponse {
 
     private int id;
     private String title;

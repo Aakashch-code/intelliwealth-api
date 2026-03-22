@@ -19,36 +19,30 @@ public class SubscriptionBillingJob {
     private final SubscriptionRepository subscriptionRepository;
     private final TransactionService transactionService;
 
-    // This cron expression runs the job every day at midnight (00:00) server time
     @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void processRecurringSubscriptions() {
         LocalDate today = LocalDate.now();
 
-        // 1. Find all ACTIVE subscriptions where the nextBillingDate is today (or earlier, just in case the server was down)
-        // Note: You will need to add this method to your SubscriptionRepository!
         List<Subscription> dueSubscriptions = subscriptionRepository.findByIsActiveTrueAndNextBillingDateLessThanEqual(today);
 
         for (Subscription sub : dueSubscriptions) {
-            // 2. Log the recurring expense
             transactionService.createSystemExpense(
-                    null, // Again, add budgetId if applicable
+                    null,
                     sub.getId(),
                     sub.getAmount(),
                     sub.getTitle(),
                     "Recurring subscription payment"
             );
 
-            // 3. Update the subscription with the NEXT billing date
             LocalDate nextDate = calculateNextBillingDate(today, sub.getBillingCycle());
             sub.setNextBillingDate(nextDate);
         }
 
-        // 4. Save all updated subscriptions back to the database
         subscriptionRepository.saveAll(dueSubscriptions);
     }
 
-    private LocalDate calculateNextBillingDate(LocalDate currentDate, BillingCycle cycle) {
+    protected LocalDate calculateNextBillingDate(LocalDate currentDate, BillingCycle cycle) {
         return switch (cycle) {
             case WEEKLY -> currentDate.plusWeeks(1);
             case MONTHLY -> currentDate.plusMonths(1);

@@ -35,7 +35,7 @@ public class BudgetService extends SecuredService {
     // -------- CRUD --------
 
     @CacheEvict(value = "budget_summary", key = "#root.target.cacheKey()")
-    public BudgetResponseDTO createBudget(BudgetRequestDTO request) {
+    public BudgetResponse createBudget(BudgetRequest request) {
 
         Budget budget = mapper.toEntity(request);
         budget.setUserId(currentUserId());
@@ -57,7 +57,7 @@ public class BudgetService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BudgetResponseDTO> getBudgets(Pageable pageable) {
+    public Page<BudgetResponse> getBudgets(Pageable pageable) {
 
         if (pageable.getPageSize() > 100) {
             throw new IllegalArgumentException("Page size too large");
@@ -68,13 +68,13 @@ public class BudgetService extends SecuredService {
     }
 
     @Transactional(readOnly = true)
-    public BudgetResponseDTO getBudgetById(Long id) {
+    public BudgetResponse getBudgetById(Long id) {
         return mapper.toResponseDTO(getBudget(id));
     }
 
 
     @CacheEvict(value = "budget_summary", key = "#root.target.cacheKey()")
-    public BudgetResponseDTO updateBudget(Long id, BudgetRequestDTO request) {
+    public BudgetResponse updateBudget(Long id, BudgetRequest request) {
 
         Budget budget = getBudget(id);
 
@@ -149,7 +149,7 @@ public class BudgetService extends SecuredService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "budget_summary", key = "#root.target.cacheKey()", unless = "#result == null")
-    public BudgetSummaryDTO getBudgetSummary() {
+    public BudgetSummary getBudgetSummary() {
 
         return repo.findBudgetSummaryByUserIdAndMode(
                 currentUserId(),

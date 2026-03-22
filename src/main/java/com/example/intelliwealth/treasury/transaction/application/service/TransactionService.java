@@ -126,7 +126,22 @@ public class TransactionService extends SecuredService {
 
         repository.delete(transaction);
     }
+// ---------- GOAL ALLOCATION OPERATIONS -------------
 
+    @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
+    public void createGoalAllocation(Long goalId, BigDecimal amount, String goalName) {
+        Transaction transaction = new Transaction();
+
+        transaction.setUserId(currentUserId());
+        transaction.setGoalId(goalId);
+        transaction.setAmount(amount);
+        transaction.setDescription("Stashed for Goal: " + goalName);
+        transaction.setType(TransactionType.ALLOCATED);
+        transaction.setTransactionDate(LocalDate.now());
+        transaction.setSystemGenerated(true);
+
+        repository.save(transaction);
+    }
     // ---------- SYSTEM OPERATIONS -------------
 
     @CacheEvict(value = "net_position", key = "#root.target.cacheKey()")
@@ -169,10 +184,12 @@ public class TransactionService extends SecuredService {
 
         BigDecimal income = getSum(userId, TransactionType.INCOME);
         BigDecimal expense = getSum(userId, TransactionType.EXPENSE);
+        BigDecimal allocated = getSum(userId,TransactionType.ALLOCATED);
 
         return new SavingResponse(
                 income,
                 expense,
+                allocated,
                 income.subtract(expense)
         );
     }

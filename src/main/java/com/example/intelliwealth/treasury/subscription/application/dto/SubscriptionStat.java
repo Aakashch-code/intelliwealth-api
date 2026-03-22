@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SubscriptionStatDTO {
+public class SubscriptionStat {
 
     private BigDecimal daily;
     private BigDecimal weekly;
