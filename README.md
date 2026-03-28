@@ -2,18 +2,19 @@
 
 <div align="center">
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square\&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green?style=flat-square\&logo=springboot)
-![Spring Security](https://img.shields.io/badge/Security-Spring_Security-6db33f?style=flat-square\&logo=springsecurity)
-![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square\&logo=jsonwebtokens)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square\&logo=postgresql)
-![MongoDB](https://img.shields.io/badge/NoSQL-MongoDB-47A248?style=flat-square\&logo=mongodb)
-![AI](https://img.shields.io/badge/AI_Engine-Fynix-purple?style=flat-square\&logo=openai)
-![Swagger](https://img.shields.io/badge/Docs-Swagger_UI-85ea2d?style=flat-square\&logo=swagger)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green?style=flat-square&logo=springboot)
+![Spring Security](https://img.shields.io/badge/Security-Spring_Security_6-6db33f?style=flat-square&logo=springsecurity)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Transactional_Data-blue?style=flat-square&logo=postgresql)
+![MongoDB](https://img.shields.io/badge/MongoDB-Financial_Records-47A248?style=flat-square&logo=mongodb)
+![Gemini](https://img.shields.io/badge/AI-Google_Gemini-8E75B2?style=flat-square&logo=google)
+![React](https://img.shields.io/badge/Frontend-React.js-61DAFB?style=flat-square&logo=react)
+![Swagger](https://img.shields.io/badge/Docs-Swagger_UI-85ea2d?style=flat-square&logo=swagger)
 
-**An AI-powered personal finance management platform — built as a solo engineering project**
+**An AI-powered personal finance management platform — built as a solo end-to-end engineering project**
 
-[Live Demo](#-live-demo) • [Frontend Repo](#-frontend-repository) • [Features](#-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started)
+[Live Demo](#-live-demo) · [Frontend Repo](#-frontend-repository) · [Features](#-features) · [Architecture](#-architecture) · [Getting Started](#-getting-started)
 
 </div>
 
@@ -21,120 +22,109 @@
 
 ## 📌 Overview
 
-**Intelli Wealth** is a backend-first personal finance system that I designed and built end-to-end as a personal engineering project to practice and demonstrate real-world backend architecture, security, and AI integration.
+**Intelli Wealth** is a backend-first personal finance system designed and built end-to-end as a solo engineering project — demonstrating real-world API design, layered architecture, AI integration, and production-grade security.
 
-The project goes beyond basic CRUD functionality. It models core financial domains such as treasury, wealth, protection, and advisory with clear boundaries and maintainable design, while emphasizing production-grade authentication, authorization, and an extensible AI layer for future intelligence-driven features.
-### Why this project exists
-
-* To prove backend depth beyond basic REST CRUD
-* To demonstrate modular monolith design
-* To integrate local LLMs (Ollama) into a real business workflow
-* To build something resume‑credible
+The platform goes well beyond CRUD. It models core financial domains — transactions, budgets, goals, assets, debt, insurance, net worth, and contingency planning — with 45+ RESTful endpoints, a unified AI reporting layer powered by Google Gemini, and a thoughtfully structured layered architecture.
 
 ---
 
 ## 🌐 Live Demo
 
-> **Backend API (Swagger UI)**
-> https://intelliwealth-api.onrender.com/swagger-ui/index.html#/
+| Interface | URL |
+|-----------|-----|
+| 🔗 Backend API (Swagger UI) | [intelliwealth-api.onrender.com/swagger-ui](https://intelliwealth-api.onrender.com/swagger-ui/index.html#/) |
+| 🖥️ Frontend Demo | [intelli-wealth-ui.netlify.app](https://intelli-wealth-ui.netlify.app/) |
 
-> **Frontend Demo**
-> https://intelli-wealth-ui.netlify.app/
-
-⚠️ Demo runs on a lightweight VM with limited resources. Expect cold starts and slow AI responses.
+> ⚠️ Demo runs on a lightweight VM. Expect cold starts and slightly slower AI responses.
 
 ---
 
 ## 🖥️ Frontend Repository
 
-The frontend is intentionally kept lightweight and API‑driven. It exists to:
+The React frontend is intentionally minimal — it exists to authenticate users, exercise every secured endpoint, and validate full end-to-end workflows.
 
-* Authenticate users
-* Call every secured backend endpoint
-* Validate full end‑to‑end flows
+> **Frontend Repo:** [github.com/Aakashch-code/intelli-wealth-ui](https://github.com/Aakashch-code/intelli-wealth-ui)
 
-> **Frontend Repo**
-https://github.com/Aakashch-code/intelli-wealth-ui
-
-**Tech used:**
-
-* React.js
-* Axios
-* JWT auth handling
-* Minimal UI (focus is backend correctness, not UI polish)
+**Stack:** React.js · Axios · JWT auth handling
 
 ---
 
 ## ✨ Features
 
 ### 🔐 Authentication & Security
+- Stateless JWT authentication with Spring Security 6
+- Role-based access control (RBAC)
+- BCrypt password hashing
+- Token refresh flow & security filter chain
 
-* Stateless JWT authentication
-* Role‑based access control (RBAC)
-* BCrypt password hashing
-* Token refresh flow
-* Spring Security filter chain
-
-### 🧠 Fynix AI Engine
-
-* Context‑aware financial assistant
-* AI‑generated financial summaries
-* Spending behavior analysis
-* Rule‑guided deterministic prompts
-* Local LLM support via Ollama
+### 🧠 AI Financial Intelligence (Google Gemini)
+- AI-powered financial summaries and personalized insights
+- Spending behaviour analysis
+- Debt strategy recommendations via a unified reporting system
+- Response payloads optimised with **Jackson null-field filtering**
 
 ### 💼 Treasury Management
+- Budgets, transactions, and subscriptions
+- Goal tracking and spending analytics
+- 45+ RESTful endpoints covering the full financial lifecycle
 
-* Budgets
-* Transactions
-* Subscriptions
-* Goals
-* Spending analytics
+### 📊 Contingency Analysis API
+- Computes **monthly burn rate**, **liquid assets**, and **financial runway** from aggregated data
+- Identifies **recommended savings gap** to reach target emergency coverage
+- Driven by a dedicated analytical endpoint, not just raw CRUD
 
 ### 💎 Wealth Management
-
-* Assets
-* Liabilities
-* Net worth aggregation
-* Category‑based classification
+- Asset and liability tracking
+- Net worth aggregation
+- Category-based classification
 
 ### 🛡️ Protection Planning
-
-* Insurance tracking
-* Emergency fund planning
-* Survival‑period estimation
-* Coverage gap detection
+- Insurance tracking
+- Emergency fund planning
+- Survival-period estimation and coverage gap detection
 
 ---
 
 ## 🏗️ Architecture
 
-**Modular Monolith** with package‑by‑feature organization.
+Intelli Wealth follows a **layered architecture** applied within a **modular monolith** structure — each financial domain owns its full vertical slice.
 
-* Each domain owns:
+```
+┌────────────────────────────────────────────────────────┐
+│                        API Layer                       │
+│         REST Controllers · Swagger Docs · DTOs         │
+├────────────────────────────────────────────────────────┤
+│                   Application Layer                    │
+│    Business Logic · Gemini AI Service · Analytics      │
+├────────────────────────────────────────────────────────┤
+│                     Domain Layer                       │
+│      Entities · Domain Models · Business Rules         │
+├────────────────────────────────────────────────────────┤
+│                  Persistence Layer                     │
+│   PostgreSQL (Transactional)  │  MongoDB (Summaries)   │
+└────────────────────────────────────────────────────────┘
+```
 
-    * Controller
-    * Service
-    * Repository
-    * DTOs
-    * Domain models
+### Layer Responsibilities
 
-* Clear boundaries
+| Layer | Responsibility |
+|-------|---------------|
+| **API** | Exposes 45+ REST endpoints; handles request/response mapping, Swagger docs, and input validation |
+| **Application** | Orchestrates business workflows, Gemini AI calls, contingency calculations, and cross-domain aggregations |
+| **Domain** | Encapsulates core financial rules — net worth computation, runway estimation, coverage gap detection |
+| **Persistence** | Polyglot persistence — PostgreSQL for user/transactional data; MongoDB for flexible financial summaries and asset records |
 
-* No god‑services
-
-* Vertical slicing
+### Package Structure
 
 ```
 com.example.intelliwealth
-├── authentication
-├── fynix
-├── treasury
-├── wealth
-├── protection
-├── advisor
-├── config
-└── exception
+├── authentication       # JWT, Spring Security, RBAC
+├── treasury             # Budgets, Transactions, Goals, Subscriptions
+├── wealth               # Assets, Liabilities, Net Worth
+├── protection           # Insurance, Emergency Fund, Contingency
+├── advisor              # Gemini AI reporting & unified insights
+├── config               # Security config, Beans, Jackson setup
+└── exception            # Global error handling
 ```
 
 ---
@@ -143,13 +133,11 @@ com.example.intelliwealth
 
 ### Prerequisites
 
-* Java 21+
-* Maven 3.8+
-* PostgreSQL 15+
-* MongoDB 6+ (for AI features)
-* Ollama (optional, for local LLM)
-
----
+- Java 21+
+- Maven 3.8+
+- PostgreSQL 15+
+- MongoDB 6+
+- Google Gemini API Key
 
 ### Application Properties
 
@@ -157,7 +145,7 @@ com.example.intelliwealth
 spring.application.name=Intelli-Wealth
 server.port=8085
 
-# Database Configuration
+# PostgreSQL — Transactional & User Data
 spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
 spring.datasource.username=<YOUR_POSTGRES_USERNAME>
 spring.datasource.password=<YOUR_POSTGRES_PASSWORD>
@@ -168,26 +156,23 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
-# Swagger UI
-springdoc.swagger-ui.path=/docs
-springdoc.swagger-ui.filter=true
-
-# AI / Ollama Configuration
-spring.ai.ollama.base-url=http://localhost:11434
-spring.ai.ollama.chat.options.model=llama3.2
-spring.ai.ollama.chat.options.temperature=0.7
-
-# MongoDB Configuration
+# MongoDB — Financial Summaries & Asset Records
 spring.data.mongodb.uri=mongodb://localhost:27017/your_mongo_db
 spring.data.mongodb.username=<YOUR_MONGO_USERNAME>
 spring.data.mongodb.password=<YOUR_MONGO_PASSWORD>
 
+# Google Gemini AI
+gemini.api.key=<YOUR_GEMINI_API_KEY>
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent
+
 # JWT Security
 application.security.jwt.secret-key=<YOUR_JWT_SECRET_KEY>
 application.security.jwt.expiration=86400000
-```
 
----
+# Swagger UI
+springdoc.swagger-ui.path=/docs
+springdoc.swagger-ui.filter=true
+```
 
 ### Run Locally
 
@@ -196,31 +181,33 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-Swagger:
-
+Swagger UI available at:
 ```
-http://localhost:8085/swagger-ui/index.html#/
+http://localhost:8085/swagger-ui/index.html
 ```
 
 ---
 
 ## 🧠 What This Project Demonstrates
 
-* Real domain modeling (not fake entities)
-* Secure JWT auth with RBAC
-* Modular backend architecture
-* AI integration into business logic
-* Polyglot persistence (Postgres + MongoDB)
-* Resume‑grade backend complexity
+| Concern | Implementation |
+|---------|---------------|
+| **API Design** | 45+ RESTful endpoints with clear resource boundaries and consistent response contracts |
+| **Layered Architecture** | API → Application → Domain → Persistence with no cross-layer leakage |
+| **Security** | Spring Security 6, stateless JWT, RBAC, BCrypt |
+| **AI Integration** | Google Gemini for summaries, debt strategies, and behavioural insights |
+| **Polyglot Persistence** | PostgreSQL for ACID-critical data; MongoDB for flexible document storage |
+| **Analytical APIs** | Contingency engine computing burn rate, runway, and savings gap from aggregated data |
+| **Response Optimisation** | Jackson null-field filtering for clean, lightweight AI payloads |
 
 ---
 
 ## ⚠️ Honest Limitations
 
-* UI is basic by design
-* No automated tests yet
-* No production hardening (rate limits, observability)
-* AI accuracy depends on prompt + model quality
+- UI is intentionally minimal — the focus is backend correctness
+- No automated tests yet (planned)
+- No production observability (rate limiting, metrics, tracing)
+- AI response quality depends on prompt design and Gemini model version
 
 ---
 
@@ -232,9 +219,6 @@ MIT
 
 ## 👤 Author
 
-**Aakash Chauhan**
-Backend Developer (Java, Spring Boot)
+**Aakash Chauhan** — Backend Developer (Java · Spring Boot · System Design)
 
----
-* Thank you for taking the time to explore Intelli Wealth. I welcome feedback and thoughtful discussion around the design and implementation choices in this project.
----
+> Thank you for exploring Intelli Wealth. Feedback and thoughtful discussion on design and implementation choices are always welcome.
