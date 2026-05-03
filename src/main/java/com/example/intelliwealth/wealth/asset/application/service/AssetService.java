@@ -1,6 +1,7 @@
 package com.example.intelliwealth.wealth.asset.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
+import com.example.intelliwealth.wealth.asset.application.dto.MainCategorySumResult;
 import com.example.intelliwealth.wealth.asset.domain.model.Asset;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
@@ -8,15 +9,23 @@ import com.example.intelliwealth.wealth.asset.domain.exception.AssetNotFoundExce
 import com.example.intelliwealth.wealth.asset.infrastructure.mapper.AssetsMapper;
 import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
 import com.example.intelliwealth.wealth.asset.domain.rules.AssetValidator;
+import com.example.intelliwealth.wealth.asset.application.dto.CategorySumResult;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Decimal128;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,76 +33,96 @@ import java.util.UUID;
 @PreAuthorize("isAuthenticated()")
 public class AssetService extends SecuredService {
 
-    private final AssetRepository repo;
-    private final AssetsMapper mapper;
+    private static final int MAX_PAGE_SIZE = 100;
 
-    // ---------------- CREATE ----------------
+    private static final String CACHE_ASSET_SUM = "asset_sum";
+    private static final String CACHE_CATEGORY_SUM = "asset_category_sum";
+    private static final String CACHE_MAIN_CATEGORY_SUM = "asset_main_category_sum";
 
-    public AssetsResponseDTO createAsset(AssetsRequestDTO dto) {
+    private final AssetRepository assetRepository;
+    private final AssetsMapper assetMapper;
 
-        if (dto.getAttributes() == null) {
-            dto.setAttributes(new HashMap<>());
+    @CacheEvict(cacheNames = {CACHE_ASSET_SUM, CACHE_CATEGORY_SUM, CACHE_MAIN_CATEGORY_SUM}, key = "#root.target.currentUserId()")
+    public AssetsResponseDTO createAsset(AssetsRequestDTO request) {
+        if (request.getAttributes() == null) {
+            request.setAttributes(new HashMap<>());
         }
 
-        AssetValidator.validateAttributes(dto.getCategory(), dto.getAttributes());
+        AssetValidator.validateAttributes(request.getCategory(), request.getAttributes());
 
-        Asset entity = mapper.toEntity(dto);
-        entity.setUserId(currentUserId());
+        Asset asset = assetMapper.toEntity(request);
+        asset.setUserId(currentUserId());
 
-        return mapper.toDto(repo.save(entity));
+        return assetMapper.toDto(assetRepository.save(asset));
     }
 
-    // ---------------- UPDATE ----------------
+    @CacheEvict(cacheNames = {CACHE_ASSET_SUM, CACHE_CATEGORY_SUM, CACHE_MAIN_CATEGORY_SUM}, key = "#root.target.currentUserId()")
+    public AssetsResponseDTO modifyAsset(AssetsRequestDTO request, String id) {
+        Asset existingAsset = findAssetOrThrow(id);
 
-    public AssetsResponseDTO modifyAsset(AssetsRequestDTO dto, String id) {
+        assetMapper.updateEntityFromDto(request, existingAsset);
+        AssetValidator.validateAttributes(existingAsset.getCategory(), existingAsset.getAttributes());
 
-        Asset existing = repo.findByIdAndUserId(id, currentUserId())
-                .orElseThrow(() -> new AssetNotFoundException("Asset not found"));
-
-        existing.setName(dto.getName());
-        existing.setMainCategory(dto.getMainCategory());
-        existing.setCategory(dto.getCategory());
-        existing.setCurrentValue(dto.getCurrentValue());
-        existing.setDateAcquired(dto.getDateAcquired());
-
-        if (dto.getAttributes() != null) {
-            existing.getAttributes().putAll(dto.getAttributes());
-        }
-
-        AssetValidator.validateAttributes(existing.getCategory(), existing.getAttributes());
-
-        return mapper.toDto(repo.save(existing));
+        return assetMapper.toDto(assetRepository.save(existingAsset));
     }
 
-    // ---------------- READ ----------------
+    @Transactional(readOnly = true)
+    public Page<AssetsResponseDTO> getAllAssets(Pageable pageable) {
+        Pageable effectivePageable = PageRequest.of(
+                pageable.getPageNumber(),
+                Math.min(pageable.getPageSize(), MAX_PAGE_SIZE),
+                pageable.getSort()
+        );
 
-    public List<AssetsResponseDTO> getAllAssets() {
-        return repo.findAllByUserId(currentUserId())
-                .stream()
-                .map(mapper::toDto)
-                .toList();
+        return assetRepository.findAllByUserId(currentUserId(), effectivePageable)
+                .map(assetMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
     public AssetsResponseDTO getAssetById(String id) {
-        return repo.findByIdAndUserId(id, currentUserId())
-                .map(mapper::toDto)
-                .orElseThrow(() -> new AssetNotFoundException("Asset not found"));
+        return assetMapper.toDto(findAssetOrThrow(id));
     }
 
-    // ---------------- AGGREGATE ----------------
-
-    @Cacheable(value = "asset_sum" , key = "#root.target.cacheKey()")
-    public Decimal128 allAssetsAmount() {
-        UUID userId = currentUserId();
-        return repo.sumAssetValueByUserId(userId);
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_ASSET_SUM, key = "#root.target.currentUserId()")
+    public BigDecimal getTotalAssetValue() {
+        Decimal128 totalAssetSum = assetRepository.sumAssetValueByUserId(currentUserId());
+        return totalAssetSum != null ? totalAssetSum.bigDecimalValue() : BigDecimal.ZERO;
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_CATEGORY_SUM, key = "#root.target.currentUserId()")
+    public Map<String, BigDecimal> getTotalValueByCategory() {
+        return assetRepository.sumByCategory(currentUserId()).stream()
+                .filter(result -> result.getId() != null && result.getTotal() != null)
+                .collect(Collectors.toMap(
+                        CategorySumResult::getId,
+                        CategorySumResult::getTotal,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
+    }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_MAIN_CATEGORY_SUM, key = "#root.target.currentUserId()")
+    public Map<String, BigDecimal> getTotalValueByMainCategory() {
+        return assetRepository.sumByMainCategory(currentUserId()).stream()
+                .filter(result -> result.getId() != null && result.getTotal() != null)
+                .collect(Collectors.toMap(
+                        MainCategorySumResult::getId,
+                        MainCategorySumResult::getTotal,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
+    }
 
-    // ---------------- DELETE ----------------
-
+    @CacheEvict(cacheNames = {CACHE_ASSET_SUM, CACHE_CATEGORY_SUM, CACHE_MAIN_CATEGORY_SUM}, key = "#root.target.currentUserId()")
     public void deleteAsset(String id) {
-        repo.deleteByIdAndUserId(id, currentUserId());
+        assetRepository.delete(findAssetOrThrow(id));
     }
 
+    private Asset findAssetOrThrow(String id) {
+        return assetRepository.findByIdAndUserId(id, currentUserId())
+                .orElseThrow(() -> new AssetNotFoundException("Asset with ID " + id + " not found"));
+    }
 }

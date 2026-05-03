@@ -5,6 +5,7 @@ import com.example.intelliwealth.wealth.asset.application.dto.AssetsRequestDTO;
 import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface AssetsMapper {
@@ -13,4 +14,8 @@ public interface AssetsMapper {
     Asset toEntity(AssetsRequestDTO dto);
 
     AssetsResponseDTO toDto(Asset asset);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    void updateEntityFromDto(AssetsRequestDTO dto, @MappingTarget Asset entity);
 }

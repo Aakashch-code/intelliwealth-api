@@ -5,11 +5,13 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AssetMainCategory {
-    FINANCIAL("Financial"),
-    PHYSICAL("Physical"),
-    DIGITAL("Digital"),
-    OTHER("Other");
+public enum AssetPriority {
+    PRIMARY("Primary"),
+    SECONDARY("Secondary");
 
     private final String label;
+
+
+
+
 }
