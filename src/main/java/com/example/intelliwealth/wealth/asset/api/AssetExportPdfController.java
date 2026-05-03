@@ -2,9 +2,11 @@ package com.example.intelliwealth.wealth.asset.api;
 
 import com.example.intelliwealth.wealth.asset.infrastructure.export.AssetExportService;
 import com.example.intelliwealth.wealth.asset.application.service.AssetService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +23,9 @@ public class AssetExportPdfController {
     private final AssetService assetService;
     private final AssetExportService assetExportService;
 
+    @Operation(summary = "Export your asset")
     @GetMapping("/pdf")
-    public void exportGoalToPdf(HttpServletResponse response)
+    public void exportGoalToPdf(HttpServletResponse response, Pageable pageable)
             throws IOException {
 
         response.setContentType("application/pdf");
@@ -34,7 +37,7 @@ public class AssetExportPdfController {
 
         assetExportService.generate(
                 response,
-                assetService.getAllAssets()
+                assetService.getAllAssets(pageable)
         );
     }
 }

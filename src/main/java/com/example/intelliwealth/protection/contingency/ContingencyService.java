@@ -6,6 +6,8 @@ import com.example.intelliwealth.wealth.asset.application.dto.AssetsResponseDTO;
 import com.example.intelliwealth.wealth.debt.application.service.DebtService;
 import com.example.intelliwealth.wealth.asset.application.service.AssetService;
 import com.example.intelliwealth.wealth.asset.domain.model.AssetCategory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -48,7 +50,7 @@ public class ContingencyService {
         }
 
         // 2. CALCULATE LIQUID WEALTH (Using your Categories)
-        List<AssetsResponseDTO> allAssets = assetService.getAllAssets();
+        Page<AssetsResponseDTO> allAssets = assetService.getAllAssets(Pageable.unpaged());
         BigDecimal liquidWealth = calculateLiquidWealth(allAssets);
 
         // 3. CALCULATE RUNWAY (Liquid Wealth / Monthly Burn)
@@ -65,7 +67,7 @@ public class ContingencyService {
         return new ContingencyReportDTO(monthlyBurn, liquidWealth, survivalMonths, gap,status);
     }
 
-    public BigDecimal calculateLiquidWealth(List<AssetsResponseDTO> assets) {
+    public BigDecimal calculateLiquidWealth(Page<AssetsResponseDTO> assets) {
 
         BigDecimal totalLiquid = BigDecimal.ZERO;
 

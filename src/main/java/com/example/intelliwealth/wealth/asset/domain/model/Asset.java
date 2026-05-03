@@ -28,9 +28,11 @@ public class Asset {
 
     private AssetMainCategory mainCategory;
     private AssetCategory category;
+    private AssetPriority priority;
 
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal currentValue;
+    private AssetCurrency currency;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateAcquired;

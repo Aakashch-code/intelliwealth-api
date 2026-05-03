@@ -23,7 +23,6 @@ import com.example.intelliwealth.wealth.debt.application.service.DebtService;
 import com.example.intelliwealth.wealth.networth.NetWorthResponseDTO;
 import com.example.intelliwealth.wealth.networth.NetWorthService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.Decimal128;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,7 +55,6 @@ public class ChatService extends SecuredService {
         SavingResponse saving = transactionService.calculateNetPosition();
 
         //Wealth
-        Decimal128 asset = assetService.allAssetsAmount();
         DebtStatsDTO debt = debtService.debtAmountSummary();
         NetWorthResponseDTO netWorth = netWorthService.calculateNetWorth();
 

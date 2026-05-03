@@ -11,7 +11,8 @@ public class AssetValidator {
             AssetCategory.REAL_ESTATE, List.of("areaSqFt", "location"),
             AssetCategory.MUTUAL_FUND, List.of("fundHouse", "nav"),
             AssetCategory.VEHICLE, List.of("registrationNo"),
-            AssetCategory.CRYPTO, List.of("wallet", "chain")
+            AssetCategory.CRYPTO, List.of("wallet", "chain"),
+            AssetCategory.BANK_ACCOUNT, List.of("bankName", "accountType", "accountNumber")
     );
 
     public static void validateAttributes(AssetCategory category, Map<String, Object> attributes) {

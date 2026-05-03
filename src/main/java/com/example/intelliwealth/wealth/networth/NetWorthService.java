@@ -4,6 +4,7 @@ import com.example.intelliwealth.authentication.application.service.SecuredServi
 import com.example.intelliwealth.wealth.asset.infrastructure.persistence.AssetRepository;
 import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,7 +20,7 @@ public class NetWorthService extends SecuredService {
     public NetWorthResponseDTO calculateNetWorth() {
         var userId = currentUserId();
 
-        BigDecimal totalAssets = sumAssets(userId);
+        BigDecimal totalAssets = sumAssets(userId, Pageable.unpaged());
         BigDecimal totalDebts = sumDebts(userId);
 
         return new NetWorthResponseDTO(
@@ -29,8 +30,8 @@ public class NetWorthService extends SecuredService {
         );
     }
 
-    private BigDecimal sumAssets(UUID userId) {
-        return assetRepository.findAllByUserId(userId)
+    private BigDecimal sumAssets(UUID userId, Pageable pageable) {
+        return assetRepository.findAllByUserId(userId,pageable)
                 .stream()
                 .map(a -> a.getCurrentValue() == null ? BigDecimal.ZERO : a.getCurrentValue())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
