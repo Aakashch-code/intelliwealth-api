@@ -2,6 +2,7 @@ package com.example.intelliwealth.wealth.debt.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtStatus;
 import com.example.intelliwealth.wealth.debt.domain.rules.DebtValidator;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;
@@ -15,7 +16,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 @Service
@@ -48,7 +51,9 @@ public class DebtService extends SecuredService {
         if (dto.getAttributes() == null) {
             dto.setAttributes(new HashMap<>());
         }
-
+        if (dto.getDueDate() == null) {
+            dto.setDueDate(LocalDate.now().plusMonths(1));
+        }
         DebtValidator.validate(dto.getCategory(), dto.getAttributes());
 
         Debt debt = mapper.toEntity(dto);
@@ -106,27 +111,74 @@ public class DebtService extends SecuredService {
                 .build();
     }
 
+    public Map<String, BigDecimal> getNextFiveMonthsEMIs() {
+        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        LocalDate now = LocalDate.now();
+
+        for (int i = 0; i < 5; i++) {
+            LocalDate date = now.plusMonths(i);
+            String monthKey = date.getMonth().name() + "-" + date.getYear();
+            result.put(monthKey, BigDecimal.ZERO);
+        }
+
+        List<Debt> activeDebts = repo.findAllByUserIdAndStatus(currentUserId(), DebtStatus.ACTIVE);
+
+        for (Debt debt : activeDebts) {
+            Map<String, Object> attrs = debt.getAttributes();
+
+            if (attrs == null || !attrs.containsKey("emiAmount") || !attrs.containsKey("remainingTenureMonths")) {
+                continue;
+            }
+
+            BigDecimal emiAmount = extractAmount(attrs, "emiAmount");
+
+            int remainingTenure;
+            try {
+                remainingTenure = Integer.parseInt(attrs.get("remainingTenureMonths").toString());
+            } catch (Exception e) {
+                continue;
+            }
+
+            LocalDate simulatedDate = debt.getDueDate() != null ? debt.getDueDate() : now;
+
+            for (int i = 0; i < remainingTenure; i++) {
+                String expectedMonthKey = simulatedDate.getMonth().name() + "-" + simulatedDate.getYear();
+
+                if (result.containsKey(expectedMonthKey)) {
+                    BigDecimal currentTotal = result.get(expectedMonthKey);
+                    result.put(expectedMonthKey, currentTotal.add(emiAmount));
+                }
+
+                simulatedDate = simulatedDate.plusMonths(1);
+
+                if (simulatedDate.isAfter(now.plusMonths(5))) {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
     public BigDecimal getTotalMonthlyEMIs() {
         List<Debt> debts = repo.findAllByUserId(currentUserId());
-
         BigDecimal total = BigDecimal.ZERO;
 
         for (Debt debt : debts) {
+            if (debt.getStatus() == DebtStatus.PAID) continue;
+
             Map<String, Object> attrs = debt.getAttributes();
             if (attrs == null) continue;
 
             BigDecimal monthly = switch (debt.getCategory()) {
-                case HOME_LOAN, PERSONAL_LOAN, CAR_LOAN ->
-                        extractAmount(attrs, "emi");
-                case EMI ->
-                        extractAmount(attrs, "emiAmount");
-                case CREDIT_CARD ->
-                        extractAmount(attrs, "minPayment");
-                case FRIEND_LOAN ->
-                        extractAmount(attrs, "repaymentAmount");
+                case HOME_LOAN, PERSONAL_LOAN, CAR_LOAN, EMI -> extractAmount(attrs, "emiAmount");
+                case CREDIT_CARD -> extractAmount(attrs, "minPayment");
+                case FRIEND_LOAN -> extractAmount(attrs, "repaymentAmount");
             };
 
-            total = total.add(monthly);
+            if (monthly != null) {
+                total = total.add(monthly);
+            }
         }
         return total;
     }

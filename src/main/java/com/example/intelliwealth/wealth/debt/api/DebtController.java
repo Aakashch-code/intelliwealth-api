@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/debts")
@@ -79,5 +81,12 @@ public class DebtController {
     @GetMapping("/stats")
     public DebtStatsDTO stats() {
         return service.debtAmountSummary();
+    }
+
+    @Operation(summary = "Emi Reports")
+    @ApiResponse(responseCode = "200", description = "Created")
+    @GetMapping("/emi")
+    public Map<String, BigDecimal> getNextFiveMonthsEMIs() {
+        return service.getNextFiveMonthsEMIs();
     }
 }

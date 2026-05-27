@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @RequestMapping("/api/debt/export")
 @RequiredArgsConstructor
 @RestController
-@Tag(name = "Goal Management", description = "APIs for managing financial goals, tracking progress, and statistics")
+@Tag(name = "Debt Management", description = "APIs for managing user debts")
 public class DebtExportPdfController {
 
     private final DebtService debtService;
