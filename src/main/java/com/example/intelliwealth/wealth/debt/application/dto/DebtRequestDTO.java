@@ -32,13 +32,12 @@ public class DebtRequestDTO {
 
     @Schema(example = "LONG_TERM")
     private DebtMainCategory mainCategory;
-
+    
     @Schema(
-            description = "Additional dynamic fields based on debt type",
-            example = "{\"interestRate\": 8.5, \"tenure\": \"20 years\"}"
+            description = "Additional dynamic fields. For EMIs, include emiAmount, totalTenureMonths, and remainingTenureMonths",
+            example = "{\"interestRate\": 8.5, \"emiAmount\": 15000, \"totalTenureMonths\": 60, \"remainingTenureMonths\": 60}"
     )
     private Map<String, Object> attributes;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Schema(example = "2026-12-23")
     private LocalDate dueDate;

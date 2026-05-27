@@ -1,5 +1,6 @@
 package com.example.intelliwealth.wealth.debt.domain.model;
 
+import com.example.intelliwealth.wealth.debt.application.dto.DebtStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
@@ -38,7 +39,7 @@ public class Debt {
     private DebtMainCategory mainCategory;
 
     private Map<String, Object> attributes;
-
+    private DebtStatus status = DebtStatus.ACTIVE;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 }

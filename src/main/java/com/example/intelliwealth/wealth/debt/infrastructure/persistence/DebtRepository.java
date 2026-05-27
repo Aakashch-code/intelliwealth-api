@@ -1,5 +1,6 @@
 package com.example.intelliwealth.wealth.debt.infrastructure.persistence;
 
+import com.example.intelliwealth.wealth.debt.application.dto.DebtStatus;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import org.bson.types.Decimal128;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -17,7 +18,7 @@ public interface DebtRepository extends MongoRepository<Debt, String> {
     List<Debt> findAllByUserId(UUID userId);
 
     Optional<Debt> findByIdAndUserId(String id, UUID userId);
-
+    List<Debt> findAllByUserIdAndStatus(UUID userId, DebtStatus status);
     @Aggregation(pipeline = {
             "{ $match: { userId: ?0 } }",
             "{ $group: { _id: null, totalValue: { $sum: '$totalAmount' } } }"
