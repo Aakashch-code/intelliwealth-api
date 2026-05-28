@@ -68,11 +68,18 @@ public class AssetService extends SecuredService {
 
     @Transactional(readOnly = true)
     public Page<AssetsResponseDTO> getAllAssets(Pageable pageable) {
-        Pageable effectivePageable = PageRequest.of(
-                pageable.getPageNumber(),
-                Math.min(pageable.getPageSize(), MAX_PAGE_SIZE),
-                pageable.getSort()
-        );
+
+        // Default to the provided pageable (which could be unpaged)
+        Pageable effectivePageable = pageable;
+
+        // Only enforce the max page size if the request is actually requesting pagination
+        if (pageable.isPaged()) {
+            effectivePageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    Math.min(pageable.getPageSize(), MAX_PAGE_SIZE),
+                    pageable.getSort()
+            );
+        }
 
         return assetRepository.findAllByUserId(currentUserId(), effectivePageable)
                 .map(assetMapper::toDto);

@@ -1,13 +1,12 @@
 package com.example.intelliwealth.wealth.debt.infrastructure.persistence;
 
-import com.example.intelliwealth.wealth.debt.application.dto.DebtStatus;
+import com.example.intelliwealth.wealth.debt.domain.model.DebtStatus;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import org.bson.types.Decimal128;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/assets")
+@RequestMapping("/api/assets")
 @RequiredArgsConstructor
 @Tag(name = "Asset Management", description = "Manage financial assets")
 public class AssetController extends SecuredService {
