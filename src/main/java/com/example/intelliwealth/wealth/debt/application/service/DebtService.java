@@ -2,7 +2,7 @@ package com.example.intelliwealth.wealth.debt.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
-import com.example.intelliwealth.wealth.debt.application.dto.DebtStatus;
+import com.example.intelliwealth.wealth.debt.domain.model.DebtStatus;
 import com.example.intelliwealth.wealth.debt.domain.rules.DebtValidator;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtRequestDTO;

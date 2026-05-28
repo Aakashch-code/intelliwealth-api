@@ -36,21 +36,26 @@ public class ContingencyService {
     }
 
     public ContingencyReportDTO getHealthCheck() {
-        // 1. CALCULATE MONTHLY BURN (Expenses + Subs + EMIs)
-        // Assuming your services return BigDecimal.ZERO if no data exists
+        
         BigDecimal avgExpenses = transactionService.getMonthlyAverageExpense(3);
         BigDecimal activeSubs = subscriptionService.getTotalMonthlySubscriptions();
         BigDecimal currentDebtEMI = debtService.getTotalMonthlyEMIs();
 
         BigDecimal monthlyBurn = avgExpenses.add(activeSubs).add(currentDebtEMI);
 
-        // Safety check to avoid division by zero
         if (monthlyBurn.compareTo(BigDecimal.ZERO) == 0) {
             return new ContingencyReportDTO(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "UNKNOWN");
         }
 
-        // 2. CALCULATE LIQUID WEALTH (Using your Categories)
-        Page<AssetsResponseDTO> allAssets = assetService.getAllAssets(Pageable.unpaged());
+        // 2. CALCULATE LIQUID WEALTH
+        Page<AssetsResponseDTO> allAssets = null;
+        try {
+            allAssets = assetService.getAllAssets(Pageable.unpaged());
+            System.out.println("Successfully fetched assets from DB.");
+        } catch (Exception e) {
+            System.out.println("CRASHED FETCHING ASSETS: " + e.getMessage());
+        }
+
         BigDecimal liquidWealth = calculateLiquidWealth(allAssets);
 
         // 3. CALCULATE RUNWAY (Liquid Wealth / Monthly Burn)
@@ -68,41 +73,38 @@ public class ContingencyService {
     }
 
     public BigDecimal calculateLiquidWealth(Page<AssetsResponseDTO> assets) {
-
         BigDecimal totalLiquid = BigDecimal.ZERO;
 
-        for (AssetsResponseDTO asset : assets) {
 
+        if (assets == null || assets.isEmpty()) {
+            System.out.println("No assets found or assets is null.");
+            return totalLiquid;
+        }
+
+        for (AssetsResponseDTO asset : assets) {
             BigDecimal value = asset.getCurrentValue();
 
             if (value == null) continue;
 
             if (asset.getCategory() == AssetCategory.CASH ||
                     asset.getCategory() == AssetCategory.FIXED_INCOME) {
-
                 totalLiquid = totalLiquid.add(value);
-
             }
             else if (asset.getCategory() == AssetCategory.MUTUAL_FUND ||
                     asset.getCategory() == AssetCategory.EQUITY) {
-
                 // 80% liquidity
                 BigDecimal adjusted = value.multiply(new BigDecimal("0.8"));
                 totalLiquid = totalLiquid.add(adjusted);
-
             }
             else if (asset.getCategory() == AssetCategory.CRYPTO) {
-
                 // 50% liquidity
                 BigDecimal adjusted = value.multiply(new BigDecimal("0.5"));
                 totalLiquid = totalLiquid.add(adjusted);
             }
-            // REAL_ESTATE, VEHICLE = ignored
         }
 
         return totalLiquid;
     }
-
 
     public String determineStatus(BigDecimal months) {
         if (months.compareTo(new BigDecimal("3")) < 0) return "DANGER";

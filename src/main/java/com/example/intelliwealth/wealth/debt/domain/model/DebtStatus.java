@@ -1,4 +1,4 @@
-package com.example.intelliwealth.wealth.debt.application.dto;
+package com.example.intelliwealth.wealth.debt.domain.model;
 
 public enum DebtStatus {
     ACTIVE,

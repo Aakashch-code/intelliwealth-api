@@ -11,5 +11,11 @@ public enum TransactionCategory {
     EDUCATION,
     INVESTMENT,
     SALARY,
+    INSURANCE,
+    TRAVEL,
+    FITNESS,
+    PERSONAL_CARE,
+    SAVINGS,
+    LOANS,
     OTHER
 }

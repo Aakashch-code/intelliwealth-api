@@ -18,18 +18,7 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     Page<Budget> findAllByUserId(UUID userId, Pageable pageable);
 
     Optional<Budget> findByIdAndUserId(Long id, UUID userId);
-    @Query("""
-SELECT new com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary(
-    COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)),
-    COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal)),
-    COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)) 
-        - COALESCE(SUM(b.amountSpent), CAST(0 AS bigdecimal))
-)
-FROM Budget b
-WHERE b.userId = :userId
-""")
-    BudgetSummary findBudgetSummaryByUserId(@Param("userId") UUID userId);
-    // Notice we changed 'ACTIVE' to :mode and added it as a parameter
+
     @Query("""
     SELECT new com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary(
         COALESCE(SUM(b.amountAllocated), CAST(0 AS bigdecimal)),

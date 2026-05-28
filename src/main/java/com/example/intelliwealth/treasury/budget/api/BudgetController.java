@@ -6,8 +6,6 @@ import com.example.intelliwealth.treasury.budget.application.dto.BudgetResponse;
 import com.example.intelliwealth.treasury.budget.application.dto.BudgetSummary;
 import com.example.intelliwealth.treasury.budget.application.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,74 +16,73 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/budget")
-@Tag(name = "Budget Controller", description = "Management APIs for Budgeting System")
 @RequiredArgsConstructor
+@Tag(name = "Budget Controller", description = "Management APIs for Budgeting System")
 public class BudgetController {
 
     private final BudgetService service;
 
-    @Operation(summary = "Get all budgets", description = "Retrieve a list of all budget entries for the current user.")
+    @Operation(summary = "Get all budgets")
     @GetMapping
     public Page<BudgetResponse> getAllBudgets(Pageable pageable) {
+
         return service.getBudgets(pageable);
     }
 
-    @Operation(summary = "Get budget by ID", description = "Retrieve a specific budget by its unique ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Budget found"),
-            @ApiResponse(responseCode = "404", description = "Budget not found")
-    })
+    @Operation(summary = "Get budget by ID")
     @GetMapping("/{id}")
     public BudgetResponse getBudgetById(@PathVariable Long id) {
+
         return service.getBudgetById(id);
     }
 
-    @Operation(summary = "Get budget summary", description = "Get calculated totals for allocated and spent amounts.")
+    @Operation(summary = "Get budget summary")
     @GetMapping("/summary")
     public BudgetSummary getBudgetSummary() {
+
         return service.getBudgetSummary();
     }
 
-    @Operation(summary = "Create a new budget", description = "Add a new budget entry.")
+    @Operation(summary = "Create budget")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BudgetResponse createBudget(@Valid @RequestBody BudgetRequest request) {
+    public BudgetResponse createBudget(
+            @Valid @RequestBody BudgetRequest request) {
+
         return service.createBudget(request);
     }
 
-    @Operation(summary = "Update an existing budget", description = "Update details of an existing budget by ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Budget updated"),
-            @ApiResponse(responseCode = "404", description = "Budget not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update budget")
     @PutMapping("/{id}")
-    public BudgetResponse updateBudget(@PathVariable Long id, @Valid @RequestBody BudgetRequest request) {
+    public BudgetResponse updateBudget(
+            @PathVariable Long id,
+            @Valid @RequestBody BudgetRequest request) {
+
         return service.updateBudget(id, request);
     }
 
-    @Operation(summary = "Delete a budget", description = "Remove a budget entry.")
+    @Operation(summary = "Delete budget")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBudgetById(@PathVariable Long id) {
+
         service.deleteBudget(id);
     }
 
+    @Operation(summary = "Delete all budgets")
     @DeleteMapping("/delete-all")
-    @Operation(
-            summary = "Delete All Budgets",
-            description = "Remove all budgets at once. Think before using this."
-    )
-    @ApiResponse(responseCode = "204", description = "All budgets deleted successfully")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllBudget() {
+
         service.deleteAllBudgets();
     }
 
-    //new
+    @Operation(summary = "Add spent amount")
     @PutMapping("/spent/{id}")
-    public void addSpentAmount(@PathVariable Long id, @RequestBody AddExpenseRequest request) {
-         service.addSpentAmount(id,request);
-    }
+    public void addSpentAmount(
+            @PathVariable Long id,
+            @RequestBody AddExpenseRequest request) {
 
+        service.addSpentAmount(id, request);
+    }
 }

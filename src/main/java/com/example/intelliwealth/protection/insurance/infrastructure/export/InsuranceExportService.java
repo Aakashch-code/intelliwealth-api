@@ -21,199 +21,459 @@ import java.util.Map;
 @Service
 public class InsuranceExportService {
 
-    // --- Configuration ---
-    private static final Locale INDIA = new Locale("en", "IN");
-    private static final NumberFormat INR = NumberFormat.getCurrencyInstance(INDIA);
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy");
+    // ─── Locale / Formats ──────────────────────────────────────────────────────
+    private static final Locale INDIA      = new Locale("en", "IN");
+    private static final NumberFormat INR  = NumberFormat.getCurrencyInstance(INDIA);
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    // --- Colors (Teal / Protection Theme) ---
-    private static final Color COL_PRIMARY_BG = new Color(0, 128, 128);   // Teal (Distinct from Asset Blue)
-    private static final Color COL_HEADER_TXT = Color.WHITE;
-    private static final Color COL_LABEL_TXT = new Color(100, 100, 100);  // Dark Gray
-    private static final Color COL_VALUE_TXT = Color.BLACK;
-    private static final Color COL_CARD_BG = Color.WHITE;
-    private static final Color COL_BORDER = new Color(220, 220, 220);
+    // ─── Palette (Clean White Executive - Protection Theme) ───────────────────
+    // Charcoal — used only for text, never as bg
+    private static final Color C_NAVY        = new Color(45,  45,  55);
+    // Accent teal (replaces the asset gold for the protection domain)
+    private static final Color C_TEAL        = new Color(0, 128, 128);
+    // Very light cool tint for alternating rows
+    private static final Color C_TEAL_TINT   = new Color(245, 252, 252);
+    // Soft off-white page background
+    private static final Color C_PAGE_BG     = new Color(250, 250, 252);
+    // Pure white
+    private static final Color C_WHITE       = Color.WHITE;
+    // Mid-gray text
+    private static final Color C_GRAY        = new Color(120, 120, 130);
+    // Near-black body text
+    private static final Color C_DARK        = new Color(25,  25,  35);
+    // Soft border
+    private static final Color C_BORDER      = new Color(225, 225, 232);
+    // Positive value green
+    private static final Color C_GREEN       = new Color(39, 174, 96);
 
-    // --- Fonts ---
-    private static final Font FONT_TITLE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, COL_PRIMARY_BG);
-    private static final Font FONT_CARD_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, COL_HEADER_TXT);
-    private static final Font FONT_CARD_AMOUNT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 15, new Color(255, 255, 224)); // Light Yellow for contrast
-    private static final Font FONT_LABEL = FontFactory.getFont(FontFactory.HELVETICA, 9, COL_LABEL_TXT);
-    private static final Font FONT_VALUE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, COL_VALUE_TXT);
-    private static final Font FONT_SECTION_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, COL_PRIMARY_BG);
+    // ─── Fonts ─────────────────────────────────────────────────────────────────
+    // Cover / page header
+    private static final Font F_COVER_SUB     = FontFactory.getFont(FontFactory.HELVETICA,      11, C_GRAY);
+    private static final Font F_COVER_DATE    = FontFactory.getFont(FontFactory.HELVETICA,       9, C_GRAY);
 
+    // Card header band
+    private static final Font F_POLICY_NAME   = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, C_DARK);
+    private static final Font F_POLICY_VALUE  = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, C_TEAL);
+    private static final Font F_POLICY_LABEL  = FontFactory.getFont(FontFactory.HELVETICA,       9, C_GRAY);
+
+    // Section / body
+    private static final Font F_SECTION_HDR   = FontFactory.getFont(FontFactory.HELVETICA_BOLD,  8, C_TEAL);
+    private static final Font F_KV_LABEL      = FontFactory.getFont(FontFactory.HELVETICA,        8, C_GRAY);
+    private static final Font F_KV_VALUE      = FontFactory.getFont(FontFactory.HELVETICA_BOLD,  10, C_DARK);
+
+    // ──────────────────────────────────────────────────────────────────────────
 
     public void generate(HttpServletResponse response, List<InsuranceResponseDTO> policies) throws IOException {
-        // A4 with moderate margins
-        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
-        PdfWriter.getInstance(document, response.getOutputStream());
-        document.open();
+        // Full A4, narrow margins so layouts have maximum real-estate
+        Document doc = new Document(PageSize.A4, 40, 40, 40, 50);
+        PdfWriter writer = PdfWriter.getInstance(doc, response.getOutputStream());
 
-        addReportTitle(document);
+        // Attach footer event
+        writer.setPageEvent(new FooterPageEvent());
 
-        int count = 0;
+        doc.open();
+
+        // Cover page
+        addCoverPage(doc, policies.size());
+
+        // One policy per page
         for (InsuranceResponseDTO policy : policies) {
-            // New Page Logic: Trigger every 2 items
-            if (count > 0 && count % 2 == 0) {
-                document.newPage();
-            }
-
-            addInsuranceCard(document, policy);
-            count++;
+            doc.newPage();
+            addInsurancePage(doc, policy);
         }
 
-        document.close();
+        doc.close();
     }
 
-    private void addReportTitle(Document document) throws DocumentException {
-        Paragraph p = new Paragraph("Insurance Coverage Report", FONT_TITLE);
-        p.setAlignment(Element.ALIGN_CENTER);
-        p.setSpacingAfter(30);
-        document.add(p);
+    // ─── Cover Page ────────────────────────────────────────────────────────────
+
+    private void addCoverPage(Document doc, int total) throws DocumentException {
+        // Top accent bar
+        PdfPTable accentBar = new PdfPTable(1);
+        accentBar.setWidthPercentage(100);
+        PdfPCell bar = new PdfPCell(new Phrase(" "));
+        bar.setBackgroundColor(C_TEAL);
+        bar.setBorder(Rectangle.NO_BORDER);
+        bar.setFixedHeight(6f);
+        accentBar.addCell(bar);
+        doc.add(accentBar);
+
+        doc.add(spacer(60));
+
+        // Firm / product name
+        Paragraph firm = new Paragraph("INTELLI WEALTH", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, C_TEAL));
+        firm.setAlignment(Element.ALIGN_CENTER);
+        doc.add(firm);
+
+        doc.add(spacer(12));
+
+        Paragraph title = new Paragraph("Insurance Coverage Report",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 28, C_DARK));
+        title.setAlignment(Element.ALIGN_CENTER);
+        doc.add(title);
+
+        doc.add(spacer(14));
+
+        Paragraph sub = new Paragraph(
+                "Comprehensive Policy Statement  ·  " + total + " Polic" + (total == 1 ? "y" : "ies") + " on Record",
+                F_COVER_SUB
+        );
+        sub.setAlignment(Element.ALIGN_CENTER);
+        doc.add(sub);
+
+        doc.add(spacer(8));
+
+        // Teal divider
+        doc.add(accentDivider());
+
+        doc.add(spacer(8));
+
+        Paragraph date = new Paragraph(
+                "Generated on " + LocalDate.now().format(DATE_FMT) + "  ·  CONFIDENTIAL",
+                F_COVER_DATE
+        );
+        date.setAlignment(Element.ALIGN_CENTER);
+        doc.add(date);
+
+        doc.add(spacer(60));
+
+        // Large navy rectangle as decorative block
+        PdfPTable deco = new PdfPTable(1);
+        deco.setWidthPercentage(60);
+        deco.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell decoCell = new PdfPCell();
+        decoCell.setBackgroundColor(C_NAVY);
+        decoCell.setBorder(Rectangle.NO_BORDER);
+        decoCell.setFixedHeight(4f);
+        deco.addCell(decoCell);
+        doc.add(deco);
+
+        doc.add(spacer(20));
+
+        Paragraph disclaimer = new Paragraph(
+                "This report is prepared exclusively for the named client and contains proprietary information.\n"
+                        + "Unauthorized disclosure, reproduction or distribution is strictly prohibited.",
+                FontFactory.getFont(FontFactory.HELVETICA, 8, C_GRAY)
+        );
+        disclaimer.setAlignment(Element.ALIGN_CENTER);
+        doc.add(disclaimer);
     }
 
-    private void addInsuranceCard(Document document, InsuranceResponseDTO policy) throws DocumentException {
-        // Container Table (The Card)
-        PdfPTable card = new PdfPTable(1);
-        card.setWidthPercentage(100);
-        card.setKeepTogether(true);
-        card.setSpacingAfter(40); // Large gap
+    // ─── Per-Policy Full Page ──────────────────────────────────────────────────
 
-        // 1. Header Section (Provider/Name + Coverage Amount)
-        PdfPCell headerCell = new PdfPCell();
-        headerCell.setBackgroundColor(COL_PRIMARY_BG);
-        headerCell.setPadding(12);
-        headerCell.setBorderColor(COL_PRIMARY_BG);
+    private void addInsurancePage(Document doc, InsuranceResponseDTO policy) throws DocumentException {
+        // ── 1. Header Band ───────────────────────────────────────────────────
+        PdfPTable headerBand = new PdfPTable(2);
+        headerBand.setWidthPercentage(100);
+        headerBand.setWidths(new float[]{3f, 2f});
 
-        PdfPTable headerContent = new PdfPTable(2);
-        headerContent.setWidthPercentage(100);
-        headerContent.setWidths(new float[]{3f, 1.5f}); // Name gets more space
+        // Left: Provider & Name + Category pill
+        PdfPCell leftHdr = new PdfPCell();
+        leftHdr.setBackgroundColor(C_WHITE);
+        leftHdr.setBorder(Rectangle.BOTTOM);
+        leftHdr.setBorderColor(C_BORDER);
+        leftHdr.setBorderWidth(1f);
+        leftHdr.setPadding(20);
+        leftHdr.setPaddingLeft(24);
 
-        // Name & Provider
-        String titleText = value(policy.getProvider()) + " - " + value(policy.getName());
-        PdfPCell nameCell = new PdfPCell(new Phrase(titleText.toUpperCase(), FONT_CARD_HEADER));
-        nameCell.setBorder(Rectangle.NO_BORDER);
-        nameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        headerContent.addCell(nameCell);
+        Paragraph catLabel = new Paragraph(
+                value(policy.getMainCategory()) + "  ›  " + value(policy.getCategory()),
+                F_POLICY_LABEL
+        );
+        leftHdr.addElement(catLabel);
 
-        // Coverage Amount (Sum Assured)
-        String coverText = "Cover: " + formatAmount(policy.getCoverageAmount());
-        PdfPCell priceCell = new PdfPCell(new Phrase(coverText, FONT_CARD_AMOUNT));
-        priceCell.setBorder(Rectangle.NO_BORDER);
-        priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        priceCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        headerContent.addCell(priceCell);
+        String titleStr = value(policy.getProvider()) + " - " + value(policy.getName());
+        Paragraph nameP = new Paragraph(titleStr.toUpperCase(), F_POLICY_NAME);
+        nameP.setSpacingBefore(4);
+        leftHdr.addElement(nameP);
 
-        headerCell.addElement(headerContent);
-        card.addCell(headerCell);
+        Paragraph acqLabel = new Paragraph(
+                "Effective  " + formatDate(policy.getStartDate()),
+                F_POLICY_LABEL
+        );
+        acqLabel.setSpacingBefore(6);
+        leftHdr.addElement(acqLabel);
 
-        // 2. Body Section
-        PdfPCell bodyCell = new PdfPCell();
-        bodyCell.setBackgroundColor(COL_CARD_BG);
-        bodyCell.setBorderColor(COL_BORDER);
-        bodyCell.setPadding(15);
-        bodyCell.setPaddingBottom(20);
+        headerBand.addCell(leftHdr);
 
-        // Core Details (Premium, Dates)
-        bodyCell.addElement(createCoreDetailsTable(policy));
+        // Right: Coverage Amount
+        PdfPCell rightHdr = new PdfPCell();
+        rightHdr.setBackgroundColor(C_WHITE);
+        rightHdr.setBorder(Rectangle.BOTTOM);
+        rightHdr.setBorderColor(C_BORDER);
+        rightHdr.setBorderWidth(1f);
+        rightHdr.setPadding(20);
+        rightHdr.setPaddingRight(24);
+        rightHdr.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        rightHdr.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-        // Separator Line
-        bodyCell.addElement(createSeparator());
+        Paragraph valLabel = new Paragraph("TOTAL COVERAGE", F_POLICY_LABEL);
+        valLabel.setAlignment(Element.ALIGN_RIGHT);
+        rightHdr.addElement(valLabel);
 
-        // Dynamic Attributes
-        bodyCell.addElement(createAttributesGrid(policy.getAttributes()));
+        Paragraph valP = new Paragraph(formatAmount(policy.getCoverageAmount()), F_POLICY_VALUE);
+        valP.setAlignment(Element.ALIGN_RIGHT);
+        valP.setSpacingBefore(6);
+        rightHdr.addElement(valP);
 
-        card.addCell(bodyCell);
-        document.add(card);
-    }
+        // Status pill text below value
+        Paragraph statusP = new Paragraph("● ACTIVE POLICY", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, C_GREEN));
+        statusP.setAlignment(Element.ALIGN_RIGHT);
+        statusP.setSpacingBefore(8);
+        rightHdr.addElement(statusP);
 
-    // --- Sub-components ---
+        headerBand.addCell(rightHdr);
+        doc.add(headerBand);
 
-    private PdfPTable createCoreDetailsTable(InsuranceResponseDTO policy) {
-        PdfPTable table = new PdfPTable(4);
-        table.setWidthPercentage(100);
-        table.setSpacingAfter(5);
+        // Teal accent stripe below header
+        doc.add(accentStripe());
 
-        // Row 1: Category | Premium
-        addKvCell(table, "Category", value(policy.getMainCategory()) + " (" + value(policy.getCategory()) + ")");
-        addKvCell(table, "Premium Amount", formatAmount(policy.getPremiumAmount()));
+        doc.add(spacer(18));
 
-        // Row 2: Start Date | End Date
-        addKvCell(table, "Policy Start Date", formatDate(policy.getStartDate()));
-        addKvCell(table, "Policy End Date", formatDate(policy.getEndDate()));
+        // ── 2. Core Info Section ─────────────────────────────────────────────
+        addSectionTitle(doc, "POLICY OVERVIEW");
+        doc.add(spacer(6));
+        doc.add(buildOverviewTable(policy));
 
-        return table;
-    }
+        doc.add(spacer(20));
 
-    private PdfPTable createAttributesGrid(Map<String, Object> attributes) {
-        PdfPTable table = new PdfPTable(4);
-        table.setWidthPercentage(100);
-        table.setWidths(new float[]{1.5f, 2f, 1.5f, 2f});
-        table.setSpacingBefore(10);
-
-        if (attributes == null || attributes.isEmpty()) {
-            return table;
+        // ── 3. Technical Specifications ──────────────────────────────────────
+        if (policy.getAttributes() != null && !policy.getAttributes().isEmpty()) {
+            addSectionTitle(doc, "POLICY DETAILS & BENEFITS");
+            doc.add(spacer(6));
+            doc.add(buildAttributesTable(policy.getAttributes()));
         }
 
-        // Section Header
-        PdfPCell titleCell = new PdfPCell(new Phrase("Policy Details & Benefits", FONT_SECTION_HEADER));
-        titleCell.setColspan(4);
-        titleCell.setBorder(Rectangle.NO_BORDER);
-        titleCell.setPaddingBottom(8);
-        table.addCell(titleCell);
+        doc.add(spacer(20));
 
-        int count = 0;
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            addKvCell(table, beautify(entry.getKey()), formatAttributeValue(entry.getKey(), entry.getValue()));
-            count++;
-        }
-
-        if (count % 2 != 0) {
-            addKvCell(table, "", "");
-        }
-
-        return table;
+        // ── 4. Key Metrics Strip ─────────────────────────────────────────────
+        doc.add(buildMetricsStrip(policy));
     }
 
-    private void addKvCell(PdfPTable table, String key, String val) {
-        PdfPCell label = new PdfPCell(new Phrase(key, FONT_LABEL));
-        label.setBorder(Rectangle.NO_BORDER);
-        label.setPaddingTop(5);
-        label.setPaddingBottom(5);
-        table.addCell(label);
+    // ─── Section Title Row ─────────────────────────────────────────────────────
 
-        PdfPCell value = new PdfPCell(new Phrase(val, FONT_VALUE));
-        value.setBorder(Rectangle.NO_BORDER);
-        value.setPaddingTop(5);
-        value.setPaddingBottom(5);
-        table.addCell(value);
-    }
+    private void addSectionTitle(Document doc, String title) throws DocumentException {
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(100);
 
-    private Paragraph createSeparator() {
-        Paragraph p = new Paragraph(" ");
-        p.setLeading(5);
-        PdfPTable line = new PdfPTable(1);
-        line.setWidthPercentage(100);
-        PdfPCell c = new PdfPCell(new Phrase(" "));
+        PdfPCell c = new PdfPCell();
         c.setBorder(Rectangle.BOTTOM);
-        c.setBorderColor(new Color(240,240,240));
-        c.setBorderWidth(1f);
-        line.addCell(c);
+        c.setBorderColor(C_TEAL);
+        c.setBorderWidth(1.5f);
+        c.setPaddingBottom(4);
+        c.setPaddingLeft(0);
+        c.setBackgroundColor(C_PAGE_BG);
+
+        Phrase phrase = new Phrase(title, F_SECTION_HDR);
+        c.setPhrase(phrase);
+        t.addCell(c);
+        doc.add(t);
+    }
+
+    // ─── Policy Overview Table ─────────────────────────────────────────────────
+
+    private PdfPTable buildOverviewTable(InsuranceResponseDTO policy) {
+        // 4 columns: label | value | label | value
+        PdfPTable t = new PdfPTable(4);
+        t.setWidthPercentage(100);
+        t.setWidths(new float[]{1.4f, 2f, 1.4f, 2f});
+
+        String[][] rows = {
+                { "Provider",      value(policy.getProvider()) },
+                { "Policy Name",   value(policy.getName())     },
+                { "Start Date",    formatDate(policy.getStartDate()) },
+                { "End Date",      formatDate(policy.getEndDate()) },
+                { "Category",      value(policy.getMainCategory()) },
+                { "Sub Category",  value(policy.getCategory()) }
+        };
+
+        for (int i = 0; i < rows.length; i += 2) {
+            boolean shade = (i / 2) % 2 == 0;
+            addKvRow(t, rows[i][0], rows[i][1], rows[i+1][0], rows[i+1][1], shade);
+        }
+        return t;
+    }
+
+    // ─── Dynamic Attributes Table ──────────────────────────────────────────────
+
+    private PdfPTable buildAttributesTable(Map<String, Object> attrs) {
+        PdfPTable t = new PdfPTable(4);
+        t.setWidthPercentage(100);
+        t.setWidths(new float[]{1.4f, 2f, 1.4f, 2f});
+
+        List<Map.Entry<String, Object>> entries = new java.util.ArrayList<>(attrs.entrySet());
+        // Pad to even
+        if (entries.size() % 2 != 0) {
+            entries.add(new java.util.AbstractMap.SimpleEntry<>("", ""));
+        }
+
+        for (int i = 0; i < entries.size(); i += 2) {
+            boolean shade = (i / 2) % 2 == 0;
+            Map.Entry<String, Object> a = entries.get(i);
+            Map.Entry<String, Object> b = entries.get(i + 1);
+            addKvRow(t,
+                    beautify(a.getKey()), formatAttributeValue(a.getKey(), a.getValue()),
+                    beautify(b.getKey()), formatAttributeValue(b.getKey(), b.getValue()),
+                    shade
+            );
+        }
+        return t;
+    }
+
+    // ─── Key Metrics Bottom Strip ──────────────────────────────────────────────
+
+    private PdfPTable buildMetricsStrip(InsuranceResponseDTO policy) {
+        PdfPTable t = new PdfPTable(3);
+        t.setWidthPercentage(100);
+        t.setWidths(new float[]{1f, 1f, 1f});
+
+        // Metric 1: Coverage Amount
+        addMetricCell(t, "Total Coverage", formatAmount(policy.getCoverageAmount()), C_NAVY);
+
+        // Metric 2: Premium Amount
+        addMetricCell(t, "Premium Amount", formatAmount(policy.getPremiumAmount()), C_TEAL);
+
+        // Metric 3: End Date
+        addMetricCell(t, "Policy Expiration", formatDate(policy.getEndDate()), C_NAVY);
+
+        return t;
+    }
+
+    private void addMetricCell(PdfPTable t, String label, String value, Color accentColor) {
+        PdfPCell c = new PdfPCell();
+        c.setBackgroundColor(C_WHITE);
+        c.setBorder(Rectangle.BOX);
+        c.setBorderColor(C_BORDER);
+        c.setBorderWidth(0.75f);
+        c.setPadding(14);
+
+        // Top accent line
+        PdfPTable topLine = new PdfPTable(1);
+        topLine.setWidthPercentage(100);
+        PdfPCell line = new PdfPCell(new Phrase(" "));
+        line.setFixedHeight(3f);
+        line.setBackgroundColor(accentColor);
+        line.setBorder(Rectangle.NO_BORDER);
+        topLine.addCell(line);
+        c.addElement(topLine);
+
+        Paragraph lbl = new Paragraph(label.toUpperCase(),
+                FontFactory.getFont(FontFactory.HELVETICA, 7, C_GRAY));
+        lbl.setSpacingBefore(6);
+        c.addElement(lbl);
+
+        Paragraph val = new Paragraph(value,
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, C_DARK));
+        val.setSpacingBefore(3);
+        c.addElement(val);
+
+        t.addCell(c);
+    }
+
+    // ─── KV Row Helpers ────────────────────────────────────────────────────────
+
+    private void addKvRow(PdfPTable t,
+                          String k1, String v1,
+                          String k2, String v2,
+                          boolean shaded) {
+        Color bg = shaded ? C_TEAL_TINT : C_WHITE;
+        t.addCell(labelCell(k1, bg));
+        t.addCell(valueCell(v1, bg));
+        t.addCell(labelCell(k2, bg));
+        t.addCell(valueCell(v2, bg));
+    }
+
+    private PdfPCell labelCell(String text, Color bg) {
+        PdfPCell c = new PdfPCell(new Phrase(text, F_KV_LABEL));
+        c.setBackgroundColor(bg);
+        c.setBorderColor(C_BORDER);
+        c.setBorder(Rectangle.BOTTOM);
+        c.setPadding(9);
+        c.setPaddingLeft(12);
+        return c;
+    }
+
+    private PdfPCell valueCell(String text, Color bg) {
+        PdfPCell c = new PdfPCell(new Phrase(text, F_KV_VALUE));
+        c.setBackgroundColor(bg);
+        c.setBorderColor(C_BORDER);
+        c.setBorder(Rectangle.BOTTOM);
+        c.setPadding(9);
+        return c;
+    }
+
+    // ─── Decorative Helpers ────────────────────────────────────────────────────
+
+    private PdfPTable accentStripe() {
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(100);
+        PdfPCell c = new PdfPCell(new Phrase(" "));
+        c.setBackgroundColor(C_TEAL);
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setFixedHeight(3f);
+        t.addCell(c);
+        return t;
+    }
+
+    private PdfPTable accentDivider() {
+        PdfPTable t = new PdfPTable(1);
+        t.setWidthPercentage(40);
+        t.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell c = new PdfPCell(new Phrase(" "));
+        c.setBackgroundColor(C_TEAL);
+        c.setBorder(Rectangle.NO_BORDER);
+        c.setFixedHeight(1.5f);
+        t.addCell(c);
+        return t;
+    }
+
+    private Paragraph spacer(float pts) {
+        Paragraph p = new Paragraph(" ");
+        p.setLeading(pts);
         return p;
     }
 
-    // --- Utilities ---
+    // ─── Footer Event ──────────────────────────────────────────────────────────
 
-    private String formatAttributeValue(String key, Object value) {
-        if (value == null) return "-";
-        String k = key.toLowerCase();
-        if (k.contains("rate") || k.contains("tax") || k.contains("bonus")) return value + "%";
-        if (k.contains("amount") || k.contains("cost") || k.contains("premium")) {
-            try {
-                return INR.format(new BigDecimal(value.toString()));
-            } catch (Exception e) { return value.toString(); }
+    static class FooterPageEvent extends PdfPageEventHelper {
+        private static final Font F = FontFactory.getFont(FontFactory.HELVETICA, 7, new Color(150, 150, 160));
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            PdfContentByte cb = writer.getDirectContent();
+            ColumnText.showTextAligned(
+                    cb,
+                    Element.ALIGN_LEFT,
+                    new Phrase("INTELLI WEALTH  ·  Insurance Coverage Report  ·  CONFIDENTIAL", F),
+                    document.left(), document.bottom() - 18, 0
+            );
+            ColumnText.showTextAligned(
+                    cb,
+                    Element.ALIGN_RIGHT,
+                    new Phrase("Page " + writer.getPageNumber(), F),
+                    document.right(), document.bottom() - 18, 0
+            );
+            // Footer line - Teal
+            cb.setLineWidth(0.5f);
+            cb.setColorStroke(new Color(0, 128, 128));
+            cb.moveTo(document.left(), document.bottom() - 10);
+            cb.lineTo(document.right(), document.bottom() - 10);
+            cb.stroke();
         }
-        return value.toString();
+    }
+
+    // ─── Formatting Utilities ──────────────────────────────────────────────────
+
+    private String formatAttributeValue(String key, Object val) {
+        if (val == null || val.toString().isBlank()) return "-";
+        String k = key.toLowerCase();
+        if (k.contains("rate") || k.contains("tax") || k.contains("bonus"))
+            return val + "%";
+        if (k.contains("amount") || k.contains("cost") || k.contains("premium") || k.contains("cover")) {
+            try { return INR.format(new BigDecimal(val.toString())); }
+            catch (Exception ignored) {}
+        }
+        return val.toString();
     }
 
     private String formatAmount(BigDecimal amount) {
@@ -221,7 +481,7 @@ public class InsuranceExportService {
     }
 
     private String formatDate(LocalDate d) {
-        return d == null ? "-" : d.format(DATE_FORMAT);
+        return d == null ? "-" : d.format(DATE_FMT);
     }
 
     private String value(Object o) {
@@ -229,7 +489,8 @@ public class InsuranceExportService {
     }
 
     private String beautify(String key) {
-        if (key == null || key.isEmpty()) return "";
-        return key.substring(0, 1).toUpperCase() + key.substring(1).replace("_", " ").toLowerCase();
+        if (key == null || key.isBlank()) return "";
+        return key.substring(0, 1).toUpperCase()
+                + key.substring(1).replace("_", " ").toLowerCase();
     }
 }
