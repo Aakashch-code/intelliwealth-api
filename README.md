@@ -24,7 +24,7 @@
 
 **Intelli Wealth** is a backend-first personal finance system designed and built end-to-end as a solo engineering project — demonstrating real-world API design, layered architecture, AI integration, and production-grade security.
 
-The platform goes well beyond CRUD. It models core financial domains — transactions, budgets, goals, assets, debt, insurance, net worth, and contingency planning — with 45+ RESTful endpoints, a unified AI reporting layer powered by Google Gemini, and a thoughtfully structured layered architecture.
+The platform goes well beyond CRUD. It models core financial domains — transactions, budgets, goals, assets, debt, insurance, net worth, and contingency planning — with 55+ RESTful endpoints, a unified AI reporting layer powered by Google Gemini, and a thoughtfully structured layered architecture.
 
 ---
 
@@ -66,7 +66,7 @@ The React frontend is intentionally minimal — it exists to authenticate users,
 ### 💼 Treasury Management
 - Budgets, transactions, and subscriptions
 - Goal tracking and spending analytics
-- 45+ RESTful endpoints covering the full financial lifecycle
+- 55+ RESTful endpoints covering the full financial lifecycle
 
 ### 📊 Contingency Analysis API
 - Computes **monthly burn rate**, **liquid assets**, and **financial runway** from aggregated data
@@ -142,36 +142,53 @@ com.example.intelliwealth
 ### Application Properties
 
 ```properties
+# Application Configuration
 spring.application.name=Intelli-Wealth
 server.port=8085
 
-# PostgreSQL — Transactional & User Data
-spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+# Database Configuration (PostgreSQL)
+spring.datasource.url=<YOUR_POSTGRES_URL>
 spring.datasource.username=<YOUR_POSTGRES_USERNAME>
 spring.datasource.password=<YOUR_POSTGRES_PASSWORD>
-spring.datasource.driver-class-name=org.postgresql.Driver
 
-# JPA / Hibernate
+# Hikari Connection Pool Configuration
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=600000
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.validation-timeout=5000
+spring.datasource.hikari.keepalive-time=300000
+
+# JPA/Hibernate Configuration
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.open-in-view=false
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
-# MongoDB — Financial Summaries & Asset Records
-spring.data.mongodb.uri=mongodb://localhost:27017/your_mongo_db
+# Security Configuration
+application.security.jwt.secret-key=<YOUR_JWT_SECRET_KEY>
+
+# Cache Configuration (Redis)
+spring.cache.type=redis
+spring.data.redis.port=6379
+spring.data.redis.timeout=60s
+spring.data.redis.ssl.enabled=true
+spring.data.redis.url=<YOUR_REDIS_URL>
+
+# MongoDB Configuration
+spring.data.mongodb.uri=<YOUR_MONGODB_URI>
 spring.data.mongodb.username=<YOUR_MONGO_USERNAME>
 spring.data.mongodb.password=<YOUR_MONGO_PASSWORD>
 
-# Google Gemini AI
+# AI Configuration
 gemini.api.key=<YOUR_GEMINI_API_KEY>
-gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent
 
-# JWT Security
-application.security.jwt.secret-key=<YOUR_JWT_SECRET_KEY>
-application.security.jwt.expiration=86400000
-
-# Swagger UI
+# Swagger Configuration
 springdoc.swagger-ui.path=/docs
 springdoc.swagger-ui.filter=true
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
 ```
 
 ### Run Locally
