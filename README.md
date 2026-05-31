@@ -209,7 +209,7 @@ http://localhost:8085/swagger-ui/index.html
 
 | Concern | Implementation |
 |---------|---------------|
-| **API Design** | 45+ RESTful endpoints with clear resource boundaries and consistent response contracts |
+| **API Design** | 55+ RESTful endpoints with clear resource boundaries and consistent response contracts |
 | **Layered Architecture** | API → Application → Domain → Persistence with no cross-layer leakage |
 | **Security** | Spring Security 6, stateless JWT, RBAC, BCrypt |
 | **AI Integration** | Google Gemini for summaries, debt strategies, and behavioural insights |
