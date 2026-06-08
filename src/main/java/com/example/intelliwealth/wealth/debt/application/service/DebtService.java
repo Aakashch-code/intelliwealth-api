@@ -12,6 +12,9 @@ import com.example.intelliwealth.wealth.debt.infrastructure.mapper.DebtMapper;
 import com.example.intelliwealth.wealth.debt.infrastructure.persistence.DebtRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Decimal128;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +49,11 @@ public class DebtService extends SecuredService {
         return mapper.toDto(debt);
     }
 
-    public DebtResponseDTO create(DebtRequestDTO dto) {
+    @Caching(evict = {
+            @CacheEvict(value = "debt_stats", key = "#root.target.cacheKey()"),
+            @CacheEvict(value = "upcoming_debt", key = "#root.target.cacheKey()")
+    })
+     public DebtResponseDTO create(DebtRequestDTO dto) {
 
         if (dto.getAttributes() == null) {
             dto.setAttributes(new HashMap<>());
@@ -63,7 +70,10 @@ public class DebtService extends SecuredService {
 
         return mapper.toDto(repo.save(debt));
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "debt_stats", key = "#root.target.cacheKey()"),
+            @CacheEvict(value = "upcoming_debt", key = "#root.target.cacheKey()")
+    })
     public DebtResponseDTO update(String id, DebtRequestDTO dto) {
 
         Debt existing = repo.findById(id)
@@ -86,7 +96,10 @@ public class DebtService extends SecuredService {
 
         return mapper.toDto(repo.save(existing));
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "debt_stats", key = "#root.target.cacheKey()"),
+            @CacheEvict(value = "upcoming_debt", key = "#root.target.cacheKey()")
+    })
     public void delete(String id) {
         repo.deleteByIdAndUserId(id,currentUserId());
     }
@@ -104,6 +117,7 @@ public class DebtService extends SecuredService {
         return repo.sumOfTotalDebtByUserId(currentUserId());
     }
 
+    @Cacheable(value = "debt_stats", key = "#root.target.cacheKey()")
     public DebtStatsDTO debtAmountSummary() {
         return DebtStatsDTO.builder()
                 .totalDebtAmount(totalDebtAmount())
@@ -111,6 +125,7 @@ public class DebtService extends SecuredService {
                 .build();
     }
 
+    @Cacheable(value = "upcoming_debt", key = "#root.target.cacheKey()")
     public Map<String, BigDecimal> getNextFiveMonthsEMIs() {
         Map<String, BigDecimal> result = new LinkedHashMap<>();
         LocalDate now = LocalDate.now();
