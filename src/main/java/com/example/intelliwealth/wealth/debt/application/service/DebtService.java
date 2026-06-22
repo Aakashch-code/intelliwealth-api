@@ -2,6 +2,7 @@ package com.example.intelliwealth.wealth.debt.application.service;
 
 import com.example.intelliwealth.authentication.application.service.SecuredService;
 import com.example.intelliwealth.wealth.debt.application.dto.DebtStatsDTO;
+import com.example.intelliwealth.wealth.debt.application.dto.DebtSumProjection;
 import com.example.intelliwealth.wealth.debt.domain.model.DebtStatus;
 import com.example.intelliwealth.wealth.debt.domain.rules.DebtValidator;
 import com.example.intelliwealth.wealth.debt.domain.model.Debt;
@@ -113,8 +114,12 @@ public class DebtService extends SecuredService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Decimal128 totalDebtAmount() {
-        return repo.sumOfTotalDebtByUserId(currentUserId());
+    public BigDecimal totalDebtAmount() {
+        DebtSumProjection projection = repo.sumOfTotalDebtByUserId(currentUserId());
+
+        return (projection != null && projection.getTotalDebt() != null)
+                ? projection.getTotalDebt()
+                : BigDecimal.ZERO;
     }
 
     @Cacheable(value = "debt_stats", key = "#root.target.cacheKey()")
