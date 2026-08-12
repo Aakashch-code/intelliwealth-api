@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/logo.png" alt="Intelli Wealth Logo" width="120"/>
+<img src="./assets/logo.png" alt="Intelli Wealth Logo" width="150"/>
 
 # Intelli Wealth
 
